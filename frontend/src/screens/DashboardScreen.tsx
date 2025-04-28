@@ -1,7 +1,17 @@
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import NavBar from '../components/NavBar';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export default function DashboardScreen({ navigation }: any) {
+type RootStackParamList = {
+  Login: undefined;
+  Dashboard: undefined;
+  Profile: undefined;
+};
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Dashboard'>;
+
+function DashboardScreen({ navigation, route }: Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Dashboard</Text>
@@ -17,6 +27,8 @@ export default function DashboardScreen({ navigation }: any) {
     </View>
   );
 }
+
+export default DashboardScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'space-between', padding: 20, backgroundColor: '#fff3e0' },

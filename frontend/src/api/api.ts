@@ -2,7 +2,7 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 const API = axios.create({
-  baseURL: 'http://127.0.0.1:8000/api', // Ensure baseURL is correct
+  baseURL: 'http://192.168.0.134:8000/api', // Substitua pelo IP da sua máquina
   timeout: 5000,
 });
 
@@ -22,7 +22,7 @@ API.interceptors.request.use(async (config) => {
     const refreshToken = await AsyncStorage.getItem('refreshToken');
     if (refreshToken) {
       try {
-        const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
+        const response = await axios.post('http://192.168.0.134:8000/api/token/refresh/', {
           refresh: refreshToken,
         });
         token = response.data.access;
@@ -61,7 +61,7 @@ API.interceptors.response.use(
       try {
         const refreshToken = await AsyncStorage.getItem('refreshToken'); // Use AsyncStorage
         if (refreshToken) {
-          const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
+          const response = await axios.post('http://192.168.x.x:8000/api/token/refresh/', {
             refresh: refreshToken,
           });
 

@@ -3,8 +3,17 @@ import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../api/api';
 import NavBar from '../components/NavBar';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-export default function ProfileScreen({ navigation }: any) {
+type RootStackParamList = {
+  Login: undefined;
+  Dashboard: undefined;
+  Profile: undefined;
+};
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Profile'>;
+
+function ProfileScreen({ navigation }: Props) {
   const [profile, setProfile] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -65,6 +74,8 @@ export default function ProfileScreen({ navigation }: any) {
     </View>
   );
 }
+
+export default ProfileScreen;
 
 const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: 'space-between', padding: 20, backgroundColor: '#fff3e0' },

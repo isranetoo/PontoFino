@@ -1,8 +1,12 @@
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import API from '../api/api';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../navigation/types';
 
-export default function RegisterScreen({ navigation }: any) {
+type Props = NativeStackScreenProps<RootStackParamList, 'Register'>;
+
+export default function RegisterScreen({ navigation }: Props) {
   // Disable the header for this screen
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
