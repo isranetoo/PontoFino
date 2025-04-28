@@ -1,12 +1,14 @@
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useState, useEffect } from 'react';
 import API from '../api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
 
 export default function LoginScreen({ navigation }: any) {
-  // Disable the header for this screen
+  // Ensure navigation is defined before calling setOptions
   useEffect(() => {
-    navigation.setOptions({ headerShown: false });
+    if (navigation && navigation.setOptions) {
+      navigation.setOptions({ headerShown: false });
+    }
   }, [navigation]);
 
   const [email, setEmail] = useState('');
@@ -22,8 +24,8 @@ export default function LoginScreen({ navigation }: any) {
       await AsyncStorage.setItem('authToken', access);
       await AsyncStorage.setItem('refreshToken', refresh);
 
-      // Navigate to the profile screen after login
-      navigation.navigate('Profile');
+      // Navigate to the dashboard screen after login
+      navigation.navigate('Dashboard');
     } catch (error: any) {
       console.error('Erro ao fazer login:', error.response?.data || error.message);
       Alert.alert('Erro no login', 'Verifique seu email e senha.');
@@ -40,7 +42,7 @@ export default function LoginScreen({ navigation }: any) {
         value={email}
         onChangeText={setEmail}
         style={styles.input}
-        placeholderTextColor="#aaa"
+        placeholderTextColor="#888"
       />
       <TextInput
         placeholder="Senha"
@@ -48,10 +50,12 @@ export default function LoginScreen({ navigation }: any) {
         onChangeText={setPassword}
         secureTextEntry
         style={styles.input}
-        placeholderTextColor="#aaa"
+        placeholderTextColor="#888"
       />
 
-      <Button title="Entrar" onPress={handleLogin} color="#6200ee" />
+      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+        <Text style={styles.buttonText}>Entrar</Text>
+      </TouchableOpacity>
       <Text style={styles.registerText} onPress={() => navigation.navigate('Register')}>
         Não tem conta? <Text style={styles.registerLink}>Registre-se</Text>
       </Text>
@@ -60,10 +64,17 @@ export default function LoginScreen({ navigation }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#f5f5f5' },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 10, color: '#333', textAlign: 'center' },
+  container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#fff3e0' },
+  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 10, color: '#fb8c00', textAlign: 'center' },
   subtitle: { fontSize: 16, color: '#666', marginBottom: 20, textAlign: 'center' },
   input: { borderWidth: 1, borderColor: '#ddd', marginBottom: 15, padding: 12, borderRadius: 8, backgroundColor: '#fff' },
+  button: {
+    backgroundColor: '#fb8c00',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
   registerText: { marginTop: 15, textAlign: 'center', color: '#666' },
-  registerLink: { color: '#6200ee', fontWeight: 'bold' },
+  registerLink: { color: '#fb8c00', fontWeight: 'bold' },
 });

@@ -1,7 +1,8 @@
-import { View, Text, Button, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../api/api';
+import NavBar from '../components/NavBar';
 
 export default function ProfileScreen({ navigation }: any) {
   const [profile, setProfile] = useState<any>(null);
@@ -34,7 +35,10 @@ export default function ProfileScreen({ navigation }: any) {
     return (
       <View style={styles.container}>
         <Text style={styles.error}>{error}</Text>
-        <Button title="Fazer Login" onPress={() => navigation.navigate('Login')} color="#6200ee" />
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
+          <Text style={styles.buttonText}>Fazer Login</Text>
+        </TouchableOpacity>
+        <NavBar navigation={navigation} />
       </View>
     );
   }
@@ -43,6 +47,7 @@ export default function ProfileScreen({ navigation }: any) {
     return (
       <View style={styles.container}>
         <Text style={styles.loading}>Carregando perfil...</Text>
+        <NavBar navigation={navigation} />
       </View>
     );
   }
@@ -53,15 +58,26 @@ export default function ProfileScreen({ navigation }: any) {
       <Text style={styles.info}>Nome: {profile.username}</Text>
       <Text style={styles.info}>Email: {profile.email}</Text>
 
-      <Button title="Voltar para Dashboard" onPress={() => navigation.navigate('Dashboard')} color="#6200ee" />
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Dashboard')}>
+        <Text style={styles.buttonText}>Voltar para Dashboard</Text>
+      </TouchableOpacity>
+      <NavBar navigation={navigation} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#f5f5f5' },
-  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 20, color: '#333', textAlign: 'center' },
+  container: { flex: 1, justifyContent: 'space-between', padding: 20, backgroundColor: '#fff3e0' },
+  title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, color: '#fb8c00', textAlign: 'center' },
   info: { fontSize: 16, color: '#666', marginBottom: 10 },
   error: { color: 'red', marginBottom: 20, textAlign: 'center' },
   loading: { fontSize: 16, color: '#666', textAlign: 'center' },
+  button: {
+    backgroundColor: '#fb8c00',
+    paddingVertical: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
 });

@@ -6,15 +6,43 @@ const API = axios.create({
   timeout: 5000,
 });
 
+// Helper function to check if a token is expired
+const isTokenExpired = (token: string): boolean => {
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  const currentTime = Math.floor(Date.now() / 1000);
+  return payload.exp < currentTime;
+};
+
 // Add the token to all requests
 API.interceptors.request.use(async (config) => {
-  const token = await AsyncStorage.getItem('authToken'); // Use AsyncStorage
+  let token = await AsyncStorage.getItem('authToken'); // Use AsyncStorage
+
+  if (token && isTokenExpired(token)) {
+    console.log('Token expirado, tentando renovar...');
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    if (refreshToken) {
+      try {
+        const response = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
+          refresh: refreshToken,
+        });
+        token = response.data.access;
+        if (token) {
+          await AsyncStorage.setItem('authToken', token);
+        }
+      } catch (error) {
+        console.error('Erro ao renovar o token:', error);
+        await AsyncStorage.removeItem('authToken');
+        await AsyncStorage.removeItem('refreshToken');
+      }
+    }
+  }
+
   if (token) {
-    console.log('Token encontrado:', token); // Log to verify the token
     config.headers.Authorization = `Bearer ${token}`;
   } else {
-    console.warn('Nenhum token encontrado. Certifique-se de que o usuário está autenticado.');
+    console.warn('Nenhum token válido encontrado.');
   }
+
   return config;
 }, (error) => {
   return Promise.reject(error);
