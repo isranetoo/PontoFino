@@ -1,6 +1,6 @@
 import { View, Text, Button, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage'; // Import AsyncStorage
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import API from '../api/api';
 
 export default function ProfileScreen({ navigation }: any) {
@@ -9,10 +9,10 @@ export default function ProfileScreen({ navigation }: any) {
 
   const fetchProfile = async () => {
     try {
-      const token = await AsyncStorage.getItem('authToken'); // Retrieve the access token
+      const token = await AsyncStorage.getItem('authToken');
       const response = await API.get('/profile/', {
         headers: {
-          Authorization: `Bearer ${token}`, // Include the token in the Authorization header
+          Authorization: `Bearer ${token}`,
         },
       });
       console.log(response.data);
@@ -34,7 +34,7 @@ export default function ProfileScreen({ navigation }: any) {
     return (
       <View style={styles.container}>
         <Text style={styles.error}>{error}</Text>
-        <Button title="Fazer Login" onPress={() => navigation.navigate('Login')} />
+        <Button title="Fazer Login" onPress={() => navigation.navigate('Login')} color="#6200ee" />
       </View>
     );
   }
@@ -42,7 +42,7 @@ export default function ProfileScreen({ navigation }: any) {
   if (!profile) {
     return (
       <View style={styles.container}>
-        <Text>Carregando perfil...</Text>
+        <Text style={styles.loading}>Carregando perfil...</Text>
       </View>
     );
   }
@@ -50,16 +50,18 @@ export default function ProfileScreen({ navigation }: any) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Perfil</Text>
-      <Text>Nome: {profile.username}</Text>
-      <Text>Email: {profile.email}</Text>
+      <Text style={styles.info}>Nome: {profile.username}</Text>
+      <Text style={styles.info}>Email: {profile.email}</Text>
 
-      <Button title="Voltar para Dashboard" onPress={() => navigation.navigate('Dashboard')} />
+      <Button title="Voltar para Dashboard" onPress={() => navigation.navigate('Dashboard')} color="#6200ee" />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
-  error: { color: 'red', marginBottom: 20 },
+  container: { flex: 1, justifyContent: 'center', padding: 20, backgroundColor: '#f5f5f5' },
+  title: { fontSize: 28, fontWeight: 'bold', marginBottom: 20, color: '#333', textAlign: 'center' },
+  info: { fontSize: 16, color: '#666', marginBottom: 10 },
+  error: { color: 'red', marginBottom: 20, textAlign: 'center' },
+  loading: { fontSize: 16, color: '#666', textAlign: 'center' },
 });
