@@ -1,6 +1,6 @@
 # PontoFino - Plataforma de Simulação de Investimentos
 
-![PontoFino Logo](https://i.ibb.co/0pC4JzSN/Ponto-Fino.png)
+<img src="https://i.ibb.co/0pC4JzSN/Ponto-Fino.png" alt="PontoFino Logo" width="300" />
 
 ## 📊 Sobre a Plataforma
 
