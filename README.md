@@ -90,7 +90,7 @@ Contribuições são bem-vindas! Se você deseja contribuir, por favor:
 
 ## 📄 Licença
 
-Este projeto está licenciado sob a [Licença MIT](LICENSE).
+Este projeto está licenciado sob a [Creative Commons Attribution ShareAlike 4.0](LICENSE).
 
 ## 📞 Contato
 
