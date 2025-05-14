@@ -10,6 +10,8 @@ import TabelaResultados from "./components/TabelaResultados";
 import ResumoSimulacao from "./components/ResumoSimulacao";
 import AjudaSimulacao from "./components/AjudaSimulacao";
 import InfoExtraSimulacaoBox from "./components/InfoExtraSimulacaoBox";
+import HeroSection from "./components/HeroSection";
+import Separador from "./components/Separador";
 
 function App() {
   const [form, setForm] = useState({
@@ -49,7 +51,8 @@ function App() {
               path="/"
               element={
                 <>
-                  <h1 className="text-3xl font-extrabold mb-6 text-center text-white">
+                  <HeroSection />
+                  <h1 className="text-3xl font-extrabold mb-6 text-center text-white" id="simulador">
                     Simulador de Investimento
                   </h1>
                   <div className="flex flex-col lg:flex-row lg:space-x-8 items-start justify-center gap-8 lg:gap-0">
@@ -148,6 +151,7 @@ function App() {
                       </div>
                     )}
                   </div>
+                  <Separador />
                 </>
               }
             />
