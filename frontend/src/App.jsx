@@ -6,6 +6,11 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import About from "./pages/About";
+import TabelaResultados from "./components/TabelaResultados";
+import ResumoSimulacao from "./components/ResumoSimulacao";
+import AjudaSimulacao from "./components/AjudaSimulacao";
+import InfoExtraSimulacao from "./components/InfoExtraSimulacao";
+import InfoExtraSimulacaoBox from "./components/InfoExtraSimulacaoBox";
 
 function App() {
   const [form, setForm] = useState({
@@ -49,169 +54,98 @@ function App() {
                     Simulador de Investimento
                   </h1>
                   <div className="flex flex-col lg:flex-row lg:space-x-8 items-start justify-center gap-8 lg:gap-0">
-                    <form
-                      onSubmit={handleSubmit}
-                      className="space-y-4 bg-white p-4 sm:p-8 sm:px-12 rounded shadow-md max-w-3xl text-gray-800 w-full"
-                    >
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Valor Inicial (R$)
-                        </label>
-                        <input
-                          name="valor_inicial"
-                          type="number"
-                          placeholder="R$ Valor Inicial"
-                          value={form.valor_inicial}
-                          onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Aporte Mensal (R$)
-                        </label>
-                        <input
-                          name="aporte_mensal"
-                          type="number"
-                          placeholder="R$ Aporte Mensal"
-                          value={form.aporte_mensal}
-                          onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Taxa de Juros (% ao mês)
-                        </label>
-                        <input
-                          name="taxa_juros_mensal"
-                          type="number"
-                          placeholder="Juros (% ao mês)"
-                          value={form.taxa_juros_mensal}
-                          onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Meta Final (R$)
-                        </label>
-                        <input
-                          name="meta_final"
-                          type="number"
-                          placeholder="R$ Meta Final"
-                          value={form.meta_final}
-                          onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        className="w-full bg-gradient-to-r from-blue-900 via-blue-600 to-blue-500 text-white py-3 rounded hover:opacity-90 transition-opacity"
+                    <div className="flex flex-col w-full max-w-3xl">
+                      <form
+                        onSubmit={handleSubmit}
+                        className="space-y-4 bg-white p-4 sm:p-8 sm:px-12 rounded shadow-md text-gray-800 w-full"
                       >
-                        Simular
-                      </button>
-                    </form>
-
-                    {resultado && (
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Valor Inicial (R$)
+                          </label>
+                          <input
+                            name="valor_inicial"
+                            type="number"
+                            placeholder="R$ Valor Inicial"
+                            value={form.valor_inicial}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Aporte Mensal (R$)
+                          </label>
+                          <input
+                            name="aporte_mensal"
+                            type="number"
+                            placeholder="R$ Aporte Mensal"
+                            value={form.aporte_mensal}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Taxa de Juros (% ao mês)
+                          </label>
+                          <input
+                            name="taxa_juros_mensal"
+                            type="number"
+                            placeholder="Juros (% ao mês)"
+                            value={form.taxa_juros_mensal}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Meta Final (R$)
+                          </label>
+                          <input
+                            name="meta_final"
+                            type="number"
+                            placeholder="R$ Meta Final"
+                            value={form.meta_final}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          className="w-full bg-gradient-to-r from-blue-900 via-blue-600 to-blue-500 text-white py-3 rounded hover:opacity-90 transition-opacity"
+                        >
+                          Simular
+                        </button>
+                        <AjudaSimulacao />
+                      </form>
+                      <InfoExtraSimulacaoBox />
+                    </div>
+                    {resultado ? (
                       <div className="mt-8 lg:mt-0 bg-white p-4 sm:p-8 sm:px-12 rounded shadow-md max-w-5xl text-gray-800 w-full overflow-x-auto">
                         <h2 className="text-2xl font-semibold mb-4 text-center">
                           Tempo para meta: {resultado.anos} anos e{" "}
                           {resultado.meses} meses
                         </h2>
-
-                        <div className="mb-6 grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                          <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">
-                              Valor Inicial:
-                            </span>
-                            <span className="font-semibold">
-                              R$ {form.valor_inicial.toLocaleString("pt-BR")}
-                            </span>
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">
-                              Aporte Mensal:
-                            </span>
-                            <span className="font-semibold">
-                              R$ {form.aporte_mensal.toLocaleString("pt-BR")}
-                            </span>
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">
-                              Taxa de Juros Mensal:
-                            </span>
-                            <span className="font-semibold">
-                              {form.taxa_juros_mensal}% ao mês
-                            </span>
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="text-sm text-gray-500">
-                              Meta Final:
-                            </span>
-                            <span className="font-semibold">
-                              R$ {form.meta_final.toLocaleString("pt-BR")}
-                            </span>
-                          </div>
+                        <ResumoSimulacao form={form} />
+                        <TabelaResultados tabela={resultado.tabela} form={form} meta_final={form.meta_final} />
+                        <div className="mt-8 flex flex-col items-center justify-center">
+                          <span className="text-lg text-gray-500 text-center">
+                            Experimente alterar os valores e simule novamente para comparar diferentes estratégias de investimento!
+                          </span>
+                          <span className="mt-4 text-blue-700 text-center">
+                            Dica: Pequenas mudanças nos aportes ou na taxa de juros podem fazer grande diferença no longo prazo.
+                          </span>
                         </div>
-
-                        <table className="w-full border-collapse border border-gray-300 text-center">
-                          <thead>
-                            <tr className="bg-gray-200">
-                              <th className="border border-gray-300 p-3">Ano</th>
-                              <th className="border border-gray-300 p-3">
-                                Valor Acumulado
-                              </th>
-                              <th className="border border-gray-300 p-3">
-                                Aporte Anual
-                              </th>
-                              <th className="border border-gray-300 p-3">
-                                Juros no Ano
-                              </th>
-                              <th className="border border-gray-300 p-3">
-                                % da Meta
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {resultado.tabela.map((linha, i) => (
-                              <tr key={i} className="hover:bg-gray-100">
-                                <td className="border border-gray-300 p-3">
-                                  {linha.ano}
-                                </td>
-                                <td className="border border-gray-300 p-3">
-                                  R$ {linha.valor.toLocaleString("pt-BR")}
-                                </td>
-                                <td className="border border-gray-300 p-3">
-                                  R${" "}
-                                  {(
-                                    form.aporte_mensal * 12
-                                  ).toLocaleString("pt-BR")}
-                                </td>
-                                <td className="border border-gray-300 p-3">
-                                  {i > 0
-                                    ? `R$ ${(
-                                        linha.valor -
-                                        resultado.tabela[i - 1].valor -
-                                        form.aporte_mensal * 12
-                                      ).toLocaleString("pt-BR")}`
-                                    : `R$ ${(
-                                        linha.valor -
-                                        form.valor_inicial -
-                                        form.aporte_mensal * 12
-                                      ).toLocaleString("pt-BR")}`}
-                                </td>
-                                <td className="border border-gray-300 p-3">
-                                  {(
-                                    (linha.valor / form.meta_final) *
-                                    100
-                                  ).toFixed(2)}
-                                  %
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
+                      </div>
+                    ) : (
+                      <div className="mt-8 lg:mt-0 bg-white p-8 rounded shadow-md max-w-5xl text-gray-800 w-full flex flex-col items-center justify-center min-h-[300px]">
+                        <span className="text-lg text-gray-500 text-center">
+                          Preencha os dados ao lado e clique em <b>Simular</b> para ver o resultado do seu investimento!
+                        </span>
+                        <span className="mt-4 text-blue-700 text-center">
+                          Dica: Simular diferentes cenários pode ajudar você a planejar melhor seus objetivos financeiros.
+                        </span>
                       </div>
                     )}
                   </div>
