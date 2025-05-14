@@ -2,8 +2,8 @@ import React from "react";
 
 const InfoExtraSimulacaoBox = () => (
   <div
-    className="mt-8 lg:mt-0 bg-white p-8 rounded shadow-md max-w-5xl text-gray-800 w-full flex flex-col items-center justify-center min-h-[300px] lg:min-h-[420px] overflow-x-auto"
-    style={{ marginTop: "30px" }}
+    className="mt-8 lg:mt-0 bg-white p-8 rounded shadow-md max-w-5xl text-gray-800 w-full flex flex-col items-center justify-center min-h-[300px] lg:min-h-[150px] overflow-x-auto"
+    style={{ marginTop: "25px" }}
   >
     {/* Novo conteúdo criado do zero */}
     <div className="flex flex-col items-center">

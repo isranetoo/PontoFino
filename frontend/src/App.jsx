@@ -9,7 +9,6 @@ import About from "./pages/About";
 import TabelaResultados from "./components/TabelaResultados";
 import ResumoSimulacao from "./components/ResumoSimulacao";
 import AjudaSimulacao from "./components/AjudaSimulacao";
-import InfoExtraSimulacao from "./components/InfoExtraSimulacao";
 import InfoExtraSimulacaoBox from "./components/InfoExtraSimulacaoBox";
 
 function App() {
