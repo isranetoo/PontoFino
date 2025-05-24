@@ -15,7 +15,7 @@ const Separador = () => {
 
   return (
     <div className="my-12 flex flex-col items-center w-full ">
-      <div className="relative w-full flex justify-center mb-8 mt-[25px] mb-[25px]">
+      <div className="relative w-full flex justify-center mt-[25px] mb-[25px]">
         <hr className="w-full max-w-5xl border-t-4 border-blue-300 rounded" />
         <span className="absolute -top-5 bg-white px-6 py-1 rounded-full shadow text-blue-700 font-bold text-lg">
           Fique por dentro das melhores dicas de investimento!

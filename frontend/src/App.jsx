@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { simularInvestimento } from "./api/api";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -11,7 +11,9 @@ import ResumoSimulacao from "./components/ResumoSimulacao";
 import AjudaSimulacao from "./components/AjudaSimulacao";
 import InfoExtraSimulacaoBox from "./components/InfoExtraSimulacaoBox";
 import HeroSection from "./components/HeroSection";
+import LaminasCarousel from "./components/LaminasCarousel";
 import Separador from "./components/Separador";
+import RankingFundos from "./components/RankingFundos";
 
 function App() {
   const [form, setForm] = useState({
@@ -21,15 +23,18 @@ function App() {
     meta_final: 1000000,
   });
 
-  const [resultado, setResultado] = useState({
-    anos: 10,
-    meses: 5,
-    tabela: [
-      { ano: 1, valor: 120000 },
-      { ano: 2, valor: 150000 },
-      { ano: 3, valor: 200000 },
-    ],
-  });
+  const [resultado, setResultado] = useState(null);
+
+  // Gera resultado inicial ao carregar a página
+  useEffect(() => {
+    const gerarResultadoInicial = async () => {
+      const dados = { ...form, taxa_juros_mensal: form.taxa_juros_mensal / 100 };
+      const res = await simularInvestimento(dados);
+      setResultado(res);
+    };
+    gerarResultadoInicial();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: parseFloat(e.target.value) });
@@ -52,6 +57,7 @@ function App() {
               element={
                 <>
                   <HeroSection />
+                  <LaminasCarousel />
                   <h1 className="text-3xl font-extrabold mb-6 text-center text-white" id="simulador">
                     Simulador de Investimento
                   </h1>
@@ -152,6 +158,7 @@ function App() {
                     )}
                   </div>
                   <Separador />
+                  <RankingFundos />
                 </>
               }
             />
