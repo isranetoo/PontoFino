@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
@@ -23,11 +24,43 @@ const Register = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-[#0096fd]">
-      <div className="bg-white shadow-2xl rounded-3xl p-10 flex flex-col items-center w-full max-w-md">
-        <img src="/assets/PontoFino_Logo.png" alt="PontoFino Logo" className="w-20 h-20 mb-4" />
-        <h1 className="text-3xl font-extrabold text-blue-900 mb-2">Crie sua conta</h1>
-        <p className="text-gray-500 mb-6 text-center">Registre-se para começar a gerenciar suas finanças.</p>
-        <form onSubmit={handleRegister} className="flex flex-col gap-4 w-full">
+      <motion.div
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+        className="bg-white shadow-2xl rounded-3xl p-10 flex flex-col items-center w-full max-w-md"
+      >
+        <motion.img
+          src="/assets/PontoFino_Logo.png"
+          alt="PontoFino Logo"
+          className="w-20 h-20 mb-4"
+          initial={{ scale: 0.7, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5, type: 'spring' }}
+        />
+        <motion.h1
+          className="text-3xl font-extrabold text-blue-900 mb-2"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+        >
+          Crie sua conta
+        </motion.h1>
+        <motion.p
+          className="text-gray-500 mb-6 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 0.5 }}
+        >
+          Registre-se para começar a gerenciar suas finanças.
+        </motion.p>
+        <motion.form
+          onSubmit={handleRegister}
+          className="flex flex-col gap-4 w-full"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.5, duration: 0.5 }}
+        >
           <input
             type="email"
             placeholder="Email"
@@ -48,18 +81,21 @@ const Register = () => {
           {success && <div className="text-green-600 text-sm text-center">{success}</div>}
           <button
             type="submit"
-            className="bg-gradient-to-br from-gray-900 via-blue-900 to-[#0096fd] hover:from-blue-600 hover:to-blue-800 text-white rounded-xl p-3 font-bold shadow-md transition-all duration-200 mt-2"
+            className="bg-gradient-to-r from-[#00b6fc] via-[#00a4fd] to-[#0096fd] hover:from-blue-600 hover:to-blue-800 text-white rounded-xl p-3 font-bold shadow-md transition-all duration-200 mt-2"
           >
             Registrar
           </button>
-        </form>
-        <button
+        </motion.form>
+        <motion.button
           className="mt-6 text-blue-600 hover:text-blue-800 underline font-medium transition-all duration-200"
           onClick={() => navigate('/login')}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7, duration: 0.4 }}
         >
           Já tem conta? <span className="font-bold">Entrar</span>
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
     </div>
   );
 };
