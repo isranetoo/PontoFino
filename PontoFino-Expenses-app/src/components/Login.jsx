@@ -28,7 +28,7 @@ const Login = () => {
           placeholder="Email"
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className="p-2 rounded border"
+          className="p-2 rounded border text-black"
           required
         />
         <input
@@ -36,7 +36,7 @@ const Login = () => {
           placeholder="Senha"
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className="p-2 rounded border"
+          className="p-2 rounded border text-black"
           required
         />
         {error && <div className="text-red-500 text-sm">{error}</div>}
