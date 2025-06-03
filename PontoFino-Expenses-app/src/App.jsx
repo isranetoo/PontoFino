@@ -60,6 +60,7 @@ function App() {
               currentMonthTransactions={currentMonthTransactions}
               goals={data.goals}
               monthlyBudget={data.monthlyBudget}
+              investments={data.investments}
             />
           </TabsContent>
 

@@ -2,8 +2,20 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { TrendingUp, TrendingDown, DollarSign, Target, PieChart as PieChartIcon, BarChart3 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+
+const investmentTypes = [
+  { id: 'cdi', name: 'CDI' },
+  { id: 'cdb', name: 'CDB' },
+  { id: 'renda_variavel', name: 'Renda Variável' },
+  { id: 'fundo', name: 'Fundos de Investimento' },
+  { id: 'crypto', name: 'Criptomoeda' },
+  { id: 'dolar', name: 'Em Dólar' },
+  { id: 'tesouro', name: 'Tesouro Direto' },
+  { id: 'outro', name: 'Outro' },
+];
 
 const Dashboard = ({ 
   totalIncome, 
@@ -12,7 +24,8 @@ const Dashboard = ({
   expensesByCategory, 
   currentMonthTransactions,
   goals,
-  monthlyBudget 
+  monthlyBudget,
+  investments = []
 }) => {
   const budgetUsed = monthlyBudget > 0 ? (totalExpenses / monthlyBudget) * 100 : 0;
   
@@ -55,6 +68,31 @@ const Dashboard = ({
 
   return (
     <div className="space-y-6">
+      {/* Investimentos */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <Card className="glassmorphism card-hover">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium text-gray-300">Investimentos</CardTitle>
+              <BarChart3 className="h-4 w-4 text-blue-400" />
+            </CardHeader>
+            <CardContent>
+              {(!investments || investments.length === 0) ? (
+                <div className="text-gray-500 text-center">Nenhum investimento cadastrado.</div>
+              ) : (
+                <div className="text-2xl font-bold text-blue-400">
+                  R$ {investments.reduce((sum, inv) => sum + Number(inv.value), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </div>
+              )}
+              <p className="text-xs text-gray-400 mt-1">Total investido</p>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <motion.div

@@ -19,6 +19,7 @@ export function useBudgetSupabase() {
     transactions: [],
     categories: defaultCategories,
     goals: [],
+    investments: [],
     monthlyBudget: 0
   });
   const [loading, setLoading] = useState(false);
@@ -59,6 +60,12 @@ export function useBudgetSupabase() {
       targetAmount: g.target_amount,
       currentAmount: g.current_amount
     }));
+    // Buscar investimentos
+    const { data: investments = [] } = await supabase
+      .from('investments')
+      .select('*')
+      .eq('user_id', userId)
+      .order('date', { ascending: false });
     // Buscar orçamento
     const { data: budgetData = [] } = await supabase
       .from('budgets')
@@ -69,10 +76,26 @@ export function useBudgetSupabase() {
       transactions: transactions || [],
       categories: defaultCategories,
       goals: goalsCamel,
+      investments: investments || [],
       monthlyBudget: budgetData && budgetData[0] ? budgetData[0].amount : 0
     });
     setLoading(false);
   }
+  // Adicionar investimento
+  const addInvestment = async (investment) => {
+    if (!user) return;
+    const newInvestment = {
+      ...investment,
+      user_id: user.id,
+      id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
+      date: investment.date || new Date().toISOString()
+    };
+    const { error } = await supabase.from('investments').insert([newInvestment]);
+    if (error) {
+      console.error('Erro ao adicionar investimento:', error.message);
+    }
+    fetchUserData(user.id);
+  };
 
   // Adicionar transação
   const addTransaction = async (transaction) => {
@@ -174,6 +197,7 @@ export function useBudgetSupabase() {
     addGoal,
     updateGoal,
     deleteGoal,
+    addInvestment,
     setMonthlyBudget,
     totalIncome,
     totalExpenses,
