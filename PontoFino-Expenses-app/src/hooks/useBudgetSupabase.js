@@ -53,6 +53,12 @@ export function useBudgetSupabase() {
       .select('*')
       .eq('user_id', userId)
       .order('created_at', { ascending: true });
+    // Converter snake_case para camelCase nas metas
+    const goalsCamel = (goals || []).map(g => ({
+      ...g,
+      targetAmount: g.target_amount,
+      currentAmount: g.current_amount
+    }));
     // Buscar orçamento
     const { data: budgetData = [] } = await supabase
       .from('budgets')
@@ -62,7 +68,7 @@ export function useBudgetSupabase() {
     setData({
       transactions: transactions || [],
       categories: defaultCategories,
-      goals: goals || [],
+      goals: goalsCamel,
       monthlyBudget: budgetData && budgetData[0] ? budgetData[0].amount : 0
     });
     setLoading(false);
@@ -93,14 +99,18 @@ export function useBudgetSupabase() {
   const addGoal = async (goal) => {
     if (!user) return;
     const newGoal = {
-      ...goal,
+      name: goal.name,
       user_id: user.id,
       id: typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(),
       target_amount: goal.targetAmount,
       current_amount: goal.currentAmount,
       created_at: new Date().toISOString()
     };
-    await supabase.from('goals').insert([newGoal]);
+    const { error } = await supabase.from('goals').insert([newGoal]);
+    if (error) {
+      // Opcional: exibir erro no console ou toast
+      console.error('Erro ao adicionar meta:', error.message);
+    }
     fetchUserData(user.id);
   };
 

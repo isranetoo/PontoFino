@@ -39,28 +39,33 @@ function NavBar() {
           <UserInfo />
         </div>
       </div>
-      <TabsList className="grid w-full grid-cols-3 gap-1 py-1 sm:grid-cols-5 md:grid-cols-5 bg-gray-800/50 border border-gray-700 rounded-lg">
-        <TabsTrigger value="dashboard" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm">
+      <TabsList className="grid w-full grid-cols-3 gap-1 py-1 sm:grid-cols-6 md:grid-cols-6 bg-gray-800/50 border border-gray-700 rounded-lg">
+        <TabsTrigger value="dashboard" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0">
           <BarChart3 className="h-4 w-4 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline">Dashboard</span>
           <span className="sm:hidden text-[10px]">Painel</span>
         </TabsTrigger>
-        <TabsTrigger value="transactions" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm">
+        <TabsTrigger value="transactions" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0">
           <Plus className="h-4 w-4 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline">Transações</span>
           <span className="sm:hidden text-[10px]">Nova</span>
         </TabsTrigger>
-        <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm">
+        <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0">
           <Wallet className="h-4 w-4 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline">Histórico</span>
           <span className="sm:hidden text-[10px]">Lista</span>
         </TabsTrigger>
-        <TabsTrigger value="goals" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm">
+        <TabsTrigger value="goals" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0">
           <Target className="h-4 w-4 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline">Metas</span>
           <span className="sm:hidden text-[10px]">Metas</span>
         </TabsTrigger>
-        <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm">
+        <TabsTrigger value="investments" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0">
+          <BarChart3 className="h-4 w-4 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">Investimentos</span>
+          <span className="sm:hidden text-[10px]">Investir</span>
+        </TabsTrigger>
+        <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0">
           <Settings className="h-4 w-4 sm:h-4 sm:w-4" />
           <span className="hidden sm:inline">Config</span>
           <span className="sm:hidden text-[10px]">Ajustes</span>

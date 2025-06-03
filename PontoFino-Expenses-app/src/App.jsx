@@ -8,6 +8,7 @@ import TransactionForm from '@/components/TransactionForm';
 import TransactionList from '@/components/TransactionList';
 import GoalsManager from '@/components/GoalsManager';
 import BudgetSettings from '@/components/BudgetSettings';
+import Investments from '@/components/Investments';
 import { BarChart3, Plus, Target, Settings, Wallet } from 'lucide-react';
 import NavBar from '@/components/NavBar';
 
@@ -93,6 +94,10 @@ function App() {
               onUpdateGoal={updateGoal}
               onDeleteGoal={deleteGoal}
             />
+          </TabsContent>
+
+          <TabsContent value="investments" className="space-y-4 sm:space-y-6">
+            <Investments />
           </TabsContent>
 
           <TabsContent value="settings" className="space-y-4 sm:space-y-6">
