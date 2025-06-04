@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
+import { BarChart3 } from 'lucide-react';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Button } from './ui/button';
@@ -10,14 +12,14 @@ import { useBudgetSupabase } from '@/hooks/useBudgetSupabase';
 import { useAuth } from '@/hooks/useAuth';
 
 const investmentTypes = [
-  { id: 'cdi', name: 'CDI' },
-  { id: 'cdb', name: 'CDB' },
-  { id: 'renda_variavel', name: 'Renda Variável' },
-  { id: 'fundo', name: 'Fundos de Investimento' },
-  { id: 'crypto', name: 'Criptomoeda' },
-  { id: 'dolar', name: 'Em Dólar' },
-  { id: 'tesouro', name: 'Tesouro Direto' },
-  { id: 'outro', name: 'Outro' },
+  { id: 'cdi', name: 'CDI', emoji: '🏦' },
+  { id: 'cdb', name: 'CDB', emoji: '💳' },
+  { id: 'renda_variavel', name: 'Renda Variável', emoji: '📈' },
+  { id: 'fundo', name: 'Fundos de Investimento', emoji: '📊' },
+  { id: 'crypto', name: 'Criptomoeda', emoji: '🪙' },
+  { id: 'dolar', name: 'Em Dólar', emoji: '💵' },
+  { id: 'tesouro', name: 'Tesouro Direto', emoji: '🏛️' },
+  { id: 'outro', name: 'Outro', emoji: '💼' },
 ];
 
 
@@ -77,104 +79,130 @@ const Investments = () => {
     toast({ title: 'Sucesso!', description: 'Investimento adicionado.' });
   };
 
+  // Recent investments (last 5)
+  const recentInvestments = (data.investments || []).slice(0, 5);
+
   return (
-    <Card className="glassmorphism card-hover">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-gray-200">
-          Investimentos
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="text-gray-400 text-base mb-4">
-          Adicione e acompanhe seus investimentos de todos os tipos.
-        </div>
-        <form onSubmit={handleSubmit} className="space-y-4 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="type" className="text-gray-300">Tipo</Label>
-              <Select value={form.type} onValueChange={handleTypeChange}>
-                <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
-                  <SelectValue placeholder="Selecione o tipo" />
-                </SelectTrigger>
-                <SelectContent>
-                  {investmentTypes.map((t) => (
-                    <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="name" className="text-gray-300">Nome</Label>
-              <Input
-                id="name"
-                name="name"
-                placeholder="Ex: Tesouro Selic, Bitcoin, Fundo XPTO"
-                value={form.name}
-                onChange={handleChange}
-                className="bg-gray-800/50 border-gray-600 text-white"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="value" className="text-gray-300">Valor (R$)</Label>
-              <Input
-                id="value"
-                name="value"
-                type="text"
-                placeholder="0,00"
-                value={form.value}
-                onChange={handleChange}
-                className="bg-gray-800/50 border-gray-600 text-white"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-gray-300">Data</Label>
-              <Input
-                id="date"
-                name="date"
-                type="date"
-                value={form.date}
-                onChange={handleChange}
-                className="bg-gray-800/50 border-gray-600 text-white"
-              />
-            </div>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      <Card className="glassmorphism card-hover">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-gray-200 text-lg sm:text-xl">
+            <BarChart3 className="h-6 w-6" />
+            Investimentos
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-gray-400 text-base mb-4">
+            Adicione e acompanhe seus investimentos de todos os tipos.
           </div>
-          <Button type="submit" className="w-full gradient-bg hover:opacity-90" disabled={!user}>
-            {user ? 'Adicionar Investimento' : 'Faça login para adicionar'}
-          </Button>
-        </form>
-        {!user && (
-          <div className="text-center text-sm text-gray-400 mb-2">
-            Para adicionar investimentos, <a href="/login" className="text-blue-400 underline">faça login</a> ou <a href="/register" className="text-blue-400 underline">registre-se</a>.
-          </div>
-        )}
-        <div className="space-y-2">
-          {(!data.investments || data.investments.length === 0) ? (
-            <div className="text-gray-500 text-center">Nenhum investimento cadastrado.</div>
-          ) : (
-            <table className="w-full text-sm text-gray-200">
-              <thead>
-                <tr className="border-b border-gray-700">
-                  <th className="py-1 text-left">Tipo</th>
-                  <th className="py-1 text-left">Nome</th>
-                  <th className="py-1 text-left">Valor</th>
-                  <th className="py-1 text-left">Data</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.investments.map(inv => (
-                  <tr key={inv.id} className="border-b border-gray-800">
-                    <td className="py-1">{investmentTypes.find(t => t.id === inv.type)?.name || inv.type}</td>
-                    <td className="py-1">{inv.name}</td>
-                    <td className="py-1">R$ {Number(inv.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
-                    <td className="py-1">{inv.date}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <form onSubmit={handleSubmit} className="space-y-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="type" className="text-gray-300">Tipo</Label>
+                <Select value={form.type} onValueChange={handleTypeChange}>
+                  <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white">
+                    <SelectValue placeholder="Selecione o tipo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {investmentTypes.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>
+                        <span className="mr-2">{t.emoji}</span>{t.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="name" className="text-gray-300">Nome</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  placeholder="Ex: Tesouro Selic, Bitcoin, Fundo XPTO"
+                  value={form.name}
+                  onChange={handleChange}
+                  className="bg-gray-800/50 border-gray-600 text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="value" className="text-gray-300">Valor (R$)</Label>
+                <Input
+                  id="value"
+                  name="value"
+                  type="text"
+                  placeholder="0,00"
+                  value={form.value}
+                  onChange={handleChange}
+                  className="bg-gray-800/50 border-gray-600 text-white"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="date" className="text-gray-300">Data</Label>
+                <Input
+                  id="date"
+                  name="date"
+                  type="date"
+                  value={form.date}
+                  onChange={handleChange}
+                  className="bg-gray-800/50 border-gray-600 text-white"
+                />
+              </div>
+            </div>
+            <Button type="submit" className="w-full gradient-bg hover:opacity-90" disabled={!user}>
+              {user ? 'Adicionar Investimento' : 'Faça login para adicionar'}
+            </Button>
+          </form>
+          {!user && (
+            <div className="text-center text-sm text-gray-400 mb-2">
+              Para adicionar investimentos, <a href="/login" className="text-blue-400 underline">faça login</a> ou <a href="/register" className="text-blue-400 underline">registre-se</a>.
+            </div>
           )}
-        </div>
-      </CardContent>
-    </Card>
+
+          {/* Recent Investments Section */}
+          <div className="space-y-2">
+            <div className="flex items-center gap-2 text-gray-200 text-lg sm:text-xl mb-2">
+              <span role="img" aria-label="Investimento">💸</span>
+              Investimentos Recentes
+            </div>
+            {recentInvestments.length === 0 ? (
+              <div className="text-center py-8 text-gray-400">
+                <span className="text-3xl">💸</span>
+                <p className="text-sm sm:text-base mt-2">Nenhum investimento cadastrado</p>
+                <p className="text-xs sm:text-sm">Adicione seu primeiro investimento</p>
+              </div>
+            ) : (
+              <div className="space-y-2 sm:space-y-3">
+                {recentInvestments.map((inv, index) => {
+                  const typeObj = investmentTypes.find(t => t.id === inv.type);
+                  return (
+                    <motion.div
+                      key={inv.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.3, delay: index * 0.05 }}
+                      className="flex items-center justify-between rounded-lg bg-gray-800/60 px-3 py-2 shadow-sm border border-gray-700"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{typeObj?.emoji || '💸'}</span>
+                        <span className="font-medium text-gray-100">{typeObj?.name || inv.type}</span>
+                        <span className="text-xs text-gray-400">{inv.name}</span>
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="font-semibold text-blue-400">R$ {Number(inv.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                        <span className="text-xs text-gray-400">{inv.date}</span>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 };
 
