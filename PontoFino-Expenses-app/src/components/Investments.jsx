@@ -1,5 +1,7 @@
 
 import React, { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { BarChart3 } from 'lucide-react';
@@ -28,14 +30,31 @@ const Investments = () => {
     type: '',
     name: '',
     value: '',
-    date: '',
+    date: '', // manter string para compatibilidade
   });
+
+  // Para o DatePicker funcionar com Date, precisamos de um estado auxiliar
+  const [dateObj, setDateObj] = useState(null);
   const { data, addInvestment } = useBudgetSupabase();
   const { toast } = useToast();
   const { user } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Quando o usuário seleciona uma data no calendário
+  const handleDateChange = (date) => {
+    setDateObj(date);
+    // Salva no formato yyyy-mm-dd para compatibilidade
+    if (date) {
+      const yyyy = date.getFullYear();
+      const mm = String(date.getMonth() + 1).padStart(2, '0');
+      const dd = String(date.getDate()).padStart(2, '0');
+      setForm({ ...form, date: `${yyyy}-${mm}-${dd}` });
+    } else {
+      setForm({ ...form, date: '' });
+    }
   };
 
   const handleTypeChange = (value) => {
@@ -76,6 +95,7 @@ const Investments = () => {
       date: form.date
     });
     setForm({ type: '', name: '', value: '', date: '' });
+    setDateObj(null);
     toast({ title: 'Sucesso!', description: 'Investimento adicionado.' });
   };
 
@@ -141,13 +161,18 @@ const Investments = () => {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="date" className="text-gray-300">Data</Label>
-                <Input
+                <DatePicker
                   id="date"
-                  name="date"
-                  type="date"
-                  value={form.date}
-                  onChange={handleChange}
-                  className="bg-gray-800/50 border-gray-600 text-white"
+                  selected={dateObj}
+                  onChange={handleDateChange}
+                  dateFormat="yyyy-MM-dd"
+                  placeholderText="Selecione a data"
+                  className="bg-gray-800/50 border-gray-600 text-white w-full rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  calendarClassName="bg-gray-900 text-white border border-gray-700 rounded-lg shadow-lg"
+                  popperClassName="z-50"
+                  wrapperClassName="w-full"
+                  locale="pt-BR"
+                  autoComplete="off"
                 />
               </div>
             </div>
