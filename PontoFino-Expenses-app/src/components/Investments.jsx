@@ -115,8 +115,16 @@ const Investments = () => {
     toast({ title: 'Sucesso!', description: 'Investimento adicionado.' });
   };
 
-  // Recent investments (last 5)
-  const recentInvestments = (data.investments || []).slice(0, 5);
+
+  // Paginação de investimentos
+  const investmentsPerPage = 5;
+  const [currentPage, setCurrentPage] = useState(1);
+  const allInvestments = data.investments || [];
+  const totalPages = Math.ceil(allInvestments.length / investmentsPerPage);
+  const paginatedInvestments = allInvestments.slice(
+    (currentPage - 1) * investmentsPerPage,
+    currentPage * investmentsPerPage
+  );
 
   return (
     <motion.div
@@ -207,56 +215,83 @@ const Investments = () => {
             </div>
           )}
 
-          {/* Recent Investments Section */}
+          {/* Todos os Investimentos com Paginação */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-200 text-lg sm:text-xl mb-2">
               <span role="img" aria-label="Investimento">💸</span>
-              Investimentos Recentes
+              Todos os Investimentos
             </div>
             {loading ? (
               <div className="flex justify-center items-center py-8 text-gray-400">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
               </div>
-            ) : recentInvestments.length === 0 ? (
+            ) : allInvestments.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
                 <span className="text-3xl">💸</span>
                 <p className="text-sm sm:text-base mt-2">Nenhum investimento cadastrado</p>
                 <p className="text-xs sm:text-sm">Adicione seu primeiro investimento</p>
               </div>
             ) : (
-              <div className="space-y-2 sm:space-y-3">
-                {recentInvestments.map((inv, index) => {
-                  const typeObj = investmentTypes.find(t => t.id === inv.type);
-                  return (
-                    <motion.div
-                      key={inv.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                      className="flex items-center justify-between rounded-lg bg-gray-800/60 px-3 py-2 shadow-sm border border-gray-700"
+              <>
+                <div className="space-y-2 sm:space-y-3">
+                  {paginatedInvestments.map((inv, index) => {
+                    const typeObj = investmentTypes.find(t => t.id === inv.type);
+                    return (
+                      <motion.div
+                        key={inv.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.05 }}
+                        className="flex items-center justify-between rounded-lg bg-gray-800/60 px-3 py-2 shadow-sm border border-gray-700"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-xl">{typeObj?.emoji || '💸'}</span>
+                          <span className="font-medium text-gray-100">{typeObj?.name || inv.type}</span>
+                          <span className="text-xs text-gray-400">{inv.name}</span>
+                        </div>
+                        <div className="flex flex-col items-end gap-1">
+                          <span className="font-semibold text-blue-400">R$ {Number(inv.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
+                          <span className="text-xs text-gray-400">{inv.date}</span>
+                          {user && (
+                            <button
+                              onClick={() => handleDeleteInvestment(inv.id)}
+                              className="mt-1 px-2 py-1 text-xs rounded bg-red-600 hover:bg-red-700 text-white transition"
+                              title="Excluir investimento"
+                            >
+                              Excluir
+                            </button>
+                          )}
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+                {totalPages > 1 && (
+                  <div className="flex justify-center items-center gap-2 mt-4">
+                    <Button
+                      type="button"
+                      className="px-3 py-1 text-xs mt-5"
+                      variant="outline"
+                      disabled={currentPage === 1}
+                      onClick={() => setCurrentPage(currentPage - 1)}
                     >
-                      <div className="flex items-center gap-2">
-                        <span className="text-xl">{typeObj?.emoji || '💸'}</span>
-                        <span className="font-medium text-gray-100">{typeObj?.name || inv.type}</span>
-                        <span className="text-xs text-gray-400">{inv.name}</span>
-                      </div>
-                      <div className="flex flex-col items-end gap-1">
-                        <span className="font-semibold text-blue-400">R$ {Number(inv.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
-                        <span className="text-xs text-gray-400">{inv.date}</span>
-                        {user && (
-                          <button
-                            onClick={() => handleDeleteInvestment(inv.id)}
-                            className="mt-1 px-2 py-1 text-xs rounded bg-red-600 hover:bg-red-700 text-white transition"
-                            title="Excluir investimento"
-                          >
-                            Excluir
-                          </button>
-                        )}
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                      Anterior
+                    </Button>
+                    <span className="text-gray-300 text-xs mt-5">
+                      Página {currentPage} de {totalPages}
+                    </span>
+                    <Button
+                      type="button"
+                      className="px-3 py-1 text-xs bg-gradient-to-r from-[#00b6fc] via-[#00a4fd] to-[#0096fd] mt-5"
+                      variant=""
+                      disabled={currentPage === totalPages}
+                      onClick={() => setCurrentPage(currentPage + 1)}
+                    >
+                      Próxima
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
           </div>
         </CardContent>
