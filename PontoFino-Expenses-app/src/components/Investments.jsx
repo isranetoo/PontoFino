@@ -18,7 +18,7 @@ const investmentTypes = [
   { id: 'cdb', name: 'CDB', emoji: '💳' },
   { id: 'renda_variavel', name: 'Renda Variável', emoji: '📈' },
   { id: 'fundo', name: 'Fundos de Investimento', emoji: '📊' },
-  { id: 'crypto', name: 'Criptomoeda', emoji: '🪙' },
+  { id: 'crypto', name: 'Criptomoeda', emoji: '💰' },
   { id: 'dolar', name: 'Em Dólar', emoji: '💵' },
   { id: 'tesouro', name: 'Tesouro Direto', emoji: '🏛️' },
   { id: 'outro', name: 'Outro', emoji: '💼' },
@@ -92,7 +92,10 @@ const Investments = () => {
       });
       return;
     }
-    const value = parseFloat(form.value.replace(',', '.'));
+    let value = parseFloat(form.value.replace(',', '.'));
+    if (form.type === 'dolar') {
+      value = value * 5.70;
+    }
     if (isNaN(value) || value <= 0) {
       toast({
         title: 'Erro',
