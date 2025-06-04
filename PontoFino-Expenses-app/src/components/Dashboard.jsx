@@ -17,16 +17,21 @@ const investmentTypes = [
   { id: 'outro', name: 'Outro' },
 ];
 
-const Dashboard = ({ 
-  totalIncome, 
-  totalExpenses, 
-  balance, 
-  expensesByCategory, 
-  currentMonthTransactions,
-  goals,
-  monthlyBudget,
-  investments = []
-}) => {
+import { useBudgetSupabase } from '@/hooks/useBudgetSupabase';
+
+const Dashboard = () => {
+  const {
+    data,
+    totalIncome,
+    totalExpenses,
+    balance,
+    expensesByCategory,
+    currentMonthTransactions,
+    loading
+  } = useBudgetSupabase();
+  const goals = data.goals || [];
+  const monthlyBudget = data.monthlyBudget;
+  const investments = data.investments || [];
   const budgetUsed = monthlyBudget > 0 ? (totalExpenses / monthlyBudget) * 100 : 0;
   
   const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -67,7 +72,12 @@ const Dashboard = ({
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-50 rounded-lg">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-400"></div>
+        </div>
+      )}
       {/* Investimentos */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <motion.div

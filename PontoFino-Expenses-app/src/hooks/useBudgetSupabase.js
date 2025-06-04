@@ -97,6 +97,13 @@ export function useBudgetSupabase() {
     fetchUserData(user.id);
   };
 
+  // Remover investimento
+  const deleteInvestment = async (id) => {
+    if (!user) return;
+    await supabase.from('investments').delete().eq('id', id).eq('user_id', user.id);
+    fetchUserData(user.id);
+  };
+
   // Adicionar transação
   const addTransaction = async (transaction) => {
     if (!user) return;
@@ -198,6 +205,7 @@ export function useBudgetSupabase() {
     updateGoal,
     deleteGoal,
     addInvestment,
+    deleteInvestment,
     setMonthlyBudget,
     totalIncome,
     totalExpenses,

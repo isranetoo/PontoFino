@@ -35,7 +35,20 @@ const Investments = () => {
 
   // Para o DatePicker funcionar com Date, precisamos de um estado auxiliar
   const [dateObj, setDateObj] = useState(null);
-  const { data, addInvestment } = useBudgetSupabase();
+  const { data, addInvestment, deleteInvestment, loading } = useBudgetSupabase();
+  // Deletar investimento
+  const handleDeleteInvestment = async (id) => {
+    if (!user) {
+      toast({
+        title: 'Faça login ou registre-se',
+        description: 'Você precisa estar logado para deletar investimentos.',
+        variant: 'destructive',
+      });
+      return;
+    }
+    await deleteInvestment(id);
+    toast({ title: 'Investimento removido', description: 'O investimento foi deletado com sucesso.' });
+  };
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -109,6 +122,11 @@ const Investments = () => {
       transition={{ duration: 0.5 }}
     >
       <Card className="glassmorphism card-hover">
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-50 rounded-lg">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+          </div>
+        )}
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-gray-200 text-lg sm:text-xl">
             <BarChart3 className="h-6 w-6" />
@@ -192,7 +210,11 @@ const Investments = () => {
               <span role="img" aria-label="Investimento">💸</span>
               Investimentos Recentes
             </div>
-            {recentInvestments.length === 0 ? (
+            {loading ? (
+              <div className="flex justify-center items-center py-8 text-gray-400">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-400"></div>
+              </div>
+            ) : recentInvestments.length === 0 ? (
               <div className="text-center py-8 text-gray-400">
                 <span className="text-3xl">💸</span>
                 <p className="text-sm sm:text-base mt-2">Nenhum investimento cadastrado</p>
@@ -215,9 +237,18 @@ const Investments = () => {
                         <span className="font-medium text-gray-100">{typeObj?.name || inv.type}</span>
                         <span className="text-xs text-gray-400">{inv.name}</span>
                       </div>
-                      <div className="flex flex-col items-end">
+                      <div className="flex flex-col items-end gap-1">
                         <span className="font-semibold text-blue-400">R$ {Number(inv.value).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>
                         <span className="text-xs text-gray-400">{inv.date}</span>
+                        {user && (
+                          <button
+                            onClick={() => handleDeleteInvestment(inv.id)}
+                            className="mt-1 px-2 py-1 text-xs rounded bg-red-600 hover:bg-red-700 text-white transition"
+                            title="Excluir investimento"
+                          >
+                            Excluir
+                          </button>
+                        )}
                       </div>
                     </motion.div>
                   );
