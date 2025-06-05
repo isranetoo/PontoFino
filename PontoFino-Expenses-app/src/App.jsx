@@ -11,6 +11,7 @@ import BudgetSettings from '@/components/BudgetSettings';
 import Investments from '@/components/Investments';
 import { BarChart3, Plus, Target, Settings, Wallet } from 'lucide-react';
 import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 
 
 function App() {
@@ -31,8 +32,8 @@ function App() {
   } = useBudgetSupabase();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-[#0096fd]">
-      <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-blue-900 to-[#0096fd]">
+      <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8 flex-1 w-full">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -110,6 +111,7 @@ function App() {
         </Tabs>
       </div>
       <Toaster />
+      <Footer />
     </div>
   );
 }
