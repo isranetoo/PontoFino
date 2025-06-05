@@ -103,38 +103,55 @@ function NavBar() {
 
       {/* Menu mobile dropdown */}
       {menuOpen && (
-        <div className="sm:hidden absolute left-0 right-0 z-30 bg-gray-900/95 border-b border-gray-700 rounded-b-lg shadow-lg animate-fade-in-down">
-          <nav className="flex flex-col gap-1 py-2 px-4">
-            {mobileMenuItems.map((item) => (
+        <div className="sm:hidden fixed inset-0 z-40 flex flex-col bg-gradient-to-br  from-[#0a2540] via-[#0178c7] to-[#00b6fc] animate-fade-in-down shadow-2xl rounded-b-3xl border-b-4 border-blue-400">
+          <div className="flex items-center justify-between px-5 pt-5 pb-2">
+            <div className="flex items-center gap-2">
+              <img src="/assets/PontoFino_Logo.png" alt="Logo" className="h-9 w-9 rounded-full shadow-lg " />
+              <span className="text-lg font-extrabold text-white drop-shadow">PontoFino</span>
+            </div>
+            <button
+              className="flex items-center justify-center p-2 rounded-full bg-white/20 hover:bg-white/40 transition"
+              onClick={() => setMenuOpen(false)}
+              aria-label="Fechar menu"
+            >
+              <X className="h-7 w-7 text-white" />
+            </button>
+          </div>
+          <nav className="flex flex-col gap-2 px-6 py-4 flex-1">
+            {mobileMenuItems.map((item, idx) => (
               <button
                 key={item.value}
                 onClick={() => handleMobileNav(item.value)}
-                className="flex items-center gap-3 px-3 py-2 rounded-md text-white hover:bg-blue-900/30 transition-all text-base"
+                className="flex items-center gap-4 px-4 py-3 rounded-xl font-semibold text-lg text-white bg-white/10 hover:bg-white/20 shadow-md transition-all duration-150 backdrop-blur-md border border-white/10 mb-1 animate-fade-in"
+                style={{ animationDelay: `${0.05 * idx + 0.1}s` }}
               >
-                {item.icon}
-                <span>{item.label}</span>
+                <span className="flex items-center justify-center bg-white/20 rounded-full p-2">
+                  {item.icon}
+                </span>
+                <span className="drop-shadow-lg">{item.label}</span>
               </button>
             ))}
-            <div className="flex flex-col gap-2 mt-2">
+            <div className="flex flex-col gap-2 mt-6 animate-fade-in-up">
               {!loading && !user && (
                 <>
                   <button
                     onClick={() => { setMenuOpen(false); navigate('/login'); }}
-                    className="px-4 py-1 rounded-lg font-medium text-white bg-gradient-to-r from-[#00b6fc] via-[#00a4fd] to-[#0096fd] hover:bg-blue-700 transition-all duration-200"
+                    className="w-full px-4 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-[#00b6fc] via-[#00a4fd] to-[#0096fd] hover:from-blue-700 hover:to-blue-900 shadow-lg transition-all duration-200 text-lg"
                   >
                     Login
                   </button>
                   <button
                     onClick={() => { setMenuOpen(false); navigate('/register'); }}
-                    className="px-4 py-1 rounded-lg font-medium text-blue-600 border border-blue-600 bg-white hover:bg-blue-50 transition-all duration-200"
+                    className="w-full px-4 py-2 rounded-xl font-bold text-blue-700 border-2 border-blue-400 bg-white hover:bg-blue-50 shadow-lg transition-all duration-200 text-lg"
                   >
                     Registrar
                   </button>
                 </>
               )}
-              <UserInfo />
+              <div className="mt-2"><UserInfo /></div>
             </div>
           </nav>
+          <div className="text-center text-xs text-white/70 pb-3 pt-2 animate-fade-in-up">© {new Date().getFullYear()} PontoFino</div>
         </div>
       )}
 
