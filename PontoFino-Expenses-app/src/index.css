@@ -1,3 +1,25 @@
+@media (max-width: 640px) {
+  .card,
+  .glassmorphism,
+  .card-hover,
+  .p-6,
+  .pt-0,
+  .p-4,
+  .rounded-lg {
+    margin-left: 1.25rem !important;
+    margin-right: 1.25rem !important;
+  }
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Espaçamento lateral para o menu hambúrguer mobile */
+  .mobile-menu-hamburger {
+    margin-left: 1.25rem !important;
+    margin-right: 1.25rem !important;
+  }
+}
 /* Custom styles for react-datepicker to match dark glassmorphism theme */
 .react-datepicker__portal, .react-datepicker__triangle, .react-datepicker__triangle::before, .react-datepicker__triangle::after {
   display: none !important;

@@ -96,7 +96,7 @@ function NavBar({ tab, setTab }) {
 
       {/* Menu mobile dropdown */}
       {menuOpen && (
-        <div className="sm:hidden mt-6 fixed inset-0 z-40 flex flex-col bg-gradient-to-br from-gray-900 via-blue-900 to-[#0096fd] animate-fade-in-down shadow-2xl rounded-b-3xl border-b-4 border-blue-400">
+        <div className="sm:hidden mt-6 fixed inset-0 z-40 flex flex-col bg-gradient-to-br from-gray-900 via-blue-900 to-[#0096fd] animate-fade-in-down shadow-2xl rounded-b-3xl border-b-4 border-blue-400 mobile-menu-hamburger">
           <div className="flex items-center justify-between px-5 pt-5 pb-2">
             <div className="flex items-center gap-2">
               <img src="/assets/PontoFino_Logo.png" alt="Logo" className="h-9 w-9 rounded-full shadow-lg " />
