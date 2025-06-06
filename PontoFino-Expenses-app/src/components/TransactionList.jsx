@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,7 +39,17 @@ const TransactionList = ({ transactions, categories, onDeleteTransaction, isRece
     });
   };
   
-  const transactionsToDisplay = isRecentList ? transactions.slice(0, 5) : transactions;
+  // Paginação: 3 por página para lista recente, 6 por página para histórico
+  const ITEMS_PER_PAGE = isRecentList ? 3 : 6;
+  const [page, setPage] = useState(1);
+  const totalPages = Math.max(1, Math.ceil(transactions.length / ITEMS_PER_PAGE));
+
+  let transactionsToDisplay = transactions.slice(0, ITEMS_PER_PAGE);
+  if (!isRecentList) {
+    const start = (page - 1) * ITEMS_PER_PAGE;
+    const end = start + ITEMS_PER_PAGE;
+    transactionsToDisplay = transactions.slice(start, end);
+  }
 
   return (
     <Card className="glassmorphism card-hover">
@@ -109,11 +119,37 @@ const TransactionList = ({ transactions, categories, onDeleteTransaction, isRece
             )}
           </AnimatePresence>
         </div>
-        {!isRecentList && transactions.length > 10 && (
-          <p className="text-center text-xs text-gray-500 mt-4">Exibindo {transactionsToDisplay.length} de {transactions.length} transações.</p>
+        {/* Paginação */}
+        {!isRecentList && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-4">
+            <Button
+              variant="outline"
+              size="sm"
+              className="px-2 py-1"
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={page === 1}
+            >
+              Anterior
+            </Button>
+            <span className="text-xs text-gray-400 select-none">
+              Página {page} de {totalPages}
+            </span>
+            <Button
+              variant="outline"
+              size="sm"
+              className="px-2 py-1"
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+            >
+              Próxima
+            </Button>
+          </div>
         )}
-        {isRecentList && transactions.length > 5 && (
-           <p className="text-center text-xs text-gray-500 mt-3">
+        {!isRecentList && transactions.length > ITEMS_PER_PAGE && (
+          <p className="text-center text-xs text-gray-500 mt-2">Exibindo {transactionsToDisplay.length} de {transactions.length} transações.</p>
+        )}
+        {isRecentList && transactions.length > 3 && (
+           <p className="text-center text-xs text-white mt-3">
              Para ver todas, acesse a aba <span className="font-semibold">Histórico</span>.
            </p>
         )}
