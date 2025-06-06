@@ -78,78 +78,72 @@ const Dashboard = () => {
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-400"></div>
         </div>
       )}
-      {/* Investimentos */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {/* Total Investido */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
-        >
-          <Card className="glassmorphism card-hover">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Investimentos</CardTitle>
-              <BarChart3 className="h-4 w-4 text-blue-400" />
-            </CardHeader>
-            <CardContent>
-              {(!investments || investments.length === 0) ? (
-                <div className="text-gray-500 text-center">Nenhum investimento cadastrado.</div>
-              ) : (
+      {/* Investimentos - só mostra se houver pelo menos 1 investimento */}
+      {investments && investments.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Total Investido */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <Card className="glassmorphism card-hover">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-300">Investimentos</CardTitle>
+                <BarChart3 className="h-4 w-4 text-blue-400" />
+              </CardHeader>
+              <CardContent>
                 <div className="text-2xl font-bold text-blue-400">
                   R$ {investments.reduce((sum, inv) => sum + Number(inv.value), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
-              )}
-              <p className="text-xs text-gray-400 mt-1">Total investido</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-        {/* Investimentos em Real */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.16 }}
-        >
-          <Card className="glassmorphism card-hover">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Invest. em Real</CardTitle>
-              <span className="text-lg">BR</span>
-            </CardHeader>
-            <CardContent>
-              {(!investments || investments.length === 0) ? (
-                <div className="text-gray-500 text-center">Nenhum investimento em real.</div>
-              ) : (
+                <p className="text-xs text-gray-400 mt-1">Total investido</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          {/* Investimentos em Real */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.16 }}
+          >
+            <Card className="glassmorphism card-hover">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-300">Invest. em Real</CardTitle>
+                <span className="text-lg">BR</span>
+              </CardHeader>
+              <CardContent>
                 <div className="text-2xl font-bold text-green-400">
                   R$ {investments.filter(inv => inv.type !== 'dolar').reduce((sum, inv) => sum + Number(inv.value), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </div>
-              )}
-              <p className="text-xs text-gray-400 mt-1">Total em Real</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-        {/* Investimentos em Dólar */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.17 }}
-        >
-          <Card className="glassmorphism card-hover">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium text-gray-300">Invest. em Dólar</CardTitle>
-              <span className="text-lg">USD</span>
-            </CardHeader>
-            <CardContent>
-              {(!investments || investments.length === 0 || !investments.some(inv => inv.type === 'dolar')) ? (
-                <div className="text-gray-500 text-center">Nenhum investimento em dólar.</div>
-              ) : (
-                <div className="text-2xl font-bold text-blue-300">
-                  R$ {investments.filter(inv => inv.type === 'dolar').reduce((sum, inv) => sum + Number(inv.value), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </div>
-              )}
-              <p className="text-xs text-gray-400 mt-1">Total em Dólar (convertido)</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-      </div>
+                <p className="text-xs text-gray-400 mt-1">Total em Real</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          {/* Investimentos em Dólar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.17 }}
+          >
+            <Card className="glassmorphism card-hover">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-300">Invest. em Dólar</CardTitle>
+                <span className="text-lg">USD</span>
+              </CardHeader>
+              <CardContent>
+                {investments.some(inv => inv.type === 'dolar') ? (
+                  <div className="text-2xl font-bold text-blue-300">
+                    R$ {investments.filter(inv => inv.type === 'dolar').reduce((sum, inv) => sum + Number(inv.value), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </div>
+                ) : (
+                  <div className="text-gray-500 text-center">Nenhum investimento em dólar.</div>
+                )}
+                <p className="text-xs text-gray-400 mt-1">Total em Dólar (convertido)</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      )}
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <motion.div
