@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 
 
-function NavBar() {
+function NavBar({ tab, setTab }) {
   const { user, loading } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -50,14 +50,7 @@ function NavBar() {
 
   // Função para navegação dos tabs no mobile
   const handleMobileNav = (value) => {
-    // Aqui você pode usar navegação por rota se necessário
-    // Exemplo: navigate(`/${value}`)
-    // Ou disparar um evento para mudar o tab ativo
-    const tab = document.querySelector(`[data-state="active"]`);
-    const trigger = document.querySelector(`[data-value="${value}"]`);
-    if (trigger && tab !== trigger) {
-      trigger.click();
-    }
+    setTab(value);
     setMenuOpen(false);
   };
 
@@ -103,7 +96,7 @@ function NavBar() {
 
       {/* Menu mobile dropdown */}
       {menuOpen && (
-        <div className="sm:hidden fixed inset-0 z-40 flex flex-col bg-gradient-to-br  from-[#0a2540] via-[#0178c7] to-[#00b6fc] animate-fade-in-down shadow-2xl rounded-b-3xl border-b-4 border-blue-400">
+        <div className="sm:hidden mt-6 fixed inset-0 z-40 flex flex-col bg-gradient-to-br from-gray-900 via-blue-900 to-[#0096fd] animate-fade-in-down shadow-2xl rounded-b-3xl border-b-4 border-blue-400">
           <div className="flex items-center justify-between px-5 pt-5 pb-2">
             <div className="flex items-center gap-2">
               <img src="/assets/PontoFino_Logo.png" alt="Logo" className="h-9 w-9 rounded-full shadow-lg " />
@@ -157,36 +150,18 @@ function NavBar() {
 
       {/* TabsList visível apenas em telas médias para cima */}
       <TabsList className="hidden sm:grid w-full grid-cols-3 gap-1 py-1 sm:grid-cols-6 md:grid-cols-6 bg-gray-800/50 border border-gray-700 rounded-lg">
-        <TabsTrigger value="dashboard" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0" data-value="dashboard">
-          <BarChart3 className="h-4 w-4 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">Dashboard</span>
-          <span className="sm:hidden text-[10px]">Painel</span>
-        </TabsTrigger>
-        <TabsTrigger value="transactions" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0" data-value="transactions">
-          <Plus className="h-4 w-4 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">Transações</span>
-          <span className="sm:hidden text-[10px]">Nova</span>
-        </TabsTrigger>
-        <TabsTrigger value="history" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0" data-value="history">
-          <Wallet className="h-4 w-4 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">Histórico</span>
-          <span className="sm:hidden text-[10px]">Lista</span>
-        </TabsTrigger>
-        <TabsTrigger value="goals" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0" data-value="goals">
-          <Target className="h-4 w-4 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">Metas</span>
-          <span className="sm:hidden text-[10px]">Metas</span>
-        </TabsTrigger>
-        <TabsTrigger value="investments" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0" data-value="investments">
-          <BarChart3 className="h-4 w-4 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">Investimentos</span>
-          <span className="sm:hidden text-[10px]">Investir</span>
-        </TabsTrigger>
-        <TabsTrigger value="settings" className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0" data-value="settings">
-          <Settings className="h-4 w-4 sm:h-4 sm:w-4" />
-          <span className="hidden sm:inline">Config</span>
-          <span className="sm:hidden text-[10px]">Ajustes</span>
-        </TabsTrigger>
+        {mobileMenuItems.map((item) => (
+          <TabsTrigger
+            key={item.value}
+            value={item.value}
+            data-value={item.value}
+            className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 data-[state=active]:bg-gradient-to-r data-[state=active]:from-[#00b6fc] data-[state=active]:to-[#0096fd] h-12 sm:h-auto text-xs sm:text-sm min-w-0"
+          >
+            {item.icon}
+            <span className="hidden sm:inline">{item.label}</span>
+            <span className="sm:hidden text-[10px]">{item.short}</span>
+          </TabsTrigger>
+        ))}
       </TabsList>
     </motion.div>
   );

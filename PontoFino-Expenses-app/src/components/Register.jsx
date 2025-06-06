@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { supabase } from '@/lib/supabaseClient';
+import { supabase } from '../lib/supabaseClient';
 import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
@@ -96,15 +96,6 @@ const Register = () => {
           Já tem conta? <span className="font-bold">Entrar</span>
         </motion.button>
       </motion.div>
-      <div className="w-full mt-4">
-        {/* Footer em todas as páginas */}
-        <div className="max-w-md mx-auto">
-          {(() => {
-            const Footer = require('./Footer').default;
-            return <Footer />;
-          })()}
-        </div>
-      </div>
     </div>
   );
 };

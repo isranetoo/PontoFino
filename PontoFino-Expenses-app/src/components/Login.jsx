@@ -95,16 +95,6 @@ const Login = () => {
           Não tem conta? <span className="font-bold">Registre-se</span>
         </motion.button>
       </motion.div>
-      <div className="w-full mt-4">
-        {/* Footer em todas as páginas */}
-        <div className="max-w-md mx-auto">
-          {/** Importação dinâmica para evitar erro de import recursivo se Login for importado em App.jsx **/}
-          {(() => {
-            const Footer = require('./Footer').default;
-            return <Footer />;
-          })()}
-        </div>
-      </div>
     </div>
   );
 };
