@@ -1,3 +1,87 @@
+@media (max-width: 640px) {
+  .card,
+  .glassmorphism,
+  .card-hover,
+  .p-6,
+  .pt-0,
+  .p-4,
+  .rounded-lg {
+    margin-left: 1.25rem !important;
+    margin-right: 1.25rem !important;
+  }
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Espaçamento lateral para o menu hambúrguer mobile */
+  .mobile-menu-hamburger {
+    margin-left: 1.25rem !important;
+    margin-right: 1.25rem !important;
+  }
+}
+/* Custom styles for react-datepicker to match dark glassmorphism theme */
+.react-datepicker__portal, .react-datepicker__triangle, .react-datepicker__triangle::before, .react-datepicker__triangle::after {
+  display: none !important;
+}
+.react-datepicker {
+  background: rgba(31, 41, 55, 0.98); /* bg-gray-900/90 */
+  border: 1px solid #374151; /* border-gray-700 */
+  color: #f3f4f6; /* text-gray-100 */
+  border-radius: 0.75rem; /* rounded-xl */
+  box-shadow: 0 8px 32px 0 rgba(31, 41, 55, 0.37);
+  font-family: inherit;
+  padding: 0.5rem 0.75rem;
+}
+.react-datepicker__header {
+  background: transparent;
+  border-bottom: 1px solid #374151;
+  color: #f3f4f6;
+  padding-top: 0.75rem;
+}
+.react-datepicker__current-month, .react-datepicker-time__header, .react-datepicker-year-header {
+  color: #f3f4f6;
+  font-weight: 600;
+}
+.react-datepicker__day, .react-datepicker__day-name {
+  color: #d1d5db; /* text-gray-300 */
+  width: 2.2rem;
+  line-height: 2.2rem;
+  margin: 0.1rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s, color 0.2s;
+}
+.react-datepicker__day--selected, .react-datepicker__day--keyboard-selected {
+  background: linear-gradient(90deg, #2563eb 0%, #38bdf8 100%); /* gradient-bg */
+  color: #fff;
+}
+.react-datepicker__day--today {
+  border: 1px solid #38bdf8;
+}
+.react-datepicker__day:hover {
+  background: #2563eb;
+  color: #000000;
+}
+.react-datepicker__navigation {
+  top: 1.2rem;
+  line-height: 1.5rem;
+  border-radius: 0.5rem;
+  color: #60a5fa;
+}
+.react-datepicker__navigation-icon::before {
+  border-color: #60a5fa;
+}
+.react-datepicker__month-container {
+  background: transparent;
+}
+.react-datepicker__input-container input {
+  background: rgba(31, 41, 55, 0.5);
+  border: 1px solid #374151;
+  color: #f3f4f6;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  width: 100%;
+}
 
 @tailwind base;
 @tailwind components;

@@ -2,18 +2,36 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { TrendingUp, TrendingDown, DollarSign, Target, PieChart as PieChartIcon, BarChart3 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-const Dashboard = ({ 
-  totalIncome, 
-  totalExpenses, 
-  balance, 
-  expensesByCategory, 
-  currentMonthTransactions,
-  goals,
-  monthlyBudget 
-}) => {
+const investmentTypes = [
+  { id: 'cdi', name: 'CDI' },
+  { id: 'cdb', name: 'CDB' },
+  { id: 'renda_variavel', name: 'Renda Variável' },
+  { id: 'fundo', name: 'Fundos de Investimento' },
+  { id: 'crypto', name: 'Criptomoeda' },
+  { id: 'dolar', name: 'Em Dólar' },
+  { id: 'tesouro', name: 'Tesouro Direto' },
+  { id: 'outro', name: 'Outro' },
+];
+
+import { useBudgetSupabase } from '@/hooks/useBudgetSupabase';
+
+const Dashboard = () => {
+  const {
+    data,
+    totalIncome,
+    totalExpenses,
+    balance,
+    expensesByCategory,
+    currentMonthTransactions,
+    loading
+  } = useBudgetSupabase();
+  const goals = data.goals || [];
+  const monthlyBudget = data.monthlyBudget;
+  const investments = data.investments || [];
   const budgetUsed = monthlyBudget > 0 ? (totalExpenses / monthlyBudget) * 100 : 0;
   
   const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -54,7 +72,78 @@ const Dashboard = ({
   }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/40 z-50 rounded-lg">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-400"></div>
+        </div>
+      )}
+      {/* Investimentos - só mostra se houver pelo menos 1 investimento */}
+      {investments && investments.length > 0 && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {/* Total Investido */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15 }}
+          >
+            <Card className="glassmorphism card-hover">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-300">Investimentos</CardTitle>
+                <BarChart3 className="h-4 w-4 text-blue-400" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-blue-400">
+                  R$ {investments.reduce((sum, inv) => sum + Number(inv.value), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">Total investido</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          {/* Investimentos em Real */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.16 }}
+          >
+            <Card className="glassmorphism card-hover">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-300">Invest. em Real</CardTitle>
+                <span className="text-lg">BR</span>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold text-green-400">
+                  R$ {investments.filter(inv => inv.type !== 'dolar').reduce((sum, inv) => sum + Number(inv.value), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </div>
+                <p className="text-xs text-gray-400 mt-1">Total em Real</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+          {/* Investimentos em Dólar */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.17 }}
+          >
+            <Card className="glassmorphism card-hover">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium text-gray-300">Invest. em Dólar</CardTitle>
+                <span className="text-lg">USD</span>
+              </CardHeader>
+              <CardContent>
+                {investments.some(inv => inv.type === 'dolar') ? (
+                  <div className="text-2xl font-bold text-blue-300">
+                    R$ {investments.filter(inv => inv.type === 'dolar').reduce((sum, inv) => sum + Number(inv.value), 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </div>
+                ) : (
+                  <div className="text-gray-500 text-center">Nenhum investimento em dólar.</div>
+                )}
+                <p className="text-xs text-gray-400 mt-1">Total em Dólar (convertido)</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+      )}
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <motion.div

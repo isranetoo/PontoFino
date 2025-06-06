@@ -11,6 +11,7 @@ import BudgetSettings from '@/components/BudgetSettings';
 import Investments from '@/components/Investments';
 import { BarChart3, Plus, Target, Settings, Wallet } from 'lucide-react';
 import NavBar from '@/components/NavBar';
+import Footer from '@/components/Footer';
 
 
 function App() {
@@ -30,9 +31,11 @@ function App() {
     loading
   } = useBudgetSupabase();
 
+  const [tab, setTab] = useState('dashboard');
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-[#0096fd]">
-      <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-900 via-blue-900 to-[#0096fd]">
+      <div className="container mx-auto px-2 sm:px-4 py-6 sm:py-8 flex-1 w-full">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -48,8 +51,8 @@ function App() {
           </p>
         </motion.div>
 
-        <Tabs defaultValue="dashboard" className="space-y-4 sm:space-y-6">
-          <NavBar />
+        <Tabs value={tab} onValueChange={setTab} className="space-y-4 sm:space-y-6">
+          <NavBar tab={tab} setTab={setTab} />
 
           <TabsContent value="dashboard" className="space-y-4 sm:space-y-6">
             <Dashboard
@@ -60,6 +63,7 @@ function App() {
               currentMonthTransactions={currentMonthTransactions}
               goals={data.goals}
               monthlyBudget={data.monthlyBudget}
+              investments={data.investments}
             />
           </TabsContent>
 
@@ -109,6 +113,7 @@ function App() {
         </Tabs>
       </div>
       <Toaster />
+      <Footer />
     </div>
   );
 }
