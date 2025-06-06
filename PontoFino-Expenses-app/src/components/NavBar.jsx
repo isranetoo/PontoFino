@@ -85,11 +85,12 @@ function NavBar({ tab, setTab }) {
           </div>
           {/* Ícone de menu hamburguer no mobile */}
           <button
-            className="sm:hidden flex items-center justify-center p-2 rounded-md text-white bg-gradient-to-r from-[#00b6fc] to-[#0096fd] focus:outline-none"
+            className="sm:hidden flex items-center justify-center p-3 rounded-xl text-white bg-gradient-to-r from-[#00b6fc] to-[#0096fd] shadow-lg focus:outline-none transition-all duration-200"
+            style={{ minWidth: 48, minHeight: 48 }}
             onClick={() => setMenuOpen((open) => !open)}
             aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
           >
-            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            {menuOpen ? <X className="h-7 w-7" /> : <Menu className="h-7 w-7" />}
           </button>
         </div>
       </div>
