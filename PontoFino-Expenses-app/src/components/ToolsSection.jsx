@@ -27,21 +27,21 @@ const tools = [
 export default function ToolsSection() {
   return (
     <section className="mb-16 animate-fade-in" style={{animationDelay: '0.3s', animationFillMode: 'both'}}>
-      <h2 className="text-3xl font-extrabold mb-8 text-primary animate-slide-up drop-shadow-lg">Ferramentas Disponíveis</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <h2 className="text-2xl sm:text-3xl font-extrabold mb-6 sm:mb-8 animate-slide-up drop-shadow-lg" style={{ color: 'white' }}>Ferramentas Disponíveis</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 sm:gap-8">
         {tools.map((tool, idx) => (
           <div
             key={tool.title}
-            className="bg-background rounded-2xl p-8 shadow-xl border border-white/10 hover:scale-105 transition-transform duration-300 group relative overflow-hidden animate-slide-up"
+            className="bg-background rounded-2xl p-5 sm:p-8 shadow-xl border border-white/10 hover:scale-105 transition-transform duration-300 group relative overflow-hidden animate-slide-up"
             style={{animationDelay: `${0.35 + idx * 0.05}s`, animationFillMode: 'both'}}
           >
             <div className="flex flex-col items-center">
               <span className="drop-shadow-lg">{tool.icon}</span>
-              <h3 className="text-xl font-bold mb-2 group-hover:text-blue-300 transition-colors duration-200">{tool.title}</h3>
-              <p className="text-gray-400 text-center">{tool.desc}</p>
+              <h3 className="text-base sm:text-xl font-bold mb-1 sm:mb-2 group-hover:text-blue-300 transition-colors duration-200">{tool.title}</h3>
+              <p className="text-gray-400 text-center text-sm sm:text-base">{tool.desc}</p>
             </div>
             {/* Decorative blob */}
-            <svg className="absolute -top-8 -right-8 w-24 h-24 opacity-10 group-hover:opacity-20 transition-opacity duration-300" fill="#00b6fc" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" /></svg>
+            <svg className="absolute -top-6 -right-6 sm:-top-8 sm:-right-8 w-16 h-16 sm:w-24 sm:h-24 opacity-10 group-hover:opacity-20 transition-opacity duration-300" fill="#00b6fc" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" /></svg>
           </div>
         ))}
       </div>
