@@ -1,3 +1,18 @@
+/* Evita scroll lateral ao focar em inputs em mobile para forms principais */
+@media (max-width: 640px) {
+  input,
+  .react-datepicker__input-container input {
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+  form {
+    overflow-x: hidden;
+  }
+  body {
+    overflow-x: hidden !important;
+  }
+}
 @media (max-width: 640px) {
   .card,
   .glassmorphism,
