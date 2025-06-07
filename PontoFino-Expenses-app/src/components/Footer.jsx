@@ -21,7 +21,7 @@ function Footer() {
             <div className="flex flex-col items-center md:items-start gap-2">
               <div className="flex items-center justify-center md:justify-start mb-2">
                 <FaEnvelope className="mr-2" />
-                <a href="mailto:contato@pontofino.com.br" className="hover:text-blue-300 break-all">contato@pontofino.com.br</a>
+                <a href="mailto:contato@pontofino.com.br" className="hover:text-blue-300 break-all">contato@pontofino.com</a>
               </div>
               <div className="flex items-center justify-center md:justify-start mb-2">
                 <FaPhone className="mr-2" />
