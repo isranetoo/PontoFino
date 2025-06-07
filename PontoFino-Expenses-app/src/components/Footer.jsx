@@ -5,13 +5,13 @@ import { FaFacebook, FaTwitter, FaInstagram, FaLinkedin, FaEnvelope, FaPhone, Fa
 
 function Footer() {
   return (
-    <footer className="bg-gray-800 text-white py-10 mt-auto">
+    <footer className="bg-gray-800 py-10 mt-auto">
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-8 sm:gap-4">
           {/* Company Info */}
           <div className="mb-8 md:mb-0 text-center md:text-left">
             <img src="/assets/PontoFino_Logo.png" alt="Logo PontoFino" className="h-12 w-12 mx-auto md:mx-0 mb-2" />
-            <h3 className="text-xl font-bold mb-2">PontoFino</h3>
+            <h3 className="text-xl font-bold mb-2 bg-gradient-to-r from-[#00b6fc] via-[#00a4fd] to-[#0096fd] bg-clip-text text-transparent">PontoFino</h3>
             <p className="mb-2">Seu parceiro de investimentos</p>
             <p className="text-sm text-gray-400 mt-4">CNPJ: 12.345.678/0001-90</p>
           </div>
