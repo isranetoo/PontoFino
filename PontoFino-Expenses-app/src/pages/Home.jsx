@@ -5,19 +5,19 @@ import HomeNavBar from '../components/HomeNavBar';
 
 function HeroSection() {
   return (
-    <section className="py-16 text-center bg-gradient-to-r from-[#00b6fc] via-[#00a4fd] to-[#0096fd] text-white rounded-lg shadow-lg mb-10">
-      <h1 className="text-4xl md:text-6xl font-bold mb-4">Bem-vindo ao PontoFino</h1>
-      <p className="text-lg md:text-2xl mb-6 max-w-2xl mx-auto">Sua plataforma completa para controle financeiro, planejamento de metas e investimentos inteligentes.</p>
-      <Button size="lg" variant="secondary" className="text-lg font-semibold">Comece Agora</Button>
+    <section className="py-16 text-center bg-gradient-to-r from-[#00b6fc] via-[#00a4fd] to-[#0096fd] text-white rounded-lg shadow-lg mb-10 animate-fade-in">
+      <h1 className="text-4xl md:text-6xl font-bold mb-4 animate-slide-up">Bem-vindo ao PontoFino</h1>
+      <p className="text-lg md:text-2xl mb-6 max-w-2xl mx-auto animate-fade-in" style={{animationDelay: '0.2s', animationFillMode: 'both'}}>Sua plataforma completa para controle financeiro, planejamento de metas e investimentos inteligentes.</p>
+      <Button size="lg" variant="secondary" className="text-lg font-semibold animate-fade-in" style={{animationDelay: '0.4s', animationFillMode: 'both'}}>Comece Agora</Button>
     </section>
   );
 }
 
 function PlatformInfo() {
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-bold mb-4 text-primary">Sobre a Plataforma</h2>
-      <p className="text-gray-200 text-lg max-w-3xl mx-auto">
+    <section className="mb-12 animate-fade-in" style={{animationDelay: '0.2s', animationFillMode: 'both'}}>
+      <h2 className="text-2xl font-bold mb-4 text-primary animate-slide-up">Sobre a Plataforma</h2>
+      <p className="text-gray-200 text-lg max-w-3xl mx-auto animate-fade-in" style={{animationDelay: '0.3s', animationFillMode: 'both'}}>
         O PontoFino oferece uma solução moderna para gerenciar suas finanças pessoais, acompanhar despesas, definir orçamentos, criar e monitorar metas financeiras, além de ferramentas para simulação e acompanhamento de investimentos.
       </p>
     </section>
@@ -26,18 +26,18 @@ function PlatformInfo() {
 
 function ToolsSection() {
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-bold mb-4 text-primary">Ferramentas Disponíveis</h2>
+    <section className="mb-12 animate-fade-in" style={{animationDelay: '0.3s', animationFillMode: 'both'}}>
+      <h2 className="text-2xl font-bold mb-4 text-primary animate-slide-up">Ferramentas Disponíveis</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-background rounded-lg p-6 shadow-md">
+        <div className="bg-background rounded-lg p-6 shadow-md animate-slide-up" style={{animationDelay: '0.35s', animationFillMode: 'both'}}>
           <h3 className="text-xl font-semibold mb-2">Gestão de Orçamento</h3>
           <p className="text-gray-400">Defina limites de gastos, acompanhe receitas e despesas em tempo real.</p>
         </div>
-        <div className="bg-background rounded-lg p-6 shadow-md">
+        <div className="bg-background rounded-lg p-6 shadow-md animate-slide-up" style={{animationDelay: '0.4s', animationFillMode: 'both'}}>
           <h3 className="text-xl font-semibold mb-2">Metas Financeiras</h3>
           <p className="text-gray-400">Crie, edite e monitore metas para alcançar seus sonhos financeiros.</p>
         </div>
-        <div className="bg-background rounded-lg p-6 shadow-md">
+        <div className="bg-background rounded-lg p-6 shadow-md animate-slide-up" style={{animationDelay: '0.45s', animationFillMode: 'both'}}>
           <h3 className="text-xl font-semibold mb-2">Simulador de Investimentos</h3>
           <p className="text-gray-400">Simule diferentes cenários de investimento e acompanhe seus rendimentos.</p>
         </div>
@@ -48,9 +48,9 @@ function ToolsSection() {
 
 function FutureProjects() {
   return (
-    <section className="mb-12">
-      <h2 className="text-2xl font-bold mb-4 text-primary">Projetos Futuros</h2>
-      <ul className="list-disc list-inside text-gray-200 text-lg max-w-2xl mx-auto">
+    <section className="mb-12 animate-fade-in" style={{animationDelay: '0.4s', animationFillMode: 'both'}}>
+      <h2 className="text-2xl font-bold mb-4 text-primary animate-slide-up">Projetos Futuros</h2>
+      <ul className="list-disc list-inside text-gray-200 text-lg max-w-2xl mx-auto animate-fade-in" style={{animationDelay: '0.45s', animationFillMode: 'both'}}>
         <li>Integração com bancos para importação automática de transações</li>
         <li>Relatórios personalizados e exportação de dados</li>
         <li>Ferramentas de educação financeira e dicas personalizadas</li>
