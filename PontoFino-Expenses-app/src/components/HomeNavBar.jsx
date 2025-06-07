@@ -13,9 +13,9 @@ export default function HomeNavBar() {
   // Itens do menu
   const menuItems = [
     { label: 'Home', to: '/' },
-    { label: 'Sobre', href: '#sobre' },
+    { label: 'Sobre', href: '/sobre' },
     { label: 'Ferramentas', to: '/ferramentas' },
-    { label: 'Projetos Futuros', href: '#projetos' },
+    { label: 'Projetos Futuros', href: '/projetos-futuros' },
   ];
 
   return (
