@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BarChart3, Plus, Target, Settings, Wallet, Menu, X } from 'lucide-react';
+import { BarChart3, Plus, Target, Settings, Wallet, Menu, X, ArrowLeft } from 'lucide-react';
 
 
 import { UserInfo } from './Auth';
@@ -61,7 +61,14 @@ function NavBar({ tab, setTab }) {
       transition={{ delay: 0.2 }}
     >
       <div className="flex justify-between items-center mb-2 w-full">
-        <div />
+        {/* Botão de voltar */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center justify-center p-2 rounded-full bg-white/20 hover:bg-white/40 transition text-[#00b6fc] mr-2"
+          aria-label="Voltar"
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </button>
         <div className="flex items-center gap-2">
           {/* Botões de login/registro visíveis apenas em telas médias para cima */}
           <div className="hidden sm:flex items-center gap-2">
