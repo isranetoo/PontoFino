@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '../components/ui/button';
+
 
 export default function HeroSection() {
   return (
@@ -15,12 +15,7 @@ export default function HeroSection() {
         <p className="text-base sm:text-xl md:text-2xl mb-6 sm:mb-8 max-w-xs sm:max-w-2xl mx-auto animate-fade-in" style={{animationDelay: '0.2s', animationFillMode: 'both'}}>
           Sua plataforma completa para <span className="font-bold text-yellow-200">controle financeiro</span>, planejamento de metas e investimentos inteligentes.
         </p>
-        <Button size="lg" variant="secondary" className="text-base sm:text-lg font-semibold transition-transform duration-300 hover:scale-110 shadow-xl px-6 sm:px-8 py-3 sm:py-4" style={{animationDelay: '0.4s', animationFillMode: 'both'}}>
-          <span className="inline-flex items-center gap-2">
-            <svg className="w-5 h-5 sm:w-6 sm:h-6 animate-spin-slow" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M12 2v2m6.364 1.636l-1.414 1.414M22 12h-2m-1.636 6.364l-1.414-1.414M12 22v-2m-6.364-1.636l1.414-1.414M2 12h2m1.636-6.364l1.414 1.414" /></svg>
-            Comece Agora
-          </span>
-        </Button>
+        {/* Botão "Comece Agora" removido */}
       </div>
     </section>
   );

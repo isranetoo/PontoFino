@@ -41,28 +41,8 @@ export default function HomeNavBar() {
             )
           )}
         </div>
-        {/* Ações de usuário desktop */}
-        <div className="hidden sm:flex gap-2 items-center">
-          {loading ? null : user ? (
-            <>
-              <span className="text-white font-medium mr-2 hidden sm:inline drop-shadow">Olá, {user.email}</span>
-              <Button variant="outline" className="font-semibold border-blue-400 text-blue-700 bg-white hover:bg-blue-50 shadow-lg transition-all duration-200" onClick={signOut}>Sair</Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="secondary"
-                className="font-semibold bg-gradient-to-r from-[#00b6fc] via-[#00a4fd] to-[#0096fd] text-white hover:from-blue-700 hover:to-blue-900 shadow-lg transition-all duration-200"
-                onClick={() => navigate('/login')}
-              >Entrar</Button>
-              <Button
-                variant="outline"
-                className="font-semibold border-blue-400 text-blue-700 bg-white hover:bg-blue-50 shadow-lg transition-all duration-200"
-                onClick={() => navigate('/register')}
-              >Cadastrar</Button>
-            </>
-          )}
-        </div>
+        {/* Ações de usuário desktop removidas */}
+        <div className="hidden sm:flex gap-2 items-center"></div>
         {/* Menu mobile hamburguer */}
         <button
           className="md:hidden flex items-center justify-center p-3 rounded-xl text-white bg-gradient-to-r from-[#00b6fc] to-[#0096fd] shadow-lg focus:outline-none transition-all duration-200"
@@ -120,27 +100,8 @@ export default function HomeNavBar() {
                 </a>
               )
             )}
-            <div className="flex flex-col gap-2 mt-6 animate-fade-in-up">
-              {loading ? null : user ? (
-                <>
-                  <span className="text-white font-medium mr-2 text-center drop-shadow">Olá, {user.email}</span>
-                  <Button variant="outline" className="font-semibold border-blue-400 text-blue-700 bg-white hover:bg-blue-50 shadow-lg transition-all duration-200" onClick={() => { setMenuOpen(false); signOut(); }}>Sair</Button>
-                </>
-              ) : (
-                <>
-                  <Button
-                    variant="secondary"
-                    className="font-semibold bg-gradient-to-r from-[#00b6fc] via-[#00a4fd] to-[#0096fd] text-white hover:from-blue-700 hover:to-blue-900 shadow-lg transition-all duration-200"
-                    onClick={() => { setMenuOpen(false); navigate('/login'); }}
-                  >Entrar</Button>
-                  <Button
-                    variant="outline"
-                    className="font-semibold border-blue-400 text-blue-700 bg-white hover:bg-blue-50 shadow-lg transition-all duration-200"
-                    onClick={() => { setMenuOpen(false); navigate('/register'); }}
-                  >Cadastrar</Button>
-                </>
-              )}
-            </div>
+            {/* Botões de login/cadastro removidos do menu mobile */}
+            <div className="flex flex-col gap-2 mt-6 animate-fade-in-up"></div>
           </nav>
           <div className="text-center text-xs text-white/70 pb-3 pt-2 animate-fade-in-up">© {new Date().getFullYear()} PontoFino</div>
         </div>

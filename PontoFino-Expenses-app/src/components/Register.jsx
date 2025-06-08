@@ -1,7 +1,9 @@
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 const Register = () => {
   const [email, setEmail] = useState('');
@@ -9,6 +11,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -19,6 +22,14 @@ const Register = () => {
       setError(error.message);
     } else {
       setSuccess('Cadastro realizado! Verifique seu email para confirmar.');
+      // Redireciona para a página de origem, se houver, senão para '/'
+      const from = location.state?.from?.pathname || '/';
+      // Se veio da rota App.jsx (catch-all /*), redireciona para /app
+      if (from === '/*' || from === '/' || from === '/login' || from === '/register') {
+        navigate('/app', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     }
   };
 

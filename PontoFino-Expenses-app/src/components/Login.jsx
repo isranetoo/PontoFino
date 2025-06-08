@@ -1,14 +1,17 @@
 
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { supabase } from '@/lib/supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -17,7 +20,14 @@ const Login = () => {
     if (error) {
       setError(error.message);
     } else {
-      navigate('/');
+      // Redireciona para a página de origem, se houver, senão para '/'
+      const from = location.state?.from?.pathname || '/';
+      // Se veio da rota App.jsx (catch-all /*), redireciona para /app
+      if (from === '/*' || from === '/' || from === '/login' || from === '/register') {
+        navigate('/app', { replace: true });
+      } else {
+        navigate(from, { replace: true });
+      }
     }
   };
 
