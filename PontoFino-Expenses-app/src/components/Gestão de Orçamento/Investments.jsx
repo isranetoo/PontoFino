@@ -1,15 +1,19 @@
+// MOVIDO: src/components/Investments.jsx
+// ---
+// Este arquivo foi movido para a pasta Gestão de Orçamento.
+// O conteúdo original está abaixo:
 
 import React, { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { motion } from 'framer-motion';
-import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { BarChart3 } from 'lucide-react';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Button } from './ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { useToast } from './ui/use-toast';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+import { Button } from '../ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select';
+import { useToast } from '../ui/use-toast';
 import { useBudgetSupabase } from '@/hooks/useBudgetSupabase';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -24,19 +28,18 @@ const investmentTypes = [
   { id: 'outro', name: 'Outro', emoji: '💼' },
 ];
 
-
 const Investments = () => {
   const [form, setForm] = useState({
     type: '',
     name: '',
     value: '',
-    date: '', // manter string para compatibilidade
+    date: '',
   });
-
-  // Para o DatePicker funcionar com Date, precisamos de um estado auxiliar
   const [dateObj, setDateObj] = useState(null);
   const { data, addInvestment, deleteInvestment, loading } = useBudgetSupabase();
-  // Deletar investimento
+  const { toast } = useToast();
+  const { user } = useAuth();
+
   const handleDeleteInvestment = async (id) => {
     if (!user) {
       toast({
@@ -49,17 +52,13 @@ const Investments = () => {
     await deleteInvestment(id);
     toast({ title: 'Investimento removido', description: 'O investimento foi deletado com sucesso.' });
   };
-  const { toast } = useToast();
-  const { user } = useAuth();
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  // Quando o usuário seleciona uma data no calendário
   const handleDateChange = (date) => {
     setDateObj(date);
-    // Salva no formato yyyy-mm-dd para compatibilidade
     if (date) {
       const yyyy = date.getFullYear();
       const mm = String(date.getMonth() + 1).padStart(2, '0');
@@ -115,8 +114,6 @@ const Investments = () => {
     toast({ title: 'Sucesso!', description: 'Investimento adicionado.' });
   };
 
-
-  // Paginação de investimentos
   const investmentsPerPage = 5;
   const [currentPage, setCurrentPage] = useState(1);
   const allInvestments = data.investments || [];
@@ -214,8 +211,6 @@ const Investments = () => {
               Para adicionar investimentos, <a href="/login" className="text-blue-400 underline">faça login</a> ou <a href="/register" className="text-blue-400 underline">registre-se</a>.
             </div>
           )}
-
-          {/* Todos os Investimentos com Paginação */}
           <div className="space-y-2">
             <div className="flex items-center gap-2 text-gray-200 text-lg sm:text-xl mb-2">
               <span role="img" aria-label="Investimento">💸</span>

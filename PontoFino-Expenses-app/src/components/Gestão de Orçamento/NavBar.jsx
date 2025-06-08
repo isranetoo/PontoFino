@@ -1,13 +1,16 @@
+// MOVIDO: src/components/NavBar.jsx
+// ---
+// Este arquivo foi movido para a pasta Gestão de Orçamento.
+// O conteúdo original está abaixo:
+
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BarChart3, Plus, Target, Settings, Wallet, Menu, X, ArrowLeft } from 'lucide-react';
 
-
-import { UserInfo } from './Auth';
+import { UserInfo } from '../Auth';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-
 
 function NavBar({ tab, setTab }) {
   const { user, loading } = useAuth();

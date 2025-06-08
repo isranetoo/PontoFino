@@ -8,6 +8,7 @@ import { Link } from 'react-router-dom';
 const tools = [
   {
     title: 'Gestão de Orçamento',
+    route: '/orcamento',
     icon: (
       <svg className="w-8 h-8 md:w-12 md:h-12 text-blue-400 mb-3" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 10h18M9 16h6M12 6v10" /></svg>
     ),

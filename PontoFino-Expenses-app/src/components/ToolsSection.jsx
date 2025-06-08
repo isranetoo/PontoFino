@@ -3,6 +3,7 @@ import React from 'react';
 const tools = [
   {
     title: 'Gestão de Orçamento',
+    route: '/orcamento',
     icon: (
       <svg className="w-10 h-10 text-blue-400 mb-2" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 10h18M9 16h6M12 6v10" /></svg>
     ),
