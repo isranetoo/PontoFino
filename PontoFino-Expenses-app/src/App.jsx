@@ -10,7 +10,7 @@ import GoalsManager from '@/components/Gestão de Orçamento/GoalsManager';
 import BudgetSettings from '@/components/Gestão de Orçamento/BudgetSettings';
 import Investments from '@/components/Gestão de Orçamento/Investments';
 import { BarChart3, Plus, Target, Settings, Wallet } from 'lucide-react';
-import NavBar from '@/components/NavBar';
+import NavBar from '@/components/Gestão de Orçamento/NavBar';
 import Footer from '@/components/Footer';
 
 

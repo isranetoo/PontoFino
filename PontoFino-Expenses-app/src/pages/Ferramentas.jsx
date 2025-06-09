@@ -33,12 +33,17 @@ const tools = [
   },
   {
     title: 'Simulador de Investimentos',
+    route: '/simulador-investimentos',
     icon: (
       <svg className="w-8 h-8 md:w-12 md:h-12 text-yellow-400 mb-3 animate-spin-slow" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
     ),
     desc: 'Simule diferentes cenários de investimento, compare rentabilidades e acompanhe seus rendimentos ao longo do tempo.',
-    action: <Button variant="secondary" className="mt-auto" disabled>Em breve</Button>,
-    available: false,
+    action: (
+      <Link to="/simulador-investimentos" className="w-full flex justify-center mt-auto">
+        <Button variant="secondary" className="w-full font-semibold">Acessar</Button>
+      </Link>
+    ),
+    available: true,
     delay: 0.3,
   },
 ];

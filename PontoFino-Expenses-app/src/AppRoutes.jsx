@@ -8,12 +8,14 @@ import About from './pages/About';
 import ProjetoFuturo from './pages/ProjetoFuturo';
 import Login from './components/Login';
 import Register from './components/Register';
+
 import Dashboard from './components/Gestão de Orçamento/Dashboard';
 import BudgetSettings from './components/Gestão de Orçamento/BudgetSettings';
 import TransactionForm from './components/Gestão de Orçamento/TransactionForm';
 import TransactionList from './components/Gestão de Orçamento/TransactionList';
 import Investments from './components/Gestão de Orçamento/Investments';
 import GoalsManager from './components/Gestão de Orçamento/GoalsManager';
+import SimuladorInvestimentos from './components/Simulador de Investimentos/SimuladorInvestimentos';
 
 export default function AppRoutes() {
   return (
@@ -34,6 +36,8 @@ export default function AppRoutes() {
         <Route path="/orcamento/metas" element={<GoalsManager goals={[]} onAddGoal={()=>{}} onUpdateGoal={()=>{}} onDeleteGoal={()=>{}} />} />
         {/* Exemplo de rota para NavBar, ajuste conforme necessário */}
         <Route path="/orcamento/navbar" element={<NavBar tab={"dashboard"} setTab={()=>{}} />} />
+        {/* Rota para Simulador de Investimentos */}
+        <Route path="/simulador-investimentos" element={<SimuladorInvestimentos />} />
         <Route path="/*" element={<App />} />
       </Routes>
     </Router>
