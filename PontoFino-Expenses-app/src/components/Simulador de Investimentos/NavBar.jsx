@@ -11,6 +11,7 @@ function SimuladorNavBar({ tab, setTab }) {
   const menuItems = [
     { label: 'Simular', icon: <PieChart className="h-5 w-5" />, value: 'simular' },
     { label: 'Comparar', icon: <BarChart3 className="h-5 w-5" />, value: 'comparar' },
+    { label: 'Comparador Fundos & RV', icon: <BarChart3 className="h-5 w-5" />, value: 'comparador_fundos' },
     { label: 'Histórico', icon: <Plus className="h-5 w-5" />, value: 'historico' },
     { label: 'Configurações', icon: <Settings className="h-5 w-5" />, value: 'config' },
   ];
@@ -73,7 +74,8 @@ function SimuladorNavBar({ tab, setTab }) {
           <div className="text-center text-xs text-white/70 pb-3 pt-2 animate-fade-in-up">© {new Date().getFullYear()} PontoFino</div>
         </div>
       )}
-        <TabsList className="hidden sm:grid w-full grid-cols-2 gap-1 py-1 sm:grid-cols-4 bg-gray-800/50 border border-gray-700 rounded-lg">
+        {/* TabsList: estilo igual ao NavBar de Gestão de Orçamento */}
+        <TabsList className="hidden sm:grid w-full grid-cols-3 gap-1 py-1 sm:grid-cols-5 md:grid-cols-5 bg-gray-800/50 border border-gray-700 rounded-lg">
           {menuItems.map((item) => (
             <TabsTrigger
               key={item.value}
@@ -83,6 +85,7 @@ function SimuladorNavBar({ tab, setTab }) {
             >
               {item.icon}
               <span className="hidden sm:inline">{item.label}</span>
+              <span className="sm:hidden text-[10px]">{item.label}</span>
             </TabsTrigger>
           ))}
         </TabsList>
