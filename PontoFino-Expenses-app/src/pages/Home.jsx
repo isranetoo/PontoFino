@@ -13,8 +13,11 @@ export default function Home() {
       <HomeNavBar />
       <div className="container mx-auto px-4 py-8 flex-1 w-full">
         <HeroSection />
+        <div className="h-10 sm:h-14" />
         <PlatformInfo />
+        <div className="h-10 sm:h-14" />
         <ToolsSection />
+        <div className="h-10 sm:h-14" />
         <FutureProjects />
       </div>
       <Footer />
