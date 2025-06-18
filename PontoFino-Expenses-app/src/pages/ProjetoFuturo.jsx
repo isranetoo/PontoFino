@@ -5,27 +5,35 @@ import Footer from '../components/Footer';
 const projects = [
   {
     icon: (
-      <svg className="w-10 h-10 text-blue-400 animate-bounce" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 10h18M9 16h6M12 6v10" /></svg>
+      <svg className="w-10 h-10 text-blue-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M3 10h18M9 16h6M12 6v10" /></svg>
     ),
-    text: 'Integração com bancos para importação automática de transações',
+    title: 'Integração Bancária',
+    text: 'Conecte suas contas bancárias e importe transações automaticamente, facilitando o controle financeiro sem esforço manual.',
+    badge: 'Em breve',
   },
   {
     icon: (
-      <svg className="w-10 h-10 text-green-400 animate-pulse" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 17h16M4 13h16M4 9h16" /></svg>
+      <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M4 17h16M4 13h16M4 9h16" /></svg>
     ),
-    text: 'Relatórios personalizados e exportação de dados',
+    title: 'Relatórios Personalizados',
+    text: 'Gere relatórios detalhados, gráficos interativos e exporte seus dados para Excel ou PDF, tornando a análise financeira simples e visual.',
+    badge: 'Planejado',
   },
   {
     icon: (
       <svg className="w-10 h-10 text-yellow-400 animate-spin-slow" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></svg>
     ),
-    text: 'Ferramentas de educação financeira e dicas personalizadas',
+    title: 'Educação Financeira',
+    text: 'Acesse dicas personalizadas, conteúdos educativos e trilhas de aprendizado para evoluir sua saúde financeira.',
+    badge: 'Em pesquisa',
   },
   {
     icon: (
       <svg className="w-10 h-10 text-pink-400 animate-float-slow" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" /></svg>
     ),
-    text: 'Aplicativo mobile para Android e iOS',
+    title: 'App Mobile',
+    text: 'Tenha o PontoFino na palma da mão! Aplicativo para Android e iOS, com notificações e sincronização em tempo real.',
+    badge: 'Futuro',
   },
 ];
 
@@ -39,17 +47,27 @@ export default function ProjetoFuturo() {
       </div>
       <HomeNavBar />
       <main className="container mx-auto px-4 py-16 flex-1 w-full relative z-10 flex flex-col items-center">
-        <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-center mb-6 sm:mb-8 animate-slide-up drop-shadow-lg" style={{ color: 'white' }}>Projetos Futuros</h1>
-        <ul className="flex flex-col gap-4 sm:gap-8 text-gray-200 text-sm sm:text-lg max-w-xs sm:max-w-2xl mx-auto animate-fade-in w-full" style={{animationDelay: '0.3s', animationFillMode: 'both'}}>
+        <h1 className="text-2xl sm:text-4xl md:text-5xl font-extrabold text-center mb-2 sm:mb-4 animate-slide-up drop-shadow-lg" style={{ color: 'white' }}>Projetos Futuros</h1>
+        <h2 className="text-lg sm:text-2xl text-blue-200 font-semibold text-center mb-8 animate-fade-in" style={{animationDelay: '0.2s'}}>O futuro das suas finanças começa aqui!</h2>
+        <ul className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10 text-gray-200 text-base sm:text-lg max-w-3xl mx-auto animate-fade-in w-full" style={{animationDelay: '0.3s', animationFillMode: 'both'}}>
           {projects.map((proj, idx) => (
-            <li key={proj.text} className="flex items-center gap-3 sm:gap-5 bg-background/60 rounded-2xl px-4 sm:px-8 py-4 sm:py-6 shadow-xl border border-white/10 hover:scale-105 transition-transform duration-300 animate-slide-up" style={{animationDelay: `${0.4 + idx * 0.07}s`, animationFillMode: 'both'}}>
-              <span>{proj.icon}</span>
-              <span>{proj.text}</span>
+            <li key={proj.title} className="flex flex-col items-center bg-background/70 rounded-2xl px-6 py-8 shadow-2xl border border-white/10 hover:scale-105 transition-transform duration-300 animate-slide-up relative" style={{animationDelay: `${0.4 + idx * 0.07}s`, animationFillMode: 'both'}}>
+              <span className="mb-3">{proj.icon}</span>
+              <span className="font-bold text-xl text-white mb-2 flex items-center gap-2">
+                {proj.title}
+                <span className="bg-blue-500 text-white text-xs px-2 py-1 rounded-full animate-pulse">{proj.badge}</span>
+              </span>
+              <span className="text-gray-200 text-center mb-2">{proj.text}</span>
             </li>
           ))}
         </ul>
-        <div className="mt-10 sm:mt-16 text-center animate-fade-in" style={{animationDelay: '0.7s', animationFillMode: 'both'}}>
-          <h2 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2 text-primary animate-slide-up">E muito mais por vir!</h2>
+        <div className="mt-12 sm:mt-16 text-center animate-fade-in" style={{animationDelay: '0.7s', animationFillMode: 'both'}}>
+          <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white animate-slide-up">Tem uma ideia incrível?</h3>
+          <p className="text-gray-200 text-sm sm:text-base mb-4">Sua sugestão pode ser o próximo grande recurso do PontoFino! Envie para <a href="mailto:contato@pontofino.com" className="underline text-blue-200 hover:text-blue-400">contato@pontofino.com</a></p>
+          <button className="bg-gradient-to-r from-blue-500 to-cyan-400 text-white font-bold px-6 py-2 rounded-full shadow-lg hover:scale-105 transition-transform">Enviar sugestão</button>
+        </div>
+        <div className="mt-10 sm:mt-16 text-center animate-fade-in" style={{animationDelay: '1s', animationFillMode: 'both'}}>
+          <h4 className="text-lg sm:text-2xl font-bold mb-1 sm:mb-2 text-white animate-slide-up">E muito mais por vir!</h4>
           <p className="text-gray-200 text-xs sm:text-base">Estamos sempre inovando para entregar a melhor experiência financeira para você. Fique ligado nas novidades!</p>
         </div>
       </main>

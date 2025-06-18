@@ -13,7 +13,7 @@ export default function HeroSection() {
       </div>
       <div className="relative z-10 flex flex-col items-center">
         <div className="bg-gradient-to-tr from-blue-500 via-cyan-400 to-blue-300 p-2 rounded-full shadow-xl mb-6 animate-float-slow">
-          <img src="/assets/PontoFino_Logo.png" alt="Logo" className="w-20 h-20 sm:w-28 sm:h-28 drop-shadow-2xl" />
+          <img src="/assets/logo_branco.png" alt="Logo" className="w-20 h-20 sm:w-28 sm:h-28 drop-shadow-2xl" />
         </div>
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold mb-6 animate-slide-up drop-shadow-2xl bg-gradient-to-r from-cyan-300 via-blue-200 to-blue-100 bg-clip-text text-transparent">
           Bem-vindo ao <span className="inline-block bg-gradient-to-br from-blue-700 via-cyan-400 to-blue-300 px-4 py-2 rounded-2xl text-white shadow-lg ml-2">PontoFino</span>
