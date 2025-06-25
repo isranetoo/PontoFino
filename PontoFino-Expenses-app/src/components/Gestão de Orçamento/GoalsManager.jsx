@@ -1,3 +1,7 @@
+// MOVIDO: src/components/GoalsManager.jsx
+// ---
+// Este arquivo foi movido para a pasta Gestão de Orçamento.
+// O conteúdo original está abaixo:
 
 import React, { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
