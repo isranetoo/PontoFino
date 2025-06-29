@@ -6,6 +6,7 @@ import Footer from '../Footer';
 import { Toaster } from '../ui/toaster';
 import HistoricoInvestimentos from './HistoricoInvestimentos';
 import ConfiguracoesInvestimentos from './ConfiguracoesInvestimentos';
+import CalculadoraAposentadoria from './CalculadoraAposentadoria';
 import { motion } from 'framer-motion';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Input } from '../ui/input';
@@ -220,6 +221,9 @@ const SimuladorInvestimentos = () => {
           )}
           {tab === 'config' && (
             <ConfiguracoesInvestimentos config={config} onConfigChange={setConfig} />
+          )}
+          {tab === 'aposentadoria' && (
+            <CalculadoraAposentadoria />
           )}
         </div>
       </div>
