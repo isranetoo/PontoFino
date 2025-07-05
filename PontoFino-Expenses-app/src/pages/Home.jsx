@@ -4,6 +4,7 @@ import HomeNavBar from '../components/HomeNavBar';
 import HeroSection from '../components/HeroSection';
 import PlatformInfo from '../components/PlatformInfo';
 import ToolsSection from '../components/ToolsSection';
+import SubscriptionSection from '../components/SubscriptionSection';
 import FutureProjects from '../components/FutureProjects';
 
 export default function Home() {
@@ -14,8 +15,9 @@ export default function Home() {
         <HeroSection />
         <div className="h-4 sm:h-8 md:h-12" />
         <PlatformInfo />
+        <div className="h-4 sm:h-8 md:h-12" />        <ToolsSection />
         <div className="h-4 sm:h-8 md:h-12" />
-        <ToolsSection />
+        <SubscriptionSection />
         <div className="h-4 sm:h-8 md:h-12" />
         <FutureProjects />
       </div>

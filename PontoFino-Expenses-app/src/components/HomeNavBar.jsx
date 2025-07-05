@@ -12,10 +12,12 @@ export default function HomeNavBar() {
 
   // Itens do menu
   const menuItems = [
+    
     { label: 'Home', to: '/' },
-    { label: 'Sobre', href: '/sobre' },
     { label: 'Ferramentas', to: '/ferramentas' },
     { label: 'Projetos Futuros', href: '/projetos-futuros' },
+    { label: 'Planos', to: '/subscriptions' },
+    { label: 'Sobre', href: '/sobre' },
   ];
 
   return (
