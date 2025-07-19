@@ -57,50 +57,70 @@ const SimuladorInvestimentos = () => {
   const [tab, setTab] = useState('simular');
   const [config, setConfig] = useState(defaultConfig);
   const { toast } = useToast();
+  const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+  const [showResumo, setShowResumo] = useState(false);
+
+  const validate = () => {
+    const newErrors = {};
+    if (!form.type) newErrors.type = 'Selecione o tipo de investimento.';
+    if (!form.aporte || isNaN(parseFloat(form.aporte.replace(',', '.'))) || parseFloat(form.aporte.replace(',', '.')) < 0) newErrors.aporte = 'Aporte inicial inválido.';
+    if (!form.taxa || isNaN(parseFloat(form.taxa.replace(',', '.'))) || parseFloat(form.taxa.replace(',', '.')) < 0) newErrors.taxa = 'Taxa inválida.';
+    if (!form.tempo || isNaN(parseInt(form.tempo)) || parseInt(form.tempo) <= 0) newErrors.tempo = 'Tempo deve ser maior que zero.';
+    return newErrors;
+  };
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
+    setErrors({ ...errors, [e.target.name]: undefined });
   };
 
   const handleTypeChange = (value) => {
     setForm({ ...form, type: value });
+    setErrors({ ...errors, type: undefined });
   };
 
   const calcularSimulacao = (e) => {
     e.preventDefault();
-    const aporte = parseFloat(form.aporte.replace(',', '.'));
-    const aporteMensal = parseFloat(form.aporteMensal?.replace(',', '.') || '0');
-    const taxa = parseFloat(form.taxa.replace(',', '.')) / 100;
-    const inflacao = parseFloat(form.inflacao?.replace(',', '.') || '0') / 100;
-    const tempo = parseInt(form.tempo);
-    if (isNaN(aporte) || isNaN(taxa) || isNaN(tempo) || aporte < 0 || taxa < 0 || tempo <= 0) {
-      toast({ title: 'Erro', description: 'Preencha todos os campos corretamente.', variant: 'destructive' });
+    const newErrors = validate();
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setResult(null);
+      setShowResumo(false);
       return;
     }
-    // Juros compostos com aporte mensal e inflação
-    let valorFinal = aporte;
-    let saldo = aporte;
-    for (let i = 1; i <= tempo; i++) {
-      saldo = (saldo + aporteMensal) * (1 + taxa);
-      if (inflacao > 0) {
-        saldo = saldo / (1 + inflacao / 12);
+    setShowResumo(true);
+    setLoading(true);
+    setTimeout(() => {
+      const aporte = parseFloat(form.aporte.replace(',', '.'));
+      const aporteMensal = parseFloat(form.aporteMensal?.replace(',', '.') || '0');
+      const taxa = parseFloat(form.taxa.replace(',', '.')) / 100;
+      const inflacao = parseFloat(form.inflacao?.replace(',', '.') || '0') / 100;
+      const tempo = parseInt(form.tempo);
+      let valorFinal = aporte;
+      let saldo = aporte;
+      for (let i = 1; i <= tempo; i++) {
+        saldo = (saldo + aporteMensal) * (1 + taxa);
+        if (inflacao > 0) {
+          saldo = saldo / (1 + inflacao / 12);
+        }
       }
-    }
-    valorFinal = saldo;
-    const simData = {
-      name: investmentTypes.find((t) => t.id === form.type)?.name || 'Simulação',
-      valorFinal,
-      rendimento: valorFinal - aporte - (aporteMensal * tempo),
-      aporte,
-      aporteMensal,
-      tempo,
-      taxa: taxa * 100,
-      inflacao: inflacao * 100,
-    };
-    setResult(simData);
-    setSimulations((prev) => [...prev, simData]);
-    setForm({ type: '', aporte: '', aporteMensal: '', taxa: '', inflacao: '', tempo: '', rendimento: 'bruto' });
-    setTab('comparar');
+      valorFinal = saldo;
+      const simData = {
+        name: investmentTypes.find((t) => t.id === form.type)?.name || 'Simulação',
+        valorFinal,
+        rendimento: valorFinal - aporte - (aporteMensal * tempo),
+        aporte,
+        aporteMensal,
+        tempo,
+        taxa: taxa * 100,
+        inflacao: inflacao * 100,
+      };
+      setResult(simData);
+      setSimulations((prev) => [...prev, simData]);
+      setLoading(false);
+      setForm({ type: '', aporte: '', aporteMensal: '', taxa: '', inflacao: '', tempo: '', rendimento: 'bruto' });
+    }, 900);
   };
 
   return (
@@ -141,7 +161,7 @@ const SimuladorInvestimentos = () => {
                       <div className="space-y-2">
                         <Label htmlFor="type" className="text-gray-300 text-sm sm:text-base">Tipo de Investimento</Label>
                         <Select value={form.type} onValueChange={handleTypeChange}>
-                          <SelectTrigger className="bg-gray-800/50 border-gray-600 text-white h-12 text-base sm:text-lg">
+                          <SelectTrigger className={`bg-gray-800/50 border-gray-600 text-white h-12 text-base sm:text-lg ${errors.type ? 'border-red-500' : ''}`}> 
                             <SelectValue placeholder="Selecione o tipo" />
                           </SelectTrigger>
                           <SelectContent>
@@ -152,6 +172,7 @@ const SimuladorInvestimentos = () => {
                             ))}
                           </SelectContent>
                         </Select>
+                        {errors.type && <span className="text-red-400 text-xs">{errors.type}</span>}
                         {form.type && (
                           <div className="text-xs text-blue-200 mt-1">
                             {investmentTypes.find(t => t.id === form.type)?.description}
@@ -160,7 +181,8 @@ const SimuladorInvestimentos = () => {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="aporte" className="text-gray-300 text-sm sm:text-base">Aporte Inicial (R$)</Label>
-                        <Input id="aporte" name="aporte" type="text" placeholder="0,00" value={form.aporte} onChange={handleChange} className="bg-gray-800/50 border-gray-600 text-white h-12 text-base sm:text-lg" />
+                        <Input id="aporte" name="aporte" type="text" placeholder="0,00" value={form.aporte} onChange={handleChange} className={`bg-gray-800/50 border-gray-600 text-white h-12 text-base sm:text-lg ${errors.aporte ? 'border-red-500' : ''}`} />
+                        {errors.aporte && <span className="text-red-400 text-xs">{errors.aporte}</span>}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="aporteMensal" className="text-gray-300 text-sm sm:text-base">Aporte Mensal (R$)</Label>
@@ -168,7 +190,8 @@ const SimuladorInvestimentos = () => {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="taxa" className="text-gray-300 text-sm sm:text-base">Taxa de Juros (% ao mês)</Label>
-                        <Input id="taxa" name="taxa" type="text" placeholder="0,00" value={form.taxa} onChange={handleChange} className="bg-gray-800/50 border-gray-600 text-white h-12 text-base sm:text-lg" />
+                        <Input id="taxa" name="taxa" type="text" placeholder="0,00" value={form.taxa} onChange={handleChange} className={`bg-gray-800/50 border-gray-600 text-white h-12 text-base sm:text-lg ${errors.taxa ? 'border-red-500' : ''}`} />
+                        {errors.taxa && <span className="text-red-400 text-xs">{errors.taxa}</span>}
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="inflacao" className="text-gray-300 text-sm sm:text-base">Inflação Anual (%)</Label>
@@ -176,12 +199,32 @@ const SimuladorInvestimentos = () => {
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="tempo" className="text-gray-300 text-sm sm:text-base">Tempo (meses)</Label>
-                        <Input id="tempo" name="tempo" type="number" placeholder="0" value={form.tempo} onChange={handleChange} className="bg-gray-800/50 border-gray-600 text-white h-12 text-base sm:text-lg" />
+                        <Input id="tempo" name="tempo" type="number" placeholder="0" value={form.tempo} onChange={handleChange} className={`bg-gray-800/50 border-gray-600 text-white h-12 text-base sm:text-lg ${errors.tempo ? 'border-red-500' : ''}`} />
+                        {errors.tempo && <span className="text-red-400 text-xs">{errors.tempo}</span>}
                       </div>
                     </div>
-                    <Button type="submit" className="w-full h-12 text-base sm:text-lg gradient-bg hover:opacity-90 transition-all duration-300 transform hover:scale-105">Simular</Button>
+                    <Button type="submit" className="w-full h-12 text-base sm:text-lg gradient-bg hover:opacity-90 transition-all duration-300 transform hover:scale-105">{loading ? 'Calculando...' : 'Simular'}</Button>
                   </form>
-                  {result && (
+
+                  {showResumo && (
+                    <div className="mt-6 p-4 rounded-lg bg-gray-900/60 border border-gray-700 text-gray-200">
+                      <div className="font-semibold mb-2">Resumo dos dados:</div>
+                      <ul className="text-sm space-y-1">
+                        <li>Tipo: <span className="font-bold">{investmentTypes.find(t => t.id === form.type)?.name || '-'}</span></li>
+                        <li>Aporte inicial: <span className="font-bold">R$ {parseFloat(form.aporte || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></li>
+                        <li>Aporte mensal: <span className="font-bold">R$ {parseFloat(form.aporteMensal || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span></li>
+                        <li>Taxa: <span className="font-bold">{form.taxa}% ao mês</span></li>
+                        <li>Inflação anual: <span className="font-bold">{form.inflacao || 0}%</span></li>
+                        <li>Tempo: <span className="font-bold">{form.tempo} meses</span></li>
+                      </ul>
+                    </div>
+                  )}
+
+                  {loading && (
+                    <div className="mt-4 text-center text-blue-400 animate-pulse">Calculando...</div>
+                  )}
+
+                  {result && !loading && (
                     <div className="mt-6 p-4 rounded-lg bg-blue-900/20 border border-blue-500/30">
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-sm font-medium text-blue-400">Resultado da Simulação</span>
