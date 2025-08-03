@@ -20,7 +20,7 @@ export default function HeroSection() {
       <div className="flex flex-col items-center max-w-6xl mx-auto">
         {/* Logo Badge */}
         <div className="mb-8 relative">
-          <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-30 animate-pulse"></div>
+          <div className="absolute inset-0 bg-white rounded-full blur-xl opacity-30"></div>
           <div className="relative bg-gradient-to-br from-blue-600 to-blue-800 p-4 rounded-full shadow-2xl">
             <img 
               src="/assets/logo_branco.png" 
