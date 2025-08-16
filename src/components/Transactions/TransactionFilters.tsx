@@ -1,21 +1,21 @@
-import React from 'react'
-import { Calendar, Search, Filter, SortAsc, SortDesc } from 'lucide-react'
+import React from 'react';
+import { Calendar, Search } from 'lucide-react';
 
 interface TransactionFiltersProps {
   filters: {
-    dateFrom?: string
-    dateTo?: string
-    category?: string
-    type?: 'income' | 'expense' | 'transfer' | ''
-    account?: string
-    search?: string
-  }
-  accounts: any[]
-  categories: any[]
-  onFiltersChange: (filters: any) => void
-  onSortChange: (field: 'date' | 'amount', order: 'asc' | 'desc') => void
-  sortBy: 'date' | 'amount'
-  sortOrder: 'asc' | 'desc'
+    dateFrom?: string;
+    dateTo?: string;
+    category?: string;
+    type?: 'income' | 'expense' | 'transfer' | '';
+    account?: string;
+    search?: string;
+  };
+  accounts: any[];
+  categories: any[];
+  onFiltersChange: (filters: any) => void;
+  onSortChange: (field: 'date' | 'amount', order: 'asc' | 'desc') => void;
+  sortBy: 'date' | 'amount';
+  sortOrder: 'asc' | 'desc';
 }
 
 export function TransactionFilters({
@@ -25,30 +25,31 @@ export function TransactionFilters({
   onFiltersChange,
   onSortChange,
   sortBy,
-  sortOrder
+  sortOrder,
 }: TransactionFiltersProps) {
-  
   const handleFilterChange = (field: string, value: string) => {
     onFiltersChange({
       ...filters,
-      [field]: value || undefined
-    })
-  }
+      [field]: value || undefined,
+    });
+  };
 
   const clearFilters = () => {
-    onFiltersChange({})
-  }
+    onFiltersChange({});
+  };
 
-  const hasActiveFilters = Object.values(filters).some(value => value && value !== '')
+  const hasActiveFilters = Object.values(filters).some(
+    (value) => value && value !== ''
+  );
 
   return (
-    <div className="space-y-4">
+    <div className="bg-white shadow-md rounded-lg p-6 space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-gray-900">Filtros</h3>
+        <h3 className="text-lg font-medium text-gray-800">Filtros</h3>
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="text-sm text-blue-600 hover:text-blue-700"
+            className="text-sm text-blue-600 hover:text-blue-800"
           >
             Limpar filtros
           </button>
@@ -83,7 +84,7 @@ export function TransactionFilters({
             onChange={(e) => handleFilterChange('type', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="">Todos os tipos</option>
+            <option value="">Todos</option>
             <option value="income">Receita</option>
             <option value="expense">Despesa</option>
             <option value="transfer">Transferência</option>
@@ -100,8 +101,8 @@ export function TransactionFilters({
             onChange={(e) => handleFilterChange('account', e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="">Todas as contas</option>
-            {accounts.map(account => (
+            <option value="">Todas</option>
+            {accounts.map((account) => (
               <option key={account.id} value={account.id}>
                 {account.name}
               </option>
@@ -142,61 +143,7 @@ export function TransactionFilters({
             />
           </div>
         </div>
-
-        {/* Categoria */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Categoria
-          </label>
-          <select
-            value={filters.category || ''}
-            onChange={(e) => handleFilterChange('category', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          >
-            <option value="">Todas as categorias</option>
-            {categories.map(category => (
-              <option key={category.id} value={category.id}>
-                {category.name} ({category.type === 'income' ? 'Receita' : category.type === 'expense' ? 'Despesa' : 'Transferência'})
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Ordenação */}
-      <div className="flex items-center space-x-4 pt-4 border-t border-gray-200">
-        <span className="text-sm font-medium text-gray-700">Ordenar por:</span>
-        
-        <div className="flex items-center space-x-2">
-          <button
-            onClick={() => onSortChange('date', sortBy === 'date' && sortOrder === 'desc' ? 'asc' : 'desc')}
-            className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-sm transition-colors ${
-              sortBy === 'date' 
-                ? 'bg-blue-100 text-blue-700' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <span>Data</span>
-            {sortBy === 'date' && (
-              sortOrder === 'desc' ? <SortDesc className="w-4 h-4" /> : <SortAsc className="w-4 h-4" />
-            )}
-          </button>
-          
-          <button
-            onClick={() => onSortChange('amount', sortBy === 'amount' && sortOrder === 'desc' ? 'asc' : 'desc')}
-            className={`flex items-center space-x-1 px-3 py-1 rounded-lg text-sm transition-colors ${
-              sortBy === 'amount' 
-                ? 'bg-blue-100 text-blue-700' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <span>Valor</span>
-            {sortBy === 'amount' && (
-              sortOrder === 'desc' ? <SortDesc className="w-4 h-4" /> : <SortAsc className="w-4 h-4" />
-            )}
-          </button>
-        </div>
       </div>
     </div>
-  )
+  );
 }

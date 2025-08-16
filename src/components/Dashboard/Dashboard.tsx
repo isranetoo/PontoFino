@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Plus, X, Calculator, Bot, Lightbulb } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Plus, X } from 'lucide-react';
 import { MetricsCard } from './MetricsCard';
 import { TransactionForm } from '../Transactions/TransactionForm';
 import { AICopilotWidget } from '../AI/AICopilotWidget';
@@ -20,8 +20,7 @@ const Dashboard: React.FC = () => {
     monthlyExpenses,
     budgetAlerts,
     loading,
-    error,
-    refreshAll
+    error
   } = useDataContext();
   
   const [showTransactionModal, setShowTransactionModal] = useState(false);
@@ -63,16 +62,16 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex flex-col py-10 px-2 md:px-8 lg:px-16">
+    <div className="min-h-screen  text-white flex flex-col py-10 px-2 md:px-8 lg:px-16">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">Dashboard</h1>
-          <p className="text-blue-500 text-base">Visão geral das suas finanças</p>
+          <p className="text-gray-600 text-base">Visão geral das suas finanças</p>
         </div>
         <button
           onClick={() => setShowTransactionModal(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition-colors flex items-center gap-2 font-semibold"
+          className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg shadow transition-colors flex items-center gap-2 font-semibold"
         >
           <Plus className="w-5 h-5" /> Nova Transação
         </button>
@@ -86,18 +85,18 @@ const Dashboard: React.FC = () => {
       )}
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid text-gray-900 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <MetricsCard
           title="Saldo Total"
           value={formatCurrency(totalBalance)}
           icon={DollarSign}
-          color="blue"
+          color="green"
         />
         <MetricsCard
           title="Receitas do Mês"
           value={formatCurrency(monthlyIncome)}
           icon={TrendingUp}
-          color="green"
+          color="blue"
         />
         <MetricsCard
           title="Despesas do Mês"
@@ -149,7 +148,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Recent Transactions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-10">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Transações Recentes</h2>
         </div>
