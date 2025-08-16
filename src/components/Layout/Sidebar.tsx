@@ -35,55 +35,55 @@ const menuItems = [
 ]
 
 export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       {/* Mobile menu button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white/10 border border-white/10 rounded-lg shadow-md backdrop-blur-md hover:bg-white/20 transition-colors"
       >
-        {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        {isOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
       </button>
 
       {/* Sidebar */}
       <div className={`
-        fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out
+        fixed inset-y-0 left-0 z-40 w-64 bg-gradient-to-br from-blue-900 via-blue-900 to-blue-900 shadow-xl border-r border-white/10 transform transition-transform duration-200 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
         <div className="p-6">
           <div className="flex items-center space-x-3 mb-8">
-            <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-white">
+            <div className="w-10 h-10 rounded-lg flex items-center justify-center">
               <img src="/assets/logo.png" alt="Logo" className="w-8 h-8 object-contain" />
             </div>
-            <h1 className="text-xl font-bold text-gray-900">PontoFino</h1>
+            <h1 className="text-xl font-bold text-white px-3 py-1 shadow-sm">PontoFino</h1>
           </div>
 
           <nav className="space-y-2">
             {menuItems.map((item) => {
-              const Icon = item.icon
-              const isActive = activeTab === item.id
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
 
               return (
                 <button
                   key={item.id}
                   onClick={() => {
-                    onTabChange(item.id)
-                    setIsOpen(false)
+                    onTabChange(item.id);
+                    setIsOpen(false);
                   }}
                   className={`
-                    w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors
-                    ${isActive 
-                      ? 'bg-blue-50 text-blue-700 border border-blue-200' 
-                      : 'text-gray-700 hover:bg-gray-50'
+                    w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors font-medium
+                    ${isActive
+                      ? 'bg-gradient-to-r from-blue-700/60 to-blue-500/60 text-white border border-blue-400/40 shadow-md'
+                      : 'text-blue-100 hover:bg-white/5 hover:text-white border border-white/10'
                     }
                   `}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <Icon className={`w-5 h-5 ${isActive ? 'text-blue-200' : 'text-blue-300'}`} />
+                  <span>{item.label}</span>
                 </button>
-              )
+              );
             })}
           </nav>
         </div>
@@ -91,11 +91,11 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
 
       {/* Overlay */}
       {isOpen && (
-        <div 
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-30"
+        <div
+          className="lg:hidden fixed inset-0 bg-black/60 z-30"
           onClick={() => setIsOpen(false)}
         />
       )}
     </>
-  )
+  );
 }

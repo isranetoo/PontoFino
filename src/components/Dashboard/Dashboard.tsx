@@ -63,31 +63,30 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-h-screen bg-white flex flex-col py-10 px-2 md:px-8 lg:px-16">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="text-gray-600">Visão geral das suas finanças</p>
+          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">Dashboard</h1>
+          <p className="text-blue-500 text-base">Visão geral das suas finanças</p>
         </div>
-        <button 
+        <button
           onClick={() => setShowTransactionModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg shadow transition-colors flex items-center gap-2 font-semibold"
         >
-          <Plus className="w-4 h-4" />
-          Nova Transação
+          <Plus className="w-5 h-5" /> Nova Transação
         </button>
       </div>
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
           <p className="text-red-600">Erro ao carregar dados: {error}</p>
         </div>
       )}
 
       {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <MetricsCard
           title="Saldo Total"
           value={formatCurrency(totalBalance)}

@@ -9,56 +9,49 @@ interface MetricsCardProps {
     isPositive: boolean
     period: string
   }
-  icon: LucideIcon
+  icon: typeof LucideIcon
   color: 'blue' | 'green' | 'yellow' | 'red' | 'purple'
 }
 
 const colorClasses = {
   blue: {
-    bg: 'bg-blue-50',
-    icon: 'text-blue-600',
-    text: 'text-blue-600'
+    icon: 'text-blue-500',
+    ring: 'ring-blue-100',
   },
   green: {
-    bg: 'bg-green-50',
-    icon: 'text-green-600',
-    text: 'text-green-600'
+    icon: 'text-emerald-500',
+    ring: 'ring-emerald-100',
   },
   yellow: {
-    bg: 'bg-yellow-50',
-    icon: 'text-yellow-600',
-    text: 'text-yellow-600'
+    icon: 'text-yellow-500',
+    ring: 'ring-yellow-100',
   },
   red: {
-    bg: 'bg-red-50',
-    icon: 'text-red-600',
-    text: 'text-red-600'
+    icon: 'text-red-500',
+    ring: 'ring-red-100',
   },
   purple: {
-    bg: 'bg-purple-50',
-    icon: 'text-purple-600',
-    text: 'text-purple-600'
+    icon: 'text-purple-500',
+    ring: 'ring-purple-100',
   }
 }
 
 export function MetricsCard({ title, value, change, icon: Icon, color }: MetricsCardProps) {
-  const colors = colorClasses[color]
-
+  const colors = colorClasses[color];
   return (
-    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`w-12 h-12 rounded-lg ${colors.bg} flex items-center justify-center`}>
+    <div className="bg-white border border-white/10 rounded-xl shadow-sm p-5 hover:shadow-md transition-shadow flex flex-col gap-2">
+      <div className="flex items-center justify-between mb-2">
+        <div className={`w-11 h-11 rounded-lg bg-white ring-2 ${colors.ring} flex items-center justify-center`}>
           <Icon className={`w-6 h-6 ${colors.icon}`} />
         </div>
         {change && (
-          <div className={`text-sm ${change.isPositive ? 'text-green-600' : 'text-red-600'}`}>
-            {change.isPositive ? '+' : ''}{change.value}% {change.period}
-          </div>
+          <div className={`text-xs font-semibold ${change.isPositive ? 'text-emerald-500' : 'text-red-500'}`}>{change.isPositive ? '+' : ''}{change.value}% {change.period}</div>
         )}
       </div>
-
-      <h3 className="text-gray-600 text-sm font-medium mb-1">{title}</h3>
-      <p className="text-2xl font-bold text-gray-900">{value}</p>
+      <div className="flex-1">
+        <div className="text-xs text-blue-400 font-medium mb-1">{title}</div>
+        <div className="text-2xl font-bold text-gray-900">{value}</div>
+      </div>
     </div>
-  )
+  );
 }
