@@ -42,7 +42,7 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white/10 border border-white/10 rounded-lg shadow-md backdrop-blur-md hover:bg-white/20 transition-colors"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-gradient-to-br from-blue-900 via-blue-900 to-blue-900 rounded-lg shadow-md backdrop-blur-md hover:bg-white/20 transition-colors"
       >
         {isOpen ? <X className="w-6 h-6 text-white" /> : <Menu className="w-6 h-6 text-white" />}
       </button>
