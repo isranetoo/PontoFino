@@ -43,46 +43,42 @@ export function TransactionFilters({
   );
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium text-gray-800">Filtros</h3>
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 space-y-8 animate-fade-in">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-xl font-bold text-gray-900 tracking-tight">Filtros</h3>
         {hasActiveFilters && (
           <button
             onClick={clearFilters}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-blue-700 font-semibold hover:underline hover:text-blue-900 transition-colors"
           >
             Limpar filtros
           </button>
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {/* Busca por texto */}
         <div className="lg:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Buscar
-          </label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Buscar</label>
           <div className="relative">
-            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+            <Search className="w-5 h-5 text-blue-400 absolute left-3 top-3" />
             <input
               type="text"
               placeholder="Descrição, conta ou categoria..."
               value={filters.search || ''}
               onChange={(e) => handleFilterChange('search', e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
             />
           </div>
         </div>
 
         {/* Tipo */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Tipo
-          </label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Tipo</label>
           <select
             value={filters.type || ''}
             onChange={(e) => handleFilterChange('type', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
           >
             <option value="">Todos</option>
             <option value="income">Receita</option>
@@ -93,13 +89,11 @@ export function TransactionFilters({
 
         {/* Conta */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Conta
-          </label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Conta</label>
           <select
             value={filters.account || ''}
             onChange={(e) => handleFilterChange('account', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
           >
             <option value="">Todas</option>
             {accounts.map((account) => (
@@ -111,35 +105,31 @@ export function TransactionFilters({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Data inicial */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Data inicial
-          </label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Data inicial</label>
           <div className="relative">
-            <Calendar className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+            <Calendar className="w-5 h-5 text-blue-400 absolute left-3 top-3" />
             <input
               type="date"
               value={filters.dateFrom || ''}
               onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
             />
           </div>
         </div>
 
         {/* Data final */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Data final
-          </label>
+          <label className="block text-sm font-semibold text-gray-800 mb-2">Data final</label>
           <div className="relative">
-            <Calendar className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
+            <Calendar className="w-5 h-5 text-blue-400 absolute left-3 top-3" />
             <input
               type="date"
               value={filters.dateTo || ''}
               onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
             />
           </div>
         </div>

@@ -29,9 +29,9 @@ export function StatementImport({ onSuccess, onCancel }: StatementImportProps) {
   };
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-6 space-y-4">
-      <h2 className="text-xl font-semibold text-gray-800">Importar Extrato</h2>
-      <div className="border border-dashed border-gray-300 rounded-lg p-4 text-center">
+    <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 max-w-lg mx-auto space-y-6 animate-fade-in">
+      <h2 className="text-2xl font-bold text-gray-900 mb-2 tracking-tight">Importar Extrato</h2>
+      <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer">
         <input
           type="file"
           onChange={handleFileInput}
@@ -40,22 +40,23 @@ export function StatementImport({ onSuccess, onCancel }: StatementImportProps) {
         />
         <label
           htmlFor="file-upload"
-          className="cursor-pointer text-blue-600 hover:text-blue-800"
+          className="cursor-pointer text-blue-700 font-semibold text-lg hover:underline"
         >
-          Clique para selecionar um arquivo ou arraste aqui
+          Clique para selecionar um arquivo <span className="font-normal text-gray-500">ou arraste aqui</span>
         </label>
+        <p className="text-xs text-gray-500 mt-2">Formatos aceitos: <span className="font-medium text-blue-700">CSV</span> ou <span className="font-medium text-blue-700">OFX</span></p>
       </div>
-      {error && <p className="text-red-500 text-sm">{error}</p>}
-      <div className="flex justify-end space-x-2">
+      {error && <p className="bg-red-100 border border-red-300 text-red-700 px-4 py-2 rounded-xl font-medium shadow-sm">{error}</p>}
+      <div className="flex justify-end gap-4 mt-4">
         <button
           onClick={onCancel}
-          className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300"
+          className="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 font-semibold transition-all"
         >
           Cancelar
         </button>
         <button
           onClick={onSuccess}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-5 py-2.5 bg-blue-700 text-white rounded-xl shadow-sm hover:bg-blue-800 focus:ring-2 focus:ring-blue-400 font-semibold transition-all"
         >
           Importar
         </button>

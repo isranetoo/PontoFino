@@ -74,58 +74,58 @@ export function BulkActions({
 
   if (success) {
     return (
-      <div className="flex items-center space-x-2 text-green-600">
-        <Check className="w-5 h-5" />
-        <span>Ação executada com sucesso!</span>
+      <div className="flex items-center justify-center space-x-2 bg-green-100 border border-green-300 rounded-xl py-4 px-6 shadow-sm animate-fade-in">
+        <Check className="w-6 h-6 text-green-700" />
+        <span className="font-semibold text-green-800">Ação executada com sucesso!</span>
       </div>
     )
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="font-medium text-gray-900">
-          Ações em lote ({selectedTransactions.length} selecionadas)
+    <div className="space-y-6 bg-white border border-gray-200 rounded-2xl shadow-lg p-6 animate-fade-in">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="font-semibold text-gray-900 text-lg tracking-tight">
+          Ações em lote <span className="text-blue-700">({selectedTransactions.length} selecionadas)</span>
         </h3>
       </div>
 
       {!action ? (
-        <div className="flex items-center space-x-3">
+        <div className="flex flex-wrap gap-4">
           <button
             onClick={() => setAction('category')}
-            className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-blue-700 text-white rounded-xl shadow-sm hover:bg-blue-800 focus:ring-2 focus:ring-blue-400 transition-all font-medium"
           >
-            <Tag className="w-4 h-4" />
+            <Tag className="w-5 h-5" />
             <span>Alterar Categoria</span>
           </button>
 
           <button
             onClick={() => setAction('account')}
-            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-green-700 text-white rounded-xl shadow-sm hover:bg-green-800 focus:ring-2 focus:ring-green-400 transition-all font-medium"
           >
-            <CreditCard className="w-4 h-4" />
+            <CreditCard className="w-5 h-5" />
             <span>Alterar Conta</span>
           </button>
 
           <button
             onClick={() => setAction('delete')}
-            className="flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 bg-red-700 text-white rounded-xl shadow-sm hover:bg-red-800 focus:ring-2 focus:ring-red-400 transition-all font-medium"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-5 h-5" />
             <span>Excluir</span>
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {action === 'category' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nova categoria para {selectedTransactions.length} transação(ões):
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                Nova categoria para <span className="text-blue-700 font-bold">{selectedTransactions.length}</span> transação(ões):
               </label>
               <select
                 value={selectedValue}
                 onChange={(e) => setSelectedValue(e.target.value)}
-                className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-50 text-gray-900"
               >
                 <option value="">Selecione uma categoria</option>
                 {categories.map(category => (
@@ -139,13 +139,13 @@ export function BulkActions({
 
           {action === 'account' && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nova conta para {selectedTransactions.length} transação(ões):
+              <label className="block text-sm font-semibold text-gray-800 mb-2">
+                Nova conta para <span className="text-blue-700 font-bold">{selectedTransactions.length}</span> transação(ões):
               </label>
               <select
                 value={selectedValue}
                 onChange={(e) => setSelectedValue(e.target.value)}
-                className="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full max-w-xs px-4 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-gray-50 text-gray-900"
               >
                 <option value="">Selecione uma conta</option>
                 {accounts.map(account => (
@@ -158,29 +158,29 @@ export function BulkActions({
           )}
 
           {action === 'delete' && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex items-center space-x-2 text-red-800">
-                <AlertCircle className="w-5 h-5" />
-                <span className="font-medium">Atenção!</span>
+            <div className="bg-red-100 border border-red-300 rounded-xl p-5 flex items-center gap-3 shadow-sm">
+              <AlertCircle className="w-6 h-6 text-red-700" />
+              <div>
+                <span className="font-semibold text-red-800">Atenção!</span>
+                <p className="text-red-700 mt-1 text-sm">
+                  Você está prestes a excluir <span className="font-bold">{selectedTransactions.length}</span> transação(ões).<br />
+                  <span className="font-medium">Esta ação não pode ser desfeita.</span>
+                </p>
               </div>
-              <p className="text-red-700 mt-1">
-                Você está prestes a excluir {selectedTransactions.length} transação(ões). 
-                Esta ação não pode ser desfeita.
-              </p>
             </div>
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <div className="bg-red-100 border border-red-300 text-red-800 px-4 py-3 rounded-xl font-medium shadow-sm">
               {error}
             </div>
           )}
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center gap-4 mt-2">
             <button
               onClick={handleBulkUpdate}
               disabled={loading || (!selectedValue && action !== 'delete')}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-5 py-2.5 bg-blue-700 text-white rounded-xl shadow-sm hover:bg-blue-800 focus:ring-2 focus:ring-blue-400 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
             >
               {loading ? 'Executando...' : 'Confirmar'}
             </button>
@@ -188,7 +188,7 @@ export function BulkActions({
             <button
               onClick={cancel}
               disabled={loading}
-              className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+              className="px-5 py-2.5 bg-gray-200 text-gray-800 rounded-xl hover:bg-gray-300 focus:ring-2 focus:ring-gray-400 font-semibold transition-all"
             >
               Cancelar
             </button>

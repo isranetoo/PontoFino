@@ -168,10 +168,9 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
     <form onSubmit={handleSubmit} className="space-y-6">
       {/* Categoria */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Categoria *
+        <label className="block text-sm font-semibold text-gray-800 mb-2 tracking-tight">
+          Categoria <span className="text-red-500">*</span>
         </label>
-        
         {categories.length > 0 ? (
           <div className="space-y-2">
             <div className="relative">
@@ -179,7 +178,7 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
               <select
                 value={formData.category_id}
                 onChange={(e) => handleInputChange('category_id', e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
+                className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900 font-medium shadow-sm transition-all"
                 required
               >
                 <option value="">Selecione uma categoria</option>
@@ -193,7 +192,7 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
             <button
               type="button"
               onClick={() => setShowCategoryForm(true)}
-              className="flex items-center space-x-2 text-blue-600 hover:text-blue-700 text-sm"
+              className="flex items-center space-x-2 text-blue-700 hover:text-blue-900 text-sm font-medium transition-colors"
             >
               <Plus className="w-4 h-4" />
               <span>Criar nova categoria</span>
@@ -201,19 +200,19 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <div className="flex items-center space-x-2 text-yellow-800">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4">
+              <div className="flex items-center space-x-2 text-yellow-900">
                 <AlertCircle className="w-5 h-5" />
-                <span className="font-medium">Nenhuma categoria de despesa encontrada</span>
+                <span className="font-semibold">Nenhuma categoria de despesa encontrada</span>
               </div>
-              <p className="text-yellow-700 mt-1 text-sm">
+              <p className="text-yellow-800 mt-1 text-sm">
                 Você precisa criar pelo menos uma categoria de despesa para criar orçamentos.
               </p>
             </div>
             <button
               type="button"
               onClick={() => setShowCategoryForm(true)}
-              className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors"
+              className="w-full flex items-center justify-center space-x-2 bg-blue-700 text-white py-3 rounded-xl hover:bg-blue-800 transition-colors font-semibold shadow"
             >
               <Plus className="w-5 h-5" />
               <span>Criar Primeira Categoria</span>
@@ -223,8 +222,8 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
 
         {/* Formulário de nova categoria */}
         {showCategoryForm && (
-          <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <h4 className="font-medium text-gray-900 mb-3">Criar Nova Categoria de Despesa</h4>
+          <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-xl shadow-sm">
+            <h4 className="font-semibold text-gray-900 mb-3">Criar Nova Categoria de Despesa</h4>
             <div className="space-y-3">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nome da Categoria</label>
@@ -232,7 +231,7 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
                   type="text"
                   value={newCategoryData.name}
                   onChange={(e) => setNewCategoryData(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium"
                   placeholder="Ex: Alimentação, Transporte, Lazer"
                 />
               </div>
@@ -243,7 +242,7 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
                     type="color"
                     value={newCategoryData.color}
                     onChange={(e) => setNewCategoryData(prev => ({ ...prev, color: e.target.value }))}
-                    className="w-full h-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full h-10 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
@@ -251,7 +250,7 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
                   <select
                     value={newCategoryData.icon}
                     onChange={(e) => setNewCategoryData(prev => ({ ...prev, icon: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium"
                   >
                     <option value="DollarSign">💰 Geral</option>
                     <option value="ShoppingCart">🛒 Compras</option>
@@ -264,11 +263,11 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
                   </select>
                 </div>
               </div>
-              <div className="flex space-x-2">
+              <div className="flex space-x-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowCategoryForm(false)}
-                  className="flex-1 px-3 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors"
+                  className="flex-1 px-3 py-2 bg-gray-200 text-gray-700 rounded-xl hover:bg-gray-300 transition-colors font-medium"
                 >
                   Cancelar
                 </button>
@@ -276,7 +275,7 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
                   type="button"
                   onClick={handleCreateCategory}
                   disabled={!newCategoryData.name.trim()}
-                  className="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 px-3 py-2 bg-blue-700 text-white rounded-xl hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow"
                 >
                   Criar Categoria
                 </button>
@@ -288,8 +287,8 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
 
       {/* Valor */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Valor do Orçamento *
+        <label className="block text-sm font-semibold text-gray-800 mb-2 tracking-tight">
+          Valor do Orçamento <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <DollarSign className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
@@ -299,7 +298,7 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
             min="0"
             value={formData.amount}
             onChange={(e) => handleInputChange('amount', e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium shadow-sm"
             placeholder="0,00"
             required
           />
@@ -308,7 +307,7 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
 
       {/* Período */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-semibold text-gray-800 mb-2 tracking-tight">
           Período
         </label>
         <div className="grid grid-cols-3 gap-2">
@@ -321,11 +320,11 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
               key={period.value}
               type="button"
               onClick={() => handleInputChange('period', period.value)}
-              className={`p-3 border-2 rounded-lg text-sm font-medium transition-all ${
-                formData.period === period.value
-                  ? 'border-blue-500 bg-blue-50 text-blue-700'
-                  : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'
-              }`}
+              className={`p-3 border-2 rounded-xl text-sm font-semibold transition-all shadow-sm
+                ${formData.period === period.value
+                  ? 'border-blue-700 bg-blue-50 text-blue-800'
+                  : 'border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100'}
+              `}
             >
               {period.label}
             </button>
@@ -335,8 +334,8 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
 
       {/* Data de início */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          Data de Início *
+        <label className="block text-sm font-semibold text-gray-800 mb-2 tracking-tight">
+          Data de Início <span className="text-red-500">*</span>
         </label>
         <div className="relative">
           <Calendar className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
@@ -344,7 +343,7 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
             type="date"
             value={formData.start_date}
             onChange={(e) => handleInputChange('start_date', e.target.value)}
-            className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white font-medium shadow-sm"
             required
           />
         </div>
@@ -352,8 +351,8 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
 
       {/* Informações do período */}
       {formData.start_date && (
-        <div className="bg-blue-50 rounded-lg p-4">
-          <h4 className="font-medium text-blue-900 mb-2">Resumo do Orçamento</h4>
+        <div className="bg-blue-50 rounded-xl p-4 mt-2 shadow-sm">
+          <h4 className="font-semibold text-blue-900 mb-2">Resumo do Orçamento</h4>
           <div className="text-sm text-blue-800 space-y-1">
             <p>
               <strong>Período:</strong> {
@@ -378,25 +377,25 @@ export function BudgetForm({ budget, categories, onSuccess, onCancel }: BudgetFo
 
       {/* Erro */}
       {submitError && (
-        <div className="flex items-center space-x-2 text-red-600 bg-red-50 border border-red-200 rounded-lg p-3">
+        <div className="flex items-center space-x-2 text-red-700 bg-red-50 border border-red-200 rounded-xl p-3 font-semibold shadow-sm">
           <AlertCircle className="w-5 h-5 flex-shrink-0" />
           <span className="text-sm">{submitError}</span>
         </div>
       )}
 
       {/* Botões */}
-      <div className="flex space-x-3 pt-4">
+      <div className="flex space-x-3 pt-6">
         <button
           type="button"
           onClick={onCancel}
-          className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors font-medium"
+          className="flex-1 px-4 py-3 text-gray-700 bg-gray-100 rounded-xl hover:bg-gray-200 transition-colors font-semibold shadow-sm"
         >
           Cancelar
         </button>
         <button
           type="submit"
           disabled={submitLoading || loading}
-          className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+          className="flex-1 px-4 py-3 bg-blue-700 text-white rounded-xl hover:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-semibold shadow"
         >
           {submitLoading ? 'Salvando...' : (budget ? 'Atualizar' : 'Criar Orçamento')}
         </button>
