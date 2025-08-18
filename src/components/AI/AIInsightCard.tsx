@@ -1,168 +1,166 @@
-import React, { useState } from 'react';
-import { useAI } from '../../hooks/useAI';
-import {
-  Bot,
-  TrendingUp,
-  TrendingDown,
-  AlertTriangle,
-  Target,
+import React, { useState } from 'react'
+import { useAI } from '../../hooks/useAI'
+import { 
+  Bot, 
+  TrendingUp, 
+  TrendingDown, 
+  AlertTriangle, 
+  Target, 
   Lightbulb,
   ChevronRight,
   Zap
-} from 'lucide-react';
+} from 'lucide-react'
 
 interface AIInsightCardProps {
-  type: 'spending' | 'budget' | 'investment' | 'fire' | 'general';
-  title: string;
-  description: string;
-  data?: any;
-  onAnalyze?: (response: any) => void;
-  compact?: boolean;
+  type: 'spending' | 'budget' | 'investment' | 'fire' | 'general'
+  title: string
+  description: string
+  data?: any
+  onAnalyze?: (response: any) => void
+  compact?: boolean
 }
 
-export function AIInsightCard({
-  type,
-  title,
-  description,
-  data,
-  onAnalyze,
-  compact = false
+export function AIInsightCard({ 
+  type, 
+  title, 
+  description, 
+  data, 
+  onAnalyze, 
+  compact = false 
 }: AIInsightCardProps) {
-  const {
-    analyzeSpending,
-    optimizeBudget,
-    analyzeInvestments,
-    planFIRE,
+  const { 
+    analyzeSpending, 
+    optimizeBudget, 
+    analyzeInvestments, 
+    planFIRE, 
     askGeneral,
-    loading
-  } = useAI();
+    loading 
+  } = useAI()
 
-  const [analyzing, setAnalyzing] = useState(false);
-  const [result, setResult] = useState<any>(null);
+  const [analyzing, setAnalyzing] = useState(false)
+  const [result, setResult] = useState<any>(null)
 
   const getIcon = () => {
     switch (type) {
       case 'spending':
-        return <TrendingDown className="w-6 h-6 text-red-500" />;
+        return <TrendingDown className="w-5 h-5 text-red-600" />
       case 'budget':
-        return <Target className="w-6 h-6 text-blue-500" />;
+        return <Target className="w-5 h-5 text-blue-600" />
       case 'investment':
-        return <TrendingUp className="w-6 h-6 text-green-500" />;
+        return <TrendingUp className="w-5 h-5 text-green-600" />
       case 'fire':
-        return <Zap className="w-6 h-6 text-purple-500" />;
+        return <Zap className="w-5 h-5 text-purple-600" />
       default:
-        return <Lightbulb className="w-6 h-6 text-yellow-500" />;
+        return <Lightbulb className="w-5 h-5 text-yellow-600" />
     }
-  };
+  }
 
   const getColor = () => {
     switch (type) {
       case 'spending':
-        return 'from-red-100 to-red-50 border-red-300';
+        return 'from-red-50 to-orange-50 border-red-200'
       case 'budget':
-        return 'from-blue-100 to-blue-50 border-blue-300';
+        return 'from-blue-50 to-indigo-50 border-blue-200'
       case 'investment':
-        return 'from-green-100 to-green-50 border-green-300';
+        return 'from-green-50 to-emerald-50 border-green-200'
       case 'fire':
-        return 'from-purple-100 to-purple-50 border-purple-300';
+        return 'from-purple-50 to-pink-50 border-purple-200'
       default:
-        return 'from-yellow-100 to-yellow-50 border-yellow-300';
+        return 'from-yellow-50 to-amber-50 border-yellow-200'
     }
-  };
+  }
 
   const handleAnalyze = async () => {
-    setAnalyzing(true);
+    setAnalyzing(true)
     try {
-      let response = null;
+      let response = null
 
       switch (type) {
         case 'spending':
-          response = await analyzeSpending(title);
-          break;
+          response = await analyzeSpending(data?.query || title)
+          break
         case 'budget':
-          response = await optimizeBudget(title);
-          break;
+          response = await optimizeBudget(data?.query || title)
+          break
         case 'investment':
-          response = await analyzeInvestments(data, title);
-          break;
+          response = await analyzeInvestments(data, data?.query || title)
+          break
         case 'fire':
-          response = await planFIRE(data, title);
-          break;
+          response = await planFIRE(data, data?.query || title)
+          break
         default:
-          response = await askGeneral(title);
+          response = await askGeneral(data?.query || title)
       }
 
       if (response) {
-        setResult(response);
-        onAnalyze?.(response);
+        setResult(response)
+        onAnalyze?.(response)
       }
     } catch (err) {
-      console.error('AI analysis error:', err);
+      console.error('AI analysis error:', err)
     } finally {
-      setAnalyzing(false);
+      setAnalyzing(false)
     }
-  };
+  }
 
   if (compact) {
     return (
-      <div className={`p-4 bg-gradient-to-br ${getColor()} border rounded-lg shadow-md`}> {/* Modern shadow */}
+      <div className={`p-3 bg-gradient-to-br ${getColor()} border rounded-lg`}>
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm"> {/* Subtle shadow */}
-              {getIcon()}
-            </div>
-            <span className="text-base font-semibold text-gray-800">{title}</span>
+          <div className="flex items-center space-x-2">
+            <Bot className="w-4 h-4 text-blue-600" />
+            <span className="text-sm font-medium text-gray-900">{title}</span>
           </div>
           <button
             onClick={handleAnalyze}
             disabled={analyzing || loading}
-            className="text-sm bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="text-xs bg-blue-600 text-white px-2 py-1 rounded hover:bg-blue-700 disabled:opacity-50 transition-colors"
           >
-            {analyzing ? 'Analisando...' : 'Analisar'}
+            {analyzing ? '...' : 'Analisar'}
           </button>
         </div>
       </div>
-    );
+    )
   }
 
   return (
-    <div className={`p-6 bg-gradient-to-br ${getColor()} border rounded-lg shadow-lg`}> {/* Enhanced shadow */}
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-md"> {/* Larger icon */}
+    <div className={`p-4 bg-gradient-to-br ${getColor()} border rounded-lg`}>
+      <div className="flex items-start justify-between mb-3">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
             {getIcon()}
           </div>
           <div>
-            <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-            <p className="text-sm text-gray-700">{description}</p>
+            <h3 className="font-medium text-gray-900">{title}</h3>
+            <p className="text-sm text-gray-600">{description}</p>
           </div>
         </div>
       </div>
 
       {result ? (
-        <div className="space-y-4">
-          <div className="bg-white rounded-lg p-4 shadow-sm">
+        <div className="space-y-3">
+          <div className="bg-white rounded-lg p-3">
             <div className="text-sm text-gray-800 whitespace-pre-wrap">
               {result.analysis}
             </div>
           </div>
-
+          
           {result.recommendations?.length > 0 && (
-            <div className="space-y-3">
-              <p className="text-xs font-medium text-gray-600">💡 Dicas Práticas:</p>
+            <div className="space-y-2">
+              <p className="text-xs font-medium opacity-75">💡 Dicas Práticas:</p>
               {result.recommendations.map((rec: any) => (
-                <div key={rec.id} className="flex items-start space-x-2 text-sm">
-                  <Lightbulb className="w-4 h-4 text-yellow-500 flex-shrink-0" />
+                <div key={rec.id} className="flex items-start space-x-2 text-xs">
+                  <Lightbulb className="w-3 h-3 mt-0.5 flex-shrink-0" />
                   <span className="text-gray-700">{rec.title}: {rec.description}</span>
                 </div>
               ))}
             </div>
           )}
-
-          <div className="bg-blue-50 rounded-lg p-3 mt-4">
+          
+          <div className="bg-blue-50 rounded-lg p-2 mt-3">
             <div className="flex items-center space-x-2">
-              <Zap className="w-4 h-4 text-blue-600" />
-              <span className="text-sm text-blue-800">
+              <Zap className="w-3 h-3 text-blue-600" />
+              <span className="text-xs text-blue-800">
                 Upgrade para Pro: análises personalizadas dos seus dados!
               </span>
             </div>
@@ -172,19 +170,19 @@ export function AIInsightCard({
         <button
           onClick={handleAnalyze}
           disabled={analyzing || loading}
-          className="w-full flex items-center justify-center space-x-3 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+          className="w-full flex items-center justify-center space-x-2 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {analyzing ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
           ) : (
             <>
-              <Bot className="w-5 h-5" />
+              <Bot className="w-4 h-4" />
               <span>Analisar com IA</span>
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4" />
             </>
           )}
         </button>
       )}
     </div>
-  );
+  )
 }

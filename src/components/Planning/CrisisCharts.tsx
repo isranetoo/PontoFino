@@ -27,56 +27,111 @@ export function CrisisCharts({ result }: CrisisChartsProps) {
     return [formatCurrency(value), name === 'antes' ? 'Antes' : name === 'depois' ? 'Depois' : name]
   }
 
-  // const formatTornadoTooltip = (value: number, name: string, props: any) => {
-  //   const sign = props.payload.direction === 'positive' ? '+' : '-'
-  //   return [`${sign}${formatCurrency(value)}`, 'Impacto']
-  // }
+  const formatTornadoTooltip = (value: number, name: string, props: any) => {
+    const sign = props.payload.direction === 'positive' ? '+' : '-'
+    return [`${sign}${formatCurrency(value)}`, 'Impacto']
+  }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       {/* Before vs After Chart */}
-      <div className="bg-gradient-to-br from-blue-50 to-slate-100 rounded-2xl p-8 border border-blue-100 shadow-xl">
-        <h3 className="text-2xl font-extrabold text-blue-900 mb-6 flex items-center gap-2">
-          <span className="inline-block w-3 h-3 rounded-full bg-blue-500 mr-2"></span>
-          Antes vs Depois por Classe
-        </h3>
-        <div className="h-80 flex items-center justify-center">
-          <div className="w-full h-full bg-white rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 text-lg font-semibold">
-            {/* Gráfico será renderizado aqui */}
-            Gráfico de Barras Comparativo
-          </div>
+      <div>
+        <h3 className="text-lg font-medium text-gray-900 mb-4">Antes vs Depois por Classe</h3>
+        <div className="h-80">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={comparisonData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis 
+                dataKey="class" 
+                angle={-45}
+                textAnchor="end"
+                height={80}
+                fontSize={12}
+              />
+              <YAxis tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} />
+              <Tooltip 
+                formatter={formatTooltip}
+                labelFormatter={(label) => `Classe: ${label}`}
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: '1px solid #e5e7eb',
+                  borderRadius: '8px',
+                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                }}
+              />
+              <Bar dataKey="antes" fill="#3B82F6" name="Antes" />
+              <Bar dataKey="depois" fill="#EF4444" name="Depois" />
+            </BarChart>
+          </ResponsiveContainer>
         </div>
       </div>
 
       {/* Tornado Chart (Sensitivity Analysis) */}
       {tornadoData.length > 0 && (
-        <div className="bg-gradient-to-br from-amber-50 to-white rounded-2xl p-8 border border-amber-100 shadow-xl">
-          <h3 className="text-2xl font-extrabold text-amber-900 mb-6 flex items-center gap-2">
-            <span className="inline-block w-3 h-3 rounded-full bg-amber-500 mr-2"></span>
-            Análise de Sensibilidade
-          </h3>
-          <div className="h-64 flex items-center justify-center">
-            <div className="w-full h-full bg-white rounded-xl border border-gray-200 flex items-center justify-center text-gray-400 text-lg font-semibold">
-              {/* Tornado chart será renderizado aqui */}
-              Gráfico Tornado (Sensibilidade)
-            </div>
+        <div>
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Análise de Sensibilidade</h3>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart 
+                data={tornadoData} 
+                layout="horizontal"
+                margin={{ top: 20, right: 30, left: 80, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  type="number" 
+                  tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                />
+                <YAxis 
+                  type="category" 
+                  dataKey="factor" 
+                  width={80}
+                  fontSize={12}
+                />
+                <Tooltip 
+                  formatter={formatTornadoTooltip}
+                  labelFormatter={(label) => `Fator: ${label}`}
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                  }}
+                />
+                <Bar dataKey="impact">
+                  {tornadoData.map((entry, index) => (
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={entry.direction === 'positive' ? '#10B981' : '#EF4444'} 
+                    />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-          <div className="mt-4 text-sm text-gray-700 flex flex-col gap-1">
-            <span className="flex items-center gap-2"><span className="inline-block w-3 h-3 rounded-full bg-green-400"></span> Impacto positivo</span>
-            <span className="flex items-center gap-2"><span className="inline-block w-3 h-3 rounded-full bg-red-400"></span> Impacto negativo</span>
-            <span className="mt-1">📊 O gráfico mostra o impacto absoluto de cada fator de risco na carteira</span>
+          <div className="mt-4 text-sm text-gray-600">
+            <p>📊 Gráfico mostra o impacto absoluto de cada fator de risco na carteira</p>
+            <p>🟢 Verde: impacto positivo | 🔴 Vermelho: impacto negativo</p>
           </div>
         </div>
       )}
 
       {/* Summary Statistics */}
-      <div className="bg-gradient-to-br from-gray-50 to-blue-50 rounded-2xl p-8 border border-blue-100 shadow">
-        <h4 className="font-semibold text-blue-900 mb-4 text-lg flex items-center gap-2">
-          <span className="inline-block w-3 h-3 rounded-full bg-sky-500 mr-2"></span>
-          Estatísticas do Cenário
-        </h4>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-base">
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm min-h-[60px] flex flex-col items-center justify-center">
+      <div className="bg-gray-50 rounded-lg p-4">
+        <h4 className="font-medium text-gray-900 mb-3">Estatísticas do Cenário</h4>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div>
+            <span className="text-gray-600">Maior Perda por Classe:</span>
+            <div className="font-medium text-red-600">
+              {(() => {
+                const worstClass = result.byClass.reduce((worst, current) => 
+                  current.relChange < worst.relChange ? current : worst
+                )
+                return `${worstClass.class}: ${(worstClass.relChange * 100).toFixed(1)}%`
+              })()}
+            </div>
+          </div>
+          <div>
             <span className="text-gray-600">Classe Mais Resiliente:</span>
             <div className="font-medium text-green-600">
               {(() => {
@@ -87,14 +142,11 @@ export function CrisisCharts({ result }: CrisisChartsProps) {
               })()}
             </div>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm min-h-[60px] flex flex-col items-center justify-center">
+          <div>
             <span className="text-gray-600">Diversificação:</span>
             <div className="font-medium text-blue-600">
               {result.byClass.length} classe{result.byClass.length !== 1 ? 's' : ''}
             </div>
-          </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-sm min-h-[60px] flex flex-col items-center justify-center">
-            {/* Estatística extra ou placeholder */}
           </div>
         </div>
       </div>

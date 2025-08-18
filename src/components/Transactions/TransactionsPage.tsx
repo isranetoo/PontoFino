@@ -180,44 +180,48 @@ export function TransactionsPage() {
   const currentTransactions = filteredTransactions.slice(startIndex, endIndex)
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">Transações</h1>
-          <p className="text-lg text-gray-500">Gerencie todas as suas transações financeiras</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Transações</h1>
+          <p className="text-gray-600">Gerencie todas as suas transações financeiras</p>
         </div>
-        <div className="flex flex-wrap gap-3">
+        
+        <div className="flex items-center space-x-3">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-xl border font-semibold shadow-sm transition-all ${
+            className={`flex items-center space-x-2 px-4 py-2 rounded-lg border transition-colors ${
               showFilters 
-                ? 'bg-blue-50 border-blue-300 text-blue-800' 
+                ? 'bg-blue-50 border-blue-200 text-blue-700' 
                 : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
             }`}
           >
-            <Filter className="w-5 h-5" />
+            <Filter className="w-4 h-4" />
             <span>Filtros</span>
           </button>
+          
           <button
             onClick={exportTransactions}
-            className="flex items-center gap-2 px-5 py-2.5 bg-gray-700 text-white rounded-xl shadow-sm hover:bg-gray-800 font-semibold transition-all"
+            className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
           >
-            <Download className="w-5 h-5" />
+            <Download className="w-4 h-4" />
             <span>Exportar</span>
           </button>
+          
           <button
             onClick={() => setShowImportModal(true)}
-            className="flex items-center gap-2 px-5 py-2.5 bg-green-700 text-white rounded-xl shadow-sm hover:bg-green-800 font-semibold transition-all"
+            className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
           >
-            <Upload className="w-5 h-5" />
+            <Upload className="w-4 h-4" />
             <span>Importar</span>
           </button>
+          
           <button
             onClick={() => setShowTransactionModal(true)}
-            className="flex items-center gap-2 bg-blue-700 text-white px-5 py-2.5 rounded-xl shadow-sm hover:bg-blue-800 font-semibold transition-all"
+            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
             <span>Nova Transação</span>
           </button>
         </div>
@@ -225,7 +229,7 @@ export function TransactionsPage() {
 
       {/* Filtros */}
       {showFilters && (
-        <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 animate-fade-in">
+        <div className="bg-white rounded-xl shadow-md p-6">
           <TransactionFilters
             filters={filters}
             accounts={accounts}
@@ -243,7 +247,7 @@ export function TransactionsPage() {
 
       {/* Ações em lote */}
       {selectedTransactions.size > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 animate-fade-in">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
           <BulkActions
             selectedTransactions={Array.from(selectedTransactions)}
             accounts={accounts}
@@ -254,29 +258,31 @@ export function TransactionsPage() {
       )}
 
       {/* Tabela de transações */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-lg overflow-hidden animate-fade-in">
+      <div className="bg-white rounded-xl shadow-md overflow-hidden">
         {/* Header da tabela com seleção */}
-        <div className="px-8 py-5 bg-gray-50 border-b border-gray-200">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-            <div className="flex items-center gap-4">
+        <div className="px-6 py-4 bg-gray-50 border-b border-gray-200">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
               <button
                 onClick={handleSelectAll}
-                className="flex items-center gap-2 text-base text-gray-700 hover:text-blue-800 font-semibold transition-all"
+                className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900"
               >
                 {selectAll ? (
-                  <CheckSquare className="w-5 h-5" />
+                  <CheckSquare className="w-4 h-4" />
                 ) : (
-                  <Square className="w-5 h-5" />
+                  <Square className="w-4 h-4" />
                 )}
                 <span>Selecionar todos</span>
               </button>
+              
               {selectedTransactions.size > 0 && (
-                <span className="text-base text-blue-700 font-semibold">
+                <span className="text-sm text-blue-600">
                   {selectedTransactions.size} transação(ões) selecionada(s)
                 </span>
               )}
             </div>
-            <div className="text-base text-gray-500 font-medium">
+            
+            <div className="text-sm text-gray-600">
               {filteredTransactions.length} transação(ões) encontrada(s)
             </div>
           </div>
@@ -284,12 +290,12 @@ export function TransactionsPage() {
 
         {/* Lista de transações */}
         {loading ? (
-          <div className="p-12 text-center">
-            <div className="w-10 h-10 border-4 border-blue-700 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600 text-lg">Carregando transações...</p>
+          <div className="p-8 text-center">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-600">Carregando transações...</p>
           </div>
         ) : error ? (
-          <div className="p-12 text-center text-red-700 text-lg font-semibold">
+          <div className="p-8 text-center text-red-600">
             <p>Erro ao carregar transações: {error}</p>
           </div>
         ) : (
@@ -304,26 +310,29 @@ export function TransactionsPage() {
 
         {/* Paginação */}
         {totalPages > 1 && (
-          <div className="px-8 py-5 bg-gray-50 border-t border-gray-200">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-              <div className="text-base text-gray-500 font-medium">
+          <div className="px-6 py-4 bg-gray-50 border-t border-gray-200">
+            <div className="flex items-center justify-between">
+              <div className="text-sm text-gray-600">
                 Mostrando {startIndex + 1} a {Math.min(endIndex, filteredTransactions.length)} de {filteredTransactions.length} transações
               </div>
-              <div className="flex items-center gap-2">
+              
+              <div className="flex items-center space-x-2">
                 <button
                   onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                   disabled={currentPage === 1}
-                  className="px-4 py-2 text-base border border-gray-300 rounded-xl bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
+                  className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Anterior
                 </button>
-                <span className="text-base text-gray-500 font-medium">
+                
+                <span className="text-sm text-gray-600">
                   Página {currentPage} de {totalPages}
                 </span>
+                
                 <button
                   onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-4 py-2 text-base border border-gray-300 rounded-xl bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-semibold transition-all"
+                  className="px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Próxima
                 </button>
@@ -335,18 +344,18 @@ export function TransactionsPage() {
 
       {/* Modal de Nova Transação */}
       {showTransactionModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-8 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">Nova Transação</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Nova Transação</h2>
               <button
                 onClick={() => setShowTransactionModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X className="w-6 h-6 text-gray-500" />
+                <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-8">
+            <div className="p-6">
               <TransactionForm
                 onSuccess={handleTransactionSuccess}
                 onCancel={() => setShowTransactionModal(false)}
@@ -358,18 +367,18 @@ export function TransactionsPage() {
 
       {/* Modal de Importação */}
       {showImportModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 animate-fade-in">
-          <div className="bg-white border border-gray-200 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-8 border-b border-gray-200">
-              <h2 className="text-2xl font-bold text-gray-900">Importar Extrato</h2>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-xl font-semibold text-gray-900">Importar Extrato</h2>
               <button
                 onClick={() => setShowImportModal(false)}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X className="w-6 h-6 text-gray-500" />
+                <X className="w-5 h-5 text-gray-500" />
               </button>
             </div>
-            <div className="p-8">
+            <div className="p-6">
               <StatementImport
                 accounts={accounts}
                 categories={categories}
@@ -382,19 +391,25 @@ export function TransactionsPage() {
       )}
 
       {/* AI Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AIInsightCard
           type="spending"
           title="Padrões de Gastos"
           description="Analise seus hábitos de consumo"
-          data={{ transactions: filteredTransactions }}
+          data={{ 
+            transactions: filteredTransactions,
+            query: "Analise meus padrões de gastos e identifique onde posso economizar"
+          }}
           compact
         />
         <AIInsightCard
           type="general"
           title="Otimizações Sugeridas"
           description="Encontre oportunidades de economia"
-          data={{ transactions: filteredTransactions }}
+          data={{ 
+            transactions: filteredTransactions,
+            query: "Quais são as melhores oportunidades de otimização nas minhas finanças?"
+          }}
           compact
         />
       </div>

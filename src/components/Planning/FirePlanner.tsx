@@ -161,32 +161,38 @@ export function FirePlanner() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="bg-gradient-to-br from-orange-50 to-blue-50 rounded-2xl p-8 border border-blue-100 shadow flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-2 tracking-tight">Planejamento FIRE</h1>
-          <p className="text-lg text-gray-700">Calcule quando você poderá viver da renda dos seus investimentos e otimize sua jornada para a independência financeira.</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Planejamento FIRE</h1>
+          <p className="text-gray-600">
+            Calcule quando você poderá viver da renda dos seus investimentos
+          </p>
         </div>
-        <div className="flex items-center gap-4">
+        
+        <div className="flex items-center space-x-3">
           {savedProfiles.length > 0 && (
             <select
               value={selectedProfileId}
               onChange={(e) => handleLoadProfile(e.target.value)}
-              className="px-4 py-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Novo plano</option>
               {savedProfiles.map(profile => (
-                <option key={profile.id} value={profile.id}>{profile.name}</option>
+                <option key={profile.id} value={profile.id}>
+                  {profile.name}
+                </option>
               ))}
             </select>
           )}
+          
           <button
             onClick={handleSaveProfile}
             disabled={saving || validationErrors.length > 0}
-            className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-semibold shadow hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            <Save className="w-5 h-5" />
+            <Save className="w-4 h-4" />
             <span>{saving ? 'Salvando...' : 'Salvar Plano'}</span>
           </button>
         </div>
@@ -194,28 +200,26 @@ export function FirePlanner() {
 
       {/* Success Message */}
       {saveSuccess && (
-        <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 text-green-800 px-6 py-4 rounded-xl shadow flex items-center gap-3">
-          <Zap className="w-5 h-5 text-green-500" />
-          <span>Plano FIRE salvo com sucesso!</span>
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+          Plano FIRE salvo com sucesso!
         </div>
       )}
 
       {/* Error Display */}
       {error && (
-        <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 text-red-800 px-6 py-4 rounded-xl shadow flex items-center gap-3">
-          <AlertCircle className="w-5 h-5 text-red-500" />
-          <span>Erro: {error}</span>
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          Erro: {error}
         </div>
       )}
 
       {/* Validation Errors */}
       {validationErrors.length > 0 && (
-        <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200 rounded-xl p-6 shadow">
-          <div className="flex items-center gap-2 mb-2">
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center space-x-2 mb-2">
             <AlertCircle className="w-5 h-5 text-yellow-600" />
-            <h3 className="font-semibold text-yellow-800">Corrija os seguintes erros:</h3>
+            <h3 className="font-medium text-yellow-800">Corrija os seguintes erros:</h3>
           </div>
-          <ul className="list-disc list-inside text-base text-yellow-700 space-y-1">
+          <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
             {validationErrors.map((error, index) => (
               <li key={index}>{error}</li>
             ))}
@@ -234,38 +238,43 @@ export function FirePlanner() {
       )}
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        {/* Left Column - Form & Results */}
-        <div className="space-y-8">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <div className="flex items-center gap-2 mb-6">
-              <Calculator className="w-6 h-6 text-blue-600" />
-              <h2 className="text-2xl font-bold text-gray-900">Parâmetros do Plano</h2>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left Column - Form */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center space-x-2 mb-6">
+              <Calculator className="w-5 h-5 text-blue-600" />
+              <h2 className="text-xl font-semibold text-gray-900">Parâmetros do Plano</h2>
             </div>
+            
             <FirePlannerForm
               formData={formData}
               onChange={handleFormChange}
               errors={validationErrors}
             />
           </div>
+
           {/* Results Summary */}
           {fireResult && (
-            <div className="bg-gradient-to-br from-blue-50 to-green-50 rounded-2xl shadow-lg p-8 border border-green-100">
-              <div className="flex items-center gap-2 mb-6">
-                <Target className="w-6 h-6 text-green-600" />
-                <h2 className="text-2xl font-bold text-gray-900">Resumo dos Resultados</h2>
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="flex items-center space-x-2 mb-6">
+                <Target className="w-5 h-5 text-green-600" />
+                <h2 className="text-xl font-semibold text-gray-900">Resumo dos Resultados</h2>
               </div>
+              
               <FirePlannerResults result={fireResult} />
             </div>
           )}
         </div>
+
         {/* Right Column - Chart */}
-        <div className="space-y-8">
-          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-            <div className="flex items-center gap-2 mb-6">
-              <TrendingUp className="w-6 h-6 text-purple-600" />
-              <h2 className="text-2xl font-bold text-gray-900">Projeção de Patrimônio</h2>
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center space-x-2 mb-6">
+              <TrendingUp className="w-5 h-5 text-purple-600" />
+              <h2 className="text-xl font-semibold text-gray-900">Projeção de Patrimônio</h2>
             </div>
+            
             {calculating ? (
               <div className="flex items-center justify-center h-80">
                 <div className="text-center">

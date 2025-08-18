@@ -48,65 +48,66 @@ export function FundCard({ fund, onToggleWatchlist, onViewDetails }: FundCardPro
   }
 
   return (
-    <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 hover:shadow-xl transition-all group animate-fade-in">
-      <div className="flex items-start justify-between mb-4 gap-4">
-        <div className="flex-1 min-w-0">
-          <h3 className="font-extrabold text-gray-900 text-xl mb-1 tracking-tight truncate">{fund.ticker}</h3>
-          <p className="text-gray-500 text-base font-medium line-clamp-2 mb-2">{fund.name}</p>
-          <div className="flex flex-wrap items-center gap-2 mt-1">
-            <span className="text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded font-semibold uppercase tracking-wide">
+    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h3 className="font-semibold text-gray-900 text-lg mb-1">{fund.ticker}</h3>
+          <p className="text-gray-600 text-sm line-clamp-2">{fund.name}</p>
+          <div className="flex items-center space-x-2 mt-2">
+            <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
               {fund.category}
             </span>
-            <span className={`text-xs px-2 py-1 rounded font-semibold uppercase tracking-wide ${getRiskColor(fund.riskLevel)}`}>
+            <span className={`text-xs px-2 py-1 rounded ${getRiskColor(fund.riskLevel)}`}>
               Risco {getRiskLabel(fund.riskLevel)}
             </span>
           </div>
         </div>
+        
         <button
           onClick={() => onToggleWatchlist(fund.id)}
-          className="p-2 rounded-full border border-gray-200 bg-white shadow-sm hover:bg-yellow-50 hover:border-yellow-300 transition-all"
-          title={fund.isWatchlisted ? 'Remover dos favoritos' : 'Adicionar aos favoritos'}
+          className="p-2 hover:bg-gray-50 rounded-lg transition-colors"
         >
           {fund.isWatchlisted ? (
-            <Star className="w-6 h-6 text-yellow-500 fill-current" />
+            <Star className="w-5 h-5 text-yellow-500 fill-current" />
           ) : (
-            <StarOff className="w-6 h-6 text-gray-400" />
+            <StarOff className="w-5 h-5 text-gray-400" />
           )}
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-3">
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500 font-semibold">Rentabilidade Recente</span>
-          <div className="flex items-center gap-1">
+          <span className="text-sm text-gray-600">Rentabilidade Recente</span>
+          <div className="flex items-center space-x-1">
             {fund.returns.recent >= 0 ? (
-              <TrendingUp className="w-5 h-5 text-green-600" />
+              <TrendingUp className="w-4 h-4 text-green-600" />
             ) : (
-              <TrendingDown className="w-5 h-5 text-red-600" />
+              <TrendingDown className="w-4 h-4 text-red-600" />
             )}
             {formatReturn(fund.returns.recent)}
           </div>
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500 font-semibold">YTD</span>
+          <span className="text-sm text-gray-600">YTD</span>
           {formatReturn(fund.returns.ytd)}
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="text-sm text-gray-500 font-semibold">12 meses</span>
+          <span className="text-sm text-gray-600">12 meses</span>
           {formatReturn(fund.returns['12m'])}
         </div>
 
-        <div className="border-t pt-4 mt-4">
+
+        <div className="border-t pt-3 mt-3">
           <div className="flex justify-between items-center text-sm">
-            <span className="text-gray-500 font-semibold">Taxa de Administração</span>
-            <span className="text-gray-900 font-bold">{fund.adminFee.toFixed(2)}% a.a.</span>
+            <span className="text-gray-600">Taxa de Administração</span>
+            <span className="text-gray-900">{fund.adminFee.toFixed(2)}% a.a.</span>
           </div>
           {fund.performanceFee && (
             <div className="flex justify-between items-center text-sm mt-1">
-              <span className="text-gray-500 font-semibold">Taxa Performance</span>
-              <span className="text-gray-900 font-bold">{fund.performanceFee.toFixed(2)}%</span>
+              <span className="text-gray-600">Taxa Performance</span>
+              <span className="text-gray-900">{fund.performanceFee.toFixed(2)}%</span>
             </div>
           )}
         </div>
@@ -114,7 +115,7 @@ export function FundCard({ fund, onToggleWatchlist, onViewDetails }: FundCardPro
 
       <button
         onClick={() => onViewDetails(fund.id)}
-        className="w-full mt-6 bg-blue-700 text-white py-2.5 rounded-xl font-bold shadow-sm hover:bg-blue-800 transition-all text-lg tracking-tight"
+        className="w-full mt-4 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-colors"
       >
         Ver Detalhes
       </button>

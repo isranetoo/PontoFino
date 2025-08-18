@@ -40,17 +40,57 @@ export function useAI() {
     setError(null)
 
     try {
+      // Get recent transactions for analysis
+      const recentTransactions = transactions.slice(0, 100)
+      
+      // Calculate spending patterns
+      const categorySpending = recentTransactions
+        .filter(t => t.type === 'expense')
+        .reduce((acc, t) => {
+          const categoryName = t.category?.name || 'Sem categoria'
+          acc[categoryName] = (acc[categoryName] || 0) + Math.abs(t.amount)
+          return acc
+        }, {} as Record<string, number>)
+
+      // Calculate monthly trends
+      const last3Months = recentTransactions
+        .filter(t => {
+          const transactionDate = new Date(t.transaction_date)
+          const threeMonthsAgo = new Date()
+          threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3)
+          return transactionDate >= threeMonthsAgo && t.type === 'expense'
+        })
+        .reduce((sum, t) => sum + Math.abs(t.amount), 0) / 3
+
+      // Find unusual spending patterns
+      const currentMonth = new Date().getMonth()
+      const currentMonthSpending = recentTransactions
+        .filter(t => {
+          const transactionDate = new Date(t.transaction_date)
+          return transactionDate.getMonth() === currentMonth && t.type === 'expense'
+        })
+        .reduce((sum, t) => sum + Math.abs(t.amount), 0)
+
       const request: AIAnalysisRequest = {
         type: 'spending_analysis',
         data: {
-          transactions: transactions.slice(0, 50), // Last 50 transactions
+          transactions: recentTransactions,
           monthlyExpenses,
-          categories: transactions.reduce((acc, t) => {
-            if (t.category && t.type === 'expense') {
-              acc[t.category.name] = (acc[t.category.name] || 0) + Math.abs(t.amount)
-            }
-            return acc
-          }, {} as Record<string, number>)
+          categorySpending,
+          monthlyTrend: {
+            average3Months: last3Months,
+            currentMonth: currentMonthSpending,
+            variance: currentMonthSpending - last3Months
+          },
+          topCategories: Object.entries(categorySpending)
+            .sort(([,a], [,b]) => b - a)
+            .slice(0, 5)
+            .map(([name, amount]) => ({ name, amount, percentage: (amount / monthlyExpenses) * 100 })),
+          accounts: accounts.map(acc => ({
+            name: acc.name,
+            type: acc.type,
+            balance: acc.balance
+          }))
         },
         userContext: getUserContext(),
         query
@@ -78,16 +118,58 @@ export function useAI() {
     setError(null)
 
     try {
+      // Calculate budget compliance and spending patterns
+      const budgetAnalysis = budgets.map(budget => {
+        const categoryTransactions = transactions.filter(t => 
+          t.category_id === budget.category_id && 
+          t.type === 'expense' &&
+          new Date(t.transaction_date) >= new Date(budget.start_date) &&
+          new Date(t.transaction_date) <= new Date(budget.end_date || new Date())
+        )
+        
+        const actualSpent = categoryTransactions.reduce((sum, t) => sum + Math.abs(t.amount), 0)
+        const compliance = (actualSpent / budget.amount) * 100
+        
+        return {
+          category: budget.category?.name || 'Categoria',
+          budgeted: budget.amount,
+          spent: actualSpent,
+          compliance,
+          status: compliance > 100 ? 'exceeded' : compliance > 80 ? 'warning' : 'good',
+          transactions: categoryTransactions.length,
+          avgTransactionSize: categoryTransactions.length > 0 ? actualSpent / categoryTransactions.length : 0
+        }
+      })
+
+      // Find categories without budgets but with significant spending
+      const categoriesWithoutBudgets = Object.entries(
+        transactions
+          .filter(t => t.type === 'expense' && t.category)
+          .reduce((acc, t) => {
+            const categoryId = t.category_id
+            const categoryName = t.category.name
+            if (!budgets.find(b => b.category_id === categoryId)) {
+              acc[categoryName] = (acc[categoryName] || 0) + Math.abs(t.amount)
+            }
+            return acc
+          }, {} as Record<string, number>)
+      )
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 3)
+        .map(([name, amount]) => ({ name, amount }))
+
       const request: AIAnalysisRequest = {
         type: 'budget_optimization',
         data: {
           budgets,
-          actualSpending: budgets.map(budget => ({
-            category: budget.category?.name,
-            budgeted: budget.amount,
-            spent: budget.spent || 0,
-            compliance: ((budget.spent || 0) / budget.amount) * 100
-          }))
+          budgetAnalysis,
+          categoriesWithoutBudgets,
+          totalBudgeted: budgets.reduce((sum, b) => sum + b.amount, 0),
+          totalSpent: budgetAnalysis.reduce((sum, b) => sum + b.spent, 0),
+          overBudgetCategories: budgetAnalysis.filter(b => b.compliance > 100),
+          underBudgetCategories: budgetAnalysis.filter(b => b.compliance < 50),
+          monthlyIncome,
+          monthlyExpenses
         },
         userContext: getUserContext(),
         query

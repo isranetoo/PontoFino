@@ -1,16 +1,25 @@
 import OpenAI from 'openai'
 
-// Check if API key is available
-const apiKey = import.meta.env.VITE_OPENAI_API_KEY
+// Check if API keys are available
+const openaiApiKey = import.meta.env.VITE_OPENAI_API_KEY
+const deepseekApiKey = import.meta.env.VITE_DEEPSEEK_API_KEY || 'sk-2e395158aff14a5d883acd1202d1f71f'
 
-if (!apiKey) {
-  console.warn('OpenAI API key not found. AI features will be disabled.')
+if (!openaiApiKey && !deepseekApiKey) {
+  console.warn('No AI API keys found. AI features will be disabled.')
 }
 
-const openai = new OpenAI({
-  apiKey: apiKey || 'dummy-key',
+// Initialize OpenAI client
+const openai = openaiApiKey ? new OpenAI({
+  apiKey: openaiApiKey,
   dangerouslyAllowBrowser: true
-})
+}) : null
+
+// Initialize DeepSeek client (compatible with OpenAI API)
+const deepseek = deepseekApiKey ? new OpenAI({
+  apiKey: deepseekApiKey,
+  baseURL: 'https://api.deepseek.com/v1',
+  dangerouslyAllowBrowser: true
+}) : null
 
 export interface AIAnalysisRequest {
   type: 'spending_analysis' | 'budget_optimization' | 'investment_advice' | 'fire_planning' | 'crisis_simulation' | 'general_query'
@@ -59,6 +68,50 @@ export interface AIAction {
 }
 
 class AIFinancialCopilot {
+  private async makeAIRequest(messages: any[], options: any = {}): Promise<string> {
+    const requestOptions = {
+      model: 'gpt-4o',
+      messages,
+      temperature: 0.7,
+      max_tokens: 1500,
+      ...options
+    }
+
+    // Try OpenAI first
+    if (openai) {
+      try {
+        console.log('🤖 Tentando OpenAI...')
+        const completion = await openai.chat.completions.create(requestOptions)
+        const response = completion.choices[0]?.message?.content || ''
+        console.log('✅ OpenAI respondeu com sucesso')
+        return response
+      } catch (error: any) {
+        console.warn('⚠️ OpenAI falhou:', error.message)
+        // Continue to try DeepSeek
+      }
+    }
+
+    // Try DeepSeek as fallback
+    if (deepseek) {
+      try {
+        console.log('🤖 Tentando DeepSeek como fallback...')
+        const deepseekOptions = {
+          ...requestOptions,
+          model: 'deepseek-chat' // DeepSeek's chat model
+        }
+        const completion = await deepseek.chat.completions.create(deepseekOptions)
+        const response = completion.choices[0]?.message?.content || ''
+        console.log('✅ DeepSeek respondeu com sucesso')
+        return response
+      } catch (error: any) {
+        console.warn('⚠️ DeepSeek também falhou:', error.message)
+      }
+    }
+
+    // If both fail, throw error
+    throw new Error('Ambas as IAs (OpenAI e DeepSeek) estão indisponíveis no momento. Tente novamente em alguns minutos.')
+  }
+
   private getSystemPrompt(userContext: AIAnalysisRequest['userContext']): string {
     return `Você é um copiloto financeiro especializado em finanças pessoais brasileiras. Suas características:
 
@@ -115,65 +168,76 @@ FORMATO DE RESPOSTA:
 Responda sempre em português brasileiro.`
   }
 
+  private handleAIRequestFailure(error: any, userContext: AIAnalysisRequest['userContext'], type: string, query?: string): AIResponse {
+    if (userContext.plan === 'free') {
+      // For free users, return educational content instead of error
+      return this.getFreeEducationalContent(type, query)
+    }
+    // For paid users, re-throw the error
+    throw error
+  }
+
   async analyzeSpending(request: AIAnalysisRequest): Promise<AIResponse> {
     const { data, userContext, query } = request
 
-    if (!apiKey) {
+    if (!openaiApiKey && !deepseekApiKey) {
       // Return educational content for free users when API key is not available
       return this.getFreeEducationalContent('spending_analysis', query)
     }
 
     const prompt = userContext.plan === 'free' ? `
-Forneça dicas educacionais sobre controle de gastos sem usar dados específicos do usuário:
+Forneça dicas educacionais sobre controle de gastos:
 
 PERGUNTA: ${query || 'Como controlar melhor os gastos?'}
 
-Forneça:
-1. Conceitos básicos de controle financeiro
-2. Estratégias gerais de economia doméstica
-3. Dicas práticas aplicáveis a qualquer pessoa
-4. Educação sobre categorização de gastos
+Forneça dicas práticas e educacionais sobre controle financeiro.` : `
+Analise os gastos reais do usuário e forneça insights personalizados:
 
-Seja educacional e motivacional, sem mencionar dados específicos.` : `
-Analise os gastos do usuário e forneça insights acionáveis:
+PERFIL FINANCEIRO:
+- Renda mensal: R$ ${userContext.monthlyIncome?.toLocaleString('pt-BR') || 'N/A'}
+- Gastos mensais: R$ ${userContext.monthlyExpenses?.toLocaleString('pt-BR') || 'N/A'}
+- Patrimônio total: R$ ${userContext.totalBalance?.toLocaleString('pt-BR') || 'N/A'}
 
-DADOS DE GASTOS:
-${JSON.stringify(data, null, 2)}
+ANÁLISE DE GASTOS:
+- Total de transações analisadas: ${data.transactions?.length || 0}
+- Gastos por categoria: ${JSON.stringify(data.categorySpending, null, 2)}
+- Tendência mensal: Média 3 meses: R$ ${data.monthlyTrend?.average3Months?.toLocaleString('pt-BR')}, Mês atual: R$ ${data.monthlyTrend?.currentMonth?.toLocaleString('pt-BR')}
+- Variação: ${data.monthlyTrend?.variance > 0 ? '+' : ''}R$ ${data.monthlyTrend?.variance?.toLocaleString('pt-BR')}
 
-PERGUNTA ESPECÍFICA: ${query || 'Análise geral dos gastos'}
+TOP 5 CATEGORIAS DE GASTO:
+${data.topCategories?.map((cat: any) => `- ${cat.name}: R$ ${cat.amount.toLocaleString('pt-BR')} (${cat.percentage.toFixed(1)}%)`).join('\n')}
 
-Forneça:
-1. Análise dos padrões de gasto
-2. Identificação de anomalias ou oportunidades
-3. Recomendações específicas para otimização
-4. Previsões para os próximos 30 dias
+CONTAS:
+${data.accounts?.map((acc: any) => `- ${acc.name} (${acc.type}): R$ ${acc.balance.toLocaleString('pt-BR')}`).join('\n')}
 
-Seja específico com valores em R$ e percentuais.`
+PERGUNTA ESPECÍFICA: ${query || 'Análise completa dos gastos'}
+
+Com base nos dados REAIS do usuário, forneça:
+1. **Análise dos padrões de gasto** - identifique tendências e anomalias
+2. **Oportunidades de economia** - categorias com maior potencial de redução
+3. **Recomendações específicas** - ações práticas com valores em R$
+4. **Previsão para próximo mês** - baseada nos padrões identificados
+5. **Alertas importantes** - gastos fora do padrão ou crescimento acelerado
+
+Seja específico com valores em R$, percentuais e prazos. Use os dados reais fornecidos.`
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: this.getSystemPrompt(userContext) },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 1500
-      })
-
-      const response = completion.choices[0]?.message?.content || ''
+      const response = await this.makeAIRequest([
+        { role: 'system', content: this.getSystemPrompt(userContext) },
+        { role: 'user', content: prompt }
+      ])
       
       return this.parseAIResponse(response, 'spending_analysis')
     } catch (error) {
       console.error('Error in AI spending analysis:', error)
-      throw new Error('Erro ao analisar gastos com IA')
+      return this.handleAIRequestFailure(error, userContext, 'spending_analysis', query)
     }
   }
 
   async optimizeBudget(request: AIAnalysisRequest): Promise<AIResponse> {
     const { data, userContext, query } = request
 
-    if (!apiKey) {
+    if (!openaiApiKey && !deepseekApiKey) {
       return this.getFreeEducationalContent('budget_optimization', query)
     }
 
@@ -182,96 +246,111 @@ Forneça dicas educacionais sobre orçamentos pessoais:
 
 OBJETIVO: ${query || 'Como criar e manter orçamentos eficazes'}
 
-Forneça:
-1. Conceitos básicos de orçamento pessoal
-2. Métodos populares (50/30/20, envelope, etc.)
-3. Dicas para manter disciplina orçamentária
-4. Como categorizar gastos eficientemente
+Forneça dicas práticas sobre orçamento pessoal.` : `
+Analise os orçamentos REAIS do usuário e forneça otimizações personalizadas:
 
-Seja prático e educacional.` : `
-Analise os orçamentos e gastos para otimização:
+PERFIL FINANCEIRO:
+- Renda mensal: R$ ${userContext.monthlyIncome?.toLocaleString('pt-BR') || 'N/A'}
+- Gastos mensais: R$ ${userContext.monthlyExpenses?.toLocaleString('pt-BR') || 'N/A'}
+- Total orçado: R$ ${data.totalBudgeted?.toLocaleString('pt-BR') || 'N/A'}
+- Total gasto: R$ ${data.totalSpent?.toLocaleString('pt-BR') || 'N/A'}
 
-DADOS DE ORÇAMENTOS:
-${JSON.stringify(data, null, 2)}
+ANÁLISE DETALHADA DOS ORÇAMENTOS:
+${data.budgetAnalysis?.map((budget: any) => 
+  `- ${budget.category}: Orçado R$ ${budget.budgeted.toLocaleString('pt-BR')}, Gasto R$ ${budget.spent.toLocaleString('pt-BR')} (${budget.compliance.toFixed(1)}% - ${budget.status})`
+).join('\n')}
 
-OBJETIVO: ${query || 'Otimizar orçamentos existentes'}
+ORÇAMENTOS EXCEDIDOS:
+${data.overBudgetCategories?.map((budget: any) => 
+  `- ${budget.category}: ${budget.compliance.toFixed(1)}% do orçamento (R$ ${(budget.spent - budget.budgeted).toLocaleString('pt-BR')} acima)`
+).join('\n') || 'Nenhum orçamento excedido'}
 
-Forneça:
-1. Análise de compliance dos orçamentos
-2. Sugestões de ajustes por categoria
-3. Identificação de categorias sem orçamento
-4. Estratégias para melhorar controle de gastos
+ORÇAMENTOS SUBUTILIZADOS:
+${data.underBudgetCategories?.map((budget: any) => 
+  `- ${budget.category}: ${budget.compliance.toFixed(1)}% usado (R$ ${(budget.budgeted - budget.spent).toLocaleString('pt-BR')} disponível)`
+).join('\n') || 'Todos os orçamentos bem utilizados'}
 
-Inclua valores específicos e percentuais de melhoria esperados.`
+CATEGORIAS SEM ORÇAMENTO (com gastos significativos):
+${data.categoriesWithoutBudgets?.map((cat: any) => 
+  `- ${cat.name}: R$ ${cat.amount.toLocaleString('pt-BR')} gastos sem controle`
+).join('\n') || 'Todas as categorias importantes têm orçamento'}
+
+PERGUNTA ESPECÍFICA: ${query || 'Como otimizar meus orçamentos?'}
+
+Com base nos dados REAIS dos orçamentos, forneça:
+1. **Análise de compliance** - quais orçamentos estão funcionando
+2. **Ajustes recomendados** - valores específicos para cada categoria
+3. **Novas categorias de orçamento** - onde criar controles
+4. **Estratégias de economia** - como reduzir gastos nas categorias problemáticas
+5. **Metas de melhoria** - objetivos específicos para próximo mês
+
+Seja específico com valores em R$ e percentuais de melhoria esperados.`
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: this.getSystemPrompt(userContext) },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 1500
-      })
-
-      const response = completion.choices[0]?.message?.content || ''
+      const response = await this.makeAIRequest([
+        { role: 'system', content: this.getSystemPrompt(userContext) },
+        { role: 'user', content: prompt }
+      ])
       
       return this.parseAIResponse(response, 'budget_optimization')
     } catch (error) {
       console.error('Error in AI budget optimization:', error)
-      throw new Error('Erro ao otimizar orçamentos com IA')
+      return this.handleAIRequestFailure(error, userContext, 'budget_optimization', query)
     }
   }
 
   async analyzeInvestments(request: AIAnalysisRequest): Promise<AIResponse> {
     const { data, userContext, query } = request
 
-    if (!apiKey) {
-      throw new Error('OpenAI API key não configurada. Configure VITE_OPENAI_API_KEY no arquivo .env')
+    if (!openaiApiKey && !deepseekApiKey) {
+      return this.getFreeEducationalContent('investment_advice', query)
     }
 
-    const prompt = `
-Analise a carteira de investimentos e forneça recomendações:
+    const prompt = userContext.plan === 'free' ? `
+Forneça educação sobre investimentos:
+
+PERGUNTA: ${query || 'Como começar a investir?'}
+
+Forneça dicas educacionais sobre investimentos.` : `
+Analise a carteira de investimentos REAL do usuário:
+
+PERFIL FINANCEIRO:
+- Patrimônio total: R$ ${userContext.totalBalance?.toLocaleString('pt-BR') || 'N/A'}
+- Renda mensal: R$ ${userContext.monthlyIncome?.toLocaleString('pt-BR') || 'N/A'}
+- Capacidade de investimento: R$ ${((userContext.monthlyIncome || 0) - (userContext.monthlyExpenses || 0)).toLocaleString('pt-BR')}
 
 DADOS DA CARTEIRA:
 ${JSON.stringify(data, null, 2)}
 
-FOCO: ${query || 'Análise geral da carteira'}
+FOCO: ${query || 'Análise completa da carteira'}
 
-Forneça:
-1. Análise de diversificação
-2. Avaliação de risco vs retorno
-3. Sugestões de rebalanceamento
-4. Oportunidades de melhoria
+Com base nos dados REAIS, forneça:
+1. **Análise de diversificação** - distribuição atual vs ideal
+2. **Avaliação de risco vs retorno** - adequação ao perfil
+3. **Sugestões de rebalanceamento** - ajustes específicos com valores
+4. **Oportunidades de melhoria** - onde investir próximos aportes
+5. **Proteção contra riscos** - como proteger o patrimônio atual
 
-Considere o cenário atual da economia brasileira.`
+Considere o cenário atual da economia brasileira e seja específico com valores e percentuais.`
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: this.getSystemPrompt(userContext) },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 1500
-      })
-
-      const response = completion.choices[0]?.message?.content || ''
+      const response = await this.makeAIRequest([
+        { role: 'system', content: this.getSystemPrompt(userContext) },
+        { role: 'user', content: prompt }
+      ])
       
       return this.parseAIResponse(response, 'investment_advice')
     } catch (error) {
       console.error('Error in AI investment analysis:', error)
-      throw new Error('Erro ao analisar investimentos com IA')
+      return this.handleAIRequestFailure(error, userContext, 'investment_advice', query)
     }
   }
 
   async planFIRE(request: AIAnalysisRequest): Promise<AIResponse> {
     const { data, userContext, query } = request
 
-    if (!apiKey) {
-      throw new Error('OpenAI API key não configurada. Configure VITE_OPENAI_API_KEY no arquivo .env')
+    if (!openaiApiKey && !deepseekApiKey) {
+      return this.getFreeEducationalContent('fire_planning', query)
     }
 
     const prompt = `
@@ -291,30 +370,23 @@ Forneça:
 Seja específico sobre tempo e valores para atingir independência financeira.`
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: this.getSystemPrompt(userContext) },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 1500
-      })
-
-      const response = completion.choices[0]?.message?.content || ''
+      const response = await this.makeAIRequest([
+        { role: 'system', content: this.getSystemPrompt(userContext) },
+        { role: 'user', content: prompt }
+      ])
       
       return this.parseAIResponse(response, 'fire_planning')
     } catch (error) {
       console.error('Error in AI FIRE planning:', error)
-      throw new Error('Erro ao planejar FIRE com IA')
+      return this.handleAIRequestFailure(error, userContext, 'fire_planning', query)
     }
   }
 
   async simulateCrisis(request: AIAnalysisRequest): Promise<AIResponse> {
     const { data, userContext, query } = request
 
-    if (!apiKey) {
-      throw new Error('OpenAI API key não configurada. Configure VITE_OPENAI_API_KEY no arquivo .env')
+    if (!openaiApiKey && !deepseekApiKey) {
+      return this.getFreeEducationalContent('crisis_simulation', query)
     }
 
     const prompt = `
@@ -334,29 +406,22 @@ Forneça:
 Foque em ações práticas para reduzir riscos.`
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: this.getSystemPrompt(userContext) },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 1500
-      })
-
-      const response = completion.choices[0]?.message?.content || ''
+      const response = await this.makeAIRequest([
+        { role: 'system', content: this.getSystemPrompt(userContext) },
+        { role: 'user', content: prompt }
+      ])
       
       return this.parseAIResponse(response, 'crisis_simulation')
     } catch (error) {
       console.error('Error in AI crisis simulation:', error)
-      throw new Error('Erro ao simular crise com IA')
+      return this.handleAIRequestFailure(error, userContext, 'crisis_simulation', query)
     }
   }
 
   async generalQuery(request: AIAnalysisRequest): Promise<AIResponse> {
     const { userContext, query } = request
 
-    if (!apiKey) {
+    if (!openaiApiKey && !deepseekApiKey) {
       return this.getFreeEducationalContent('general_query', query)
     }
 
@@ -368,22 +433,15 @@ PERGUNTA: ${query}
 Forneça uma resposta educacional e prática, considerando o contexto financeiro brasileiro e o perfil do usuário.`
 
     try {
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4o',
-        messages: [
-          { role: 'system', content: this.getSystemPrompt(userContext) },
-          { role: 'user', content: prompt }
-        ],
-        temperature: 0.7,
-        max_tokens: 1000
-      })
-
-      const response = completion.choices[0]?.message?.content || ''
+      const response = await this.makeAIRequest([
+        { role: 'system', content: this.getSystemPrompt(userContext) },
+        { role: 'user', content: prompt }
+      ], { max_tokens: 1000 })
       
       return this.parseAIResponse(response, 'general_query')
     } catch (error) {
       console.error('Error in AI general query:', error)
-      throw new Error('Erro ao processar pergunta com IA')
+      return this.handleAIRequestFailure(error, userContext, 'general_query', query)
     }
   }
 
@@ -445,7 +503,7 @@ Forneça uma resposta educacional e prática, considerando o contexto financeiro
   private getFreeEducationalContent(type: string, query?: string): AIResponse {
     const educationalContent = {
       spending_analysis: {
-        analysis: `💡 **Dicas para Controlar Gastos (Plano Free)**
+        analysis: `💡 **Dicas para Controlar Gastos**
 
 **📊 Regra dos 50/30/20:**
 • 50% para necessidades (moradia, alimentação, transporte)
@@ -496,7 +554,7 @@ Forneça uma resposta educacional e prática, considerando o contexto financeiro
         ]
       },
       budget_optimization: {
-        analysis: `🎯 **Guia de Orçamentos Eficazes (Plano Free)**
+        analysis: `🎯 **Guia de Orçamentos Eficazes**
 
 **📋 Método Envelope Digital:**
 • Crie "envelopes" para cada categoria de gasto
@@ -539,8 +597,136 @@ Forneça uma resposta educacional e prática, considerando o contexto financeiro
           }
         ]
       },
+      investment_advice: {
+        analysis: `📈 **Guia de Investimentos para Iniciantes**
+
+**🏦 Primeiros Passos:**
+• Quite dívidas de cartão (juros de 300%+ ao ano)
+• Monte reserva de emergência (6 meses de gastos)
+• Comece com Tesouro Direto (seguro e acessível)
+• Diversifique gradualmente
+
+**💼 Carteira Básica Sugerida:**
+• 60% Renda Fixa (Tesouro, CDB, LCI/LCA)
+• 30% Ações/ETFs (BOVA11, IVVB11)
+• 10% FIIs (fundos imobiliários)
+
+**⚠️ Evite no Início:**
+• Day trade e especulação
+• Produtos complexos (COE, estruturados)
+• Concentração em uma única ação
+• Investir dinheiro que precisa em 2 anos
+
+🎯 **Meta:** Comece com R$ 100/mês e aumente 10% a cada 6 meses`,
+        recommendations: [
+          {
+            id: 'inv_1',
+            title: 'Monte sua reserva de emergência',
+            description: '6 meses de gastos em CDB ou Tesouro Selic',
+            priority: 'high' as const,
+            category: 'emergency',
+            impact: 'Alto',
+            actionable: true
+          },
+          {
+            id: 'inv_2',
+            title: 'Comece com Tesouro Direto',
+            description: 'Investimento mais seguro para iniciantes',
+            priority: 'high' as const,
+            category: 'investing',
+            impact: 'Médio',
+            actionable: true
+          }
+        ]
+      },
+      fire_planning: {
+        analysis: `🔥 **Guia FIRE (Financial Independence, Retire Early)**
+
+**📊 Regra dos 25x:**
+• Acumule 25x seus gastos anuais
+• Exemplo: R$ 5.000/mês = R$ 1.500.000 para FIRE
+• Use taxa de retirada de 4% ao ano
+
+**🎯 Estratégias FIRE:**
+• **Lean FIRE:** Vida minimalista, meta menor
+• **Fat FIRE:** Manter padrão de vida alto
+• **Coast FIRE:** Investir cedo, deixar render
+• **Barista FIRE:** Trabalho part-time + investimentos
+
+**⚡ Acelere seu FIRE:**
+• Aumente renda (side hustles, promoções)
+• Reduza gastos desnecessários
+• Invista em ativos que rendem acima da inflação
+• Reinvista todos os dividendos
+
+**📈 Exemplo Prático:**
+R$ 2.000/mês por 20 anos a 10% a.a. = R$ 1.5M`,
+        recommendations: [
+          {
+            id: 'fire_1',
+            title: 'Calcule sua meta FIRE',
+            description: 'Multiplique gastos anuais por 25',
+            priority: 'high' as const,
+            category: 'planning',
+            impact: 'Alto',
+            actionable: true
+          },
+          {
+            id: 'fire_2',
+            title: 'Aumente sua taxa de poupança',
+            description: 'Meta: poupar 50%+ da renda para FIRE rápido',
+            priority: 'high' as const,
+            category: 'savings',
+            impact: 'Alto',
+            actionable: true
+          }
+        ]
+      },
+      crisis_simulation: {
+        analysis: `⚠️ **Preparação para Crises Financeiras**
+
+**🛡️ Proteções Essenciais:**
+• Reserva de emergência robusta (12 meses)
+• Diversificação geográfica de investimentos
+• Renda passiva através de dividendos
+• Habilidades que geram renda extra
+
+**📉 Cenários de Crise:**
+• **Recessão:** -30% em ações, +20% desemprego
+• **Hiperinflação:** Ativos reais protegem valor
+• **Crise Setorial:** Diversificação salva carteira
+• **Emergência Pessoal:** Reserva evita venda forçada
+
+**🎯 Estratégias Anti-Crise:**
+• Mantenha 20% em dólar (hedge cambial)
+• Invista em REITs e FIIs (renda passiva)
+• Desenvolva múltiplas fontes de renda
+• Evite alavancagem excessiva
+
+💪 **Mentalidade:** Crises são oportunidades para quem está preparado`,
+        recommendations: [
+          {
+            id: 'crisis_1',
+            title: 'Aumente reserva de emergência',
+            description: 'Meta: 12 meses de gastos para maior segurança',
+            priority: 'high' as const,
+            category: 'emergency',
+            impact: 'Alto',
+            actionable: true
+          },
+          {
+            id: 'crisis_2',
+            title: 'Diversifique geograficamente',
+            description: 'Tenha 20% dos investimentos em dólar',
+            priority: 'medium' as const,
+            category: 'diversification',
+            impact: 'Médio',
+            actionable: true
+          }
+        ]
+      },
       general_query: {
-        analysis: `💡 **Educação Financeira (Plano Free)**
+        analysis: `💡 **Educação Financeira**
 
 **🎯 Primeiros Passos:**
 • Organize suas finanças: receitas, gastos, patrimônio

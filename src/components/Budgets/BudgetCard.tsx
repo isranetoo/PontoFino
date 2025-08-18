@@ -29,13 +29,13 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
       case 'good':
         return 'bg-green-500'
       case 'caution':
-        return 'bg-yellow-400'
+        return 'bg-yellow-500'
       case 'warning':
-        return 'bg-orange-400'
+        return 'bg-orange-500'
       case 'exceeded':
         return 'bg-red-500'
       default:
-        return 'bg-gray-300'
+        return 'bg-gray-500'
     }
   }
 
@@ -82,58 +82,59 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
   }
 
   return (
-    <div className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-2xl shadow-lg p-6 group hover:shadow-2xl transition-all duration-200">
+    <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow">
       {/* Header */}
-      <div className="flex items-start justify-between mb-5">
-        <div className="flex items-center gap-3">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center space-x-3">
           <div
-            className="w-5 h-5 rounded-full border-2 border-white shadow"
+            className="w-4 h-4 rounded-full"
             style={{ backgroundColor: budget.category?.color || '#3B82F6' }}
           />
           <div>
-            <h3 className="font-semibold text-lg text-gray-900 tracking-tight">
+            <h3 className="font-semibold text-gray-900">
               {budget.category?.name || 'Categoria'}
             </h3>
-            <span className="inline-block text-xs text-gray-500 font-medium mt-0.5 px-2 py-0.5 rounded bg-gray-100">
-              {getPeriodText(budget.period)}
-            </span>
+            <p className="text-sm text-gray-600">{getPeriodText(budget.period)}</p>
           </div>
         </div>
-        <div className="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity">
+        
+        <div className="flex items-center space-x-1">
           <button
             onClick={() => onEdit(budget)}
-            className="p-2 hover:bg-blue-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-200"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             title="Editar orçamento"
           >
-            <Edit3 className="w-4 h-4 text-blue-600" />
+            <Edit3 className="w-4 h-4 text-gray-600" />
           </button>
           <button
             onClick={() => onDelete(budget.id)}
-            className="p-2 hover:bg-red-50 rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-red-200"
+            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             title="Excluir orçamento"
           >
-            <Trash2 className="w-4 h-4 text-red-500" />
+            <Trash2 className="w-4 h-4 text-gray-600" />
           </button>
         </div>
       </div>
 
       {/* Valores */}
-      <div className="space-y-2 mb-5">
+      <div className="space-y-3 mb-4">
         <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-500">Orçamento</span>
-          <span className="font-bold text-gray-900 text-base">{formatCurrency(budget.amount)}</span>
+          <span className="text-sm text-gray-600">Orçamento</span>
+          <span className="font-semibold text-gray-900">{formatCurrency(budget.amount)}</span>
         </div>
+        
         <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-500">Gasto</span>
-          <span className={`font-bold text-base ${
+          <span className="text-sm text-gray-600">Gasto</span>
+          <span className={`font-semibold ${
             budget.status === 'exceeded' ? 'text-red-600' : 'text-gray-900'
           }`}>
             {formatCurrency(budget.spent)}
           </span>
         </div>
+        
         <div className="flex justify-between items-center">
-          <span className="text-xs text-gray-500">Disponível</span>
-          <span className={`font-bold text-base ${
+          <span className="text-sm text-gray-600">Disponível</span>
+          <span className={`font-semibold ${
             budget.remaining <= 0 ? 'text-red-600' : 'text-green-600'
           }`}>
             {formatCurrency(budget.remaining)}
@@ -142,37 +143,37 @@ export function BudgetCard({ budget, onEdit, onDelete }: BudgetCardProps) {
       </div>
 
       {/* Barra de progresso */}
-      <div className="mb-5">
-        <div className="flex justify-between items-center mb-1">
-          <span className="text-xs text-gray-500">Progresso</span>
-          <span className="text-xs font-semibold text-gray-700">
+      <div className="mb-4">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm text-gray-600">Progresso</span>
+          <span className="text-sm font-medium text-gray-900">
             {budget.percentage.toFixed(1)}%
           </span>
         </div>
-        <div className="w-full bg-gray-200 rounded-full h-3 relative overflow-hidden">
+        
+        <div className="w-full bg-gray-200 rounded-full h-3">
           <div
             className={`h-3 rounded-full transition-all duration-300 ${getStatusColor(budget.status)}`}
             style={{ width: `${Math.min(budget.percentage, 100)}%` }}
           />
-          {budget.percentage > 100 && (
-            <div className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-red-600 font-semibold animate-pulse">
-              +{formatCurrency(budget.spent - budget.amount)}
-            </div>
-          )}
         </div>
+        
+        {budget.percentage > 100 && (
+          <div className="mt-1 text-xs text-red-600">
+            Excedido em {formatCurrency(budget.spent - budget.amount)}
+          </div>
+        )}
       </div>
 
       {/* Status */}
-      <div className="flex items-center gap-2 pt-4 border-t border-gray-100">
-        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold shadow-sm
-          ${
-            budget.status === 'exceeded' ? 'bg-red-100 text-red-700' :
-            budget.status === 'warning' ? 'bg-orange-100 text-orange-700' :
-            budget.status === 'caution' ? 'bg-yellow-100 text-yellow-700' :
-            'bg-green-100 text-green-700'
-          }
-        `}>
-          {getStatusIcon(budget.status)}
+      <div className="flex items-center space-x-2 pt-3 border-t border-gray-200">
+        {getStatusIcon(budget.status)}
+        <span className={`text-sm font-medium ${
+          budget.status === 'exceeded' ? 'text-red-600' :
+          budget.status === 'warning' ? 'text-orange-600' :
+          budget.status === 'caution' ? 'text-yellow-600' :
+          'text-green-600'
+        }`}>
           {getStatusText(budget.status)}
         </span>
       </div>

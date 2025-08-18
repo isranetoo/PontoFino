@@ -1,191 +1,372 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useSupabase } from '../../hooks/useSupabase'
 import { RetirementPlannerForm } from './RetirementPlannerForm'
-// Se o Chart existir e você quiser usar, mantenha a importação:
 import { RetirementPlannerChart } from './RetirementPlannerChart'
 import { RetirementPlannerResults } from './RetirementPlannerResults'
 import { AICopilotWidget } from '../AI/AICopilotWidget'
-import { calculateRetirementPlan, validateRetirementInput, FxService } from '../../utils/retirementCalculations'
-import { Calendar, TrendingUp, CheckCircle, AlertTriangle } from 'lucide-react'
-
-type AnyRecord = Record<string, any>
+import { AIInsightCard } from '../AI/AIInsightCard'
+import { 
+  calculateRetirementPlan, 
+  validateRetirementInput, 
+  FxService,
+  RetirementInput, 
+  RetirementResult 
+} from '../../utils/retirementCalculations'
+import { 
+  Plane, 
+  Globe, 
+  Calculator, 
+  Save, 
+  AlertCircle,
+  TrendingUp
+} from 'lucide-react'
 
 export function RetirementPlanner() {
-  // HOOKS E LÓGICA PRINCIPAL
-  useSupabase()
+  const { 
+    createRetirementPlan,
+    updateRetirementPlan,
+    getRetirementPlans,
+    getFxRates,
+    loading, 
+    error 
+  } = useSupabase()
 
-  const [formData, setFormData] = useState<AnyRecord>({ incomes: [], portfolio: [] })
+  // Form state
+  const [formData, setFormData] = useState<RetirementInput>({
+    baseCurrency: 'BRL',
+    spendCurrency: 'EUR',
+    targetCountry: 'Portugal',
+    currentAge: 35,
+    retirementAge: 60,
+    lifeExpectancy: 85,
+    monthlyExpenses: 3000, // EUR
+    expenseInflationRate: 0.03, // 3%
+    safeWithdrawalRate: 0.04, // 4%
+    incomes: [
+      {
+        name: 'INSS',
+        currency: 'BRL',
+        monthlyAmount: 2500,
+        startAge: 65,
+        inflationRate: 0.04,
+        type: 'social_security'
+      }
+    ],
+    portfolio: [
+      {
+        currency: 'BRL',
+        amount: 200000,
+        expectedRealReturn: 0.06,
+        assetClass: 'equity'
+      },
+      {
+        currency: 'USD',
+        amount: 50000,
+        expectedRealReturn: 0.07,
+        assetClass: 'equity'
+      }
+    ]
+  })
+
+  // Results state
+  const [retirementResult, setRetirementResult] = useState<RetirementResult | null>(null)
   const [validationErrors, setValidationErrors] = useState<string[]>([])
   const [calculating, setCalculating] = useState(false)
-  const [retirementResult, setRetirementResult] = useState<any>(null)
-
-  // useState completos (com setters) para permitir atualização futura
-  const [savedPlans, setSavedPlans] = useState<any[]>([])
-  const [error, setError] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
 
-  // Handlers
-  const handleFormChange = (field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+  // FX Service
+  const [fxService, setFxService] = useState<FxService | null>(null)
 
-  const handleIncomeChange = (index: number, income: any) => {
-    setFormData((prev) => {
-      const incomes = Array.isArray(prev.incomes) ? [...prev.incomes] : []
-      incomes[index] = income
-      return { ...prev, incomes }
-    })
-  }
+  // Saved plans
+  const [savedPlans, setSavedPlans] = useState<any[]>([])
+  const [selectedPlanId, setSelectedPlanId] = useState<string>('')
 
-  const handlePortfolioChange = (index: number, portfolio: any) => {
-    setFormData((prev) => {
-      const portfolioArr = Array.isArray(prev.portfolio) ? [...prev.portfolio] : []
-      portfolioArr[index] = portfolio
-      return { ...prev, portfolio: portfolioArr }
-    })
-  }
-
-  // Câmbio padrão (memoizado) e serviço de FX (memoizado)
-  const defaultRates = useMemo(
-    () => ({
-      BRL: { USD: 0.2, EUR: 0.18, GBP: 0.15, CHF: 0.16, CAD: 0.27, AUD: 0.29 },
-      USD: { BRL: 5.0, EUR: 0.9, GBP: 0.8,  CHF: 0.88, CAD: 1.35, AUD: 1.45 },
-      EUR: { BRL: 5.5, USD: 1.1, GBP: 0.88, CHF: 0.98, CAD: 1.5,  AUD: 1.6  },
-      GBP: { BRL: 6.5, USD: 1.25, EUR: 1.13, CHF: 1.12, CAD: 1.7,  AUD: 1.8  },
-      CHF: { BRL: 6.2, USD: 1.14, EUR: 1.02, GBP: 0.89, CAD: 1.55, AUD: 1.65 },
-      CAD: { BRL: 3.7, USD: 0.74, EUR: 0.67, GBP: 0.59, CHF: 0.65, AUD: 1.07 },
-      AUD: { BRL: 3.4, USD: 0.69, EUR: 0.62, GBP: 0.56, CHF: 0.61, CAD: 0.93 },
-    }),
-    []
-  )
-
-  const fxService = useMemo(() => new FxService(defaultRates), [defaultRates])
-
-  // Debounce do cálculo para evitar rodar a cada tecla
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
+  // Load initial data
   useEffect(() => {
-    if (!formData || Object.keys(formData).length === 0) return
+    loadInitialData()
+  }, [])
 
-    setCalculating(true)
-    if (debounceRef.current) clearTimeout(debounceRef.current)
+  // Calculate retirement plan when form data changes
+  useEffect(() => {
+    const errors = validateRetirementInput(formData)
+    setValidationErrors(errors)
 
-    debounceRef.current = setTimeout(() => {
-      try {
-        const errors = validateRetirementInput(formData)
-        setValidationErrors(errors)
-
-        if (errors.length === 0) {
+    if (errors.length === 0 && fxService) {
+      setCalculating(true)
+      const timer = setTimeout(() => {
+        try {
           const result = calculateRetirementPlan(formData, fxService)
           setRetirementResult(result)
-          setError(null)
-        } else {
+        } catch (err) {
+          console.error('Error calculating retirement plan:', err)
           setRetirementResult(null)
+        } finally {
+          setCalculating(false)
         }
-      } catch (e: any) {
-        setError(e?.message ?? 'Erro inesperado ao calcular o plano.')
-        setRetirementResult(null)
-      } finally {
-        setCalculating(false)
-      }
-    }, 500)
+      }, 300)
 
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current)
+      return () => clearTimeout(timer)
+    } else {
+      setRetirementResult(null)
     }
   }, [formData, fxService])
 
-  // Renderização principal
+  const loadInitialData = async () => {
+    try {
+      // Load FX rates
+      const fxRatesResult = await getFxRates()
+      if (fxRatesResult.data) {
+        const currentRates: Record<string, Record<string, number>> = {}
+        
+        fxRatesResult.data.forEach((rate: any) => {
+          if (!currentRates[rate.base_currency]) {
+            currentRates[rate.base_currency] = {}
+          }
+          currentRates[rate.base_currency][rate.quote_currency] = rate.rate
+        })
+        
+        setFxService(new FxService(currentRates))
+      }
+
+      // Load saved plans
+      const plansResult = await getRetirementPlans()
+      if (plansResult.data) {
+        setSavedPlans(plansResult.data)
+      }
+    } catch (err) {
+      console.error('Error loading initial data:', err)
+    }
+  }
+
+  const handleFormChange = (field: keyof RetirementInput, value: any) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+    setSaveSuccess(false)
+  }
+
+  const handleIncomeChange = (index: number, income: any) => {
+    const newIncomes = [...formData.incomes]
+    newIncomes[index] = income
+    setFormData(prev => ({ ...prev, incomes: newIncomes }))
+  }
+
+  const handlePortfolioChange = (index: number, portfolio: any) => {
+    const newPortfolio = [...formData.portfolio]
+    newPortfolio[index] = portfolio
+    setFormData(prev => ({ ...prev, portfolio: newPortfolio }))
+  }
+
+  const handleLoadPlan = (planId: string) => {
+    const plan = savedPlans.find(p => p.id === planId)
+    if (plan) {
+      setFormData({
+        baseCurrency: plan.base_currency,
+        spendCurrency: plan.spend_currency,
+        targetCountry: plan.target_country,
+        currentAge: plan.current_age,
+        retirementAge: plan.retirement_age,
+        lifeExpectancy: plan.life_expectancy,
+        monthlyExpenses: Number(plan.monthly_expenses),
+        expenseInflationRate: Number(plan.expense_inflation_rate),
+        safeWithdrawalRate: Number(plan.safe_withdrawal_rate),
+        incomes: plan.incomes || [],
+        portfolio: plan.portfolio || []
+      })
+      setSelectedPlanId(planId)
+    }
+  }
+
+  const handleSavePlan = async () => {
+    if (validationErrors.length > 0) return
+
+    setSaving(true)
+    try {
+      const planData = {
+        name: `Aposentadoria ${formData.targetCountry} - ${new Date().toLocaleDateString('pt-BR')}`,
+        base_currency: formData.baseCurrency,
+        spend_currency: formData.spendCurrency,
+        target_country: formData.targetCountry,
+        current_age: formData.currentAge,
+        retirement_age: formData.retirementAge,
+        life_expectancy: formData.lifeExpectancy,
+        monthly_expenses: formData.monthlyExpenses,
+        expense_inflation_rate: formData.expenseInflationRate,
+        safe_withdrawal_rate: formData.safeWithdrawalRate,
+        incomes: formData.incomes,
+        portfolio: formData.portfolio
+      }
+
+      let planResult
+      if (selectedPlanId) {
+        planResult = await updateRetirementPlan(selectedPlanId, planData)
+      } else {
+        planResult = await createRetirementPlan(planData)
+      }
+
+      if (planResult.error) {
+        throw new Error(planResult.error)
+      }
+
+      setSaveSuccess(true)
+      await loadInitialData()
+      
+      setTimeout(() => setSaveSuccess(false), 3000)
+
+    } catch (err: any) {
+      console.error('Error saving plan:', err)
+    } finally {
+      setSaving(false)
+    }
+  }
+
   return (
-    <>
-      <div className="space-y-10">
-        <div className="bg-gradient-to-br from-blue-50 to-purple-100 rounded-3xl p-8 border border-blue-200 shadow-xl text-center">
-          <h1 className="text-3xl md:text-4xl font-extrabold text-blue-900 mb-2 tracking-tight">
-            Planejador de Aposentadoria
-          </h1>
-          <p className="text-lg text-blue-800 max-w-2xl mx-auto">
-            Projete sua aposentadoria internacional, simule diferentes cenários e visualize sua segurança financeira no futuro.
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Aposentadoria Multi-Moeda</h1>
+          <p className="text-gray-600">
+            Planeje sua aposentadoria internacional com múltiplas moedas
           </p>
         </div>
-
-        {saveSuccess && (
-          <div className="bg-green-50 border border-green-200 text-green-800 rounded-xl p-4 shadow flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-green-500" />
-            <span className="font-semibold">Plano salvo com sucesso!</span>
-          </div>
-        )}
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 shadow flex items-center gap-3">
-            <AlertTriangle className="w-6 h-6 text-red-500" />
-            <span className="font-semibold">Erro: {error}</span>
-          </div>
-        )}
-
-        {validationErrors.length > 0 && (
-          <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-xl p-4 shadow flex flex-col gap-2">
-            <span className="font-semibold">Corrija os seguintes campos:</span>
-            <ul className="list-disc pl-5">
-              {validationErrors.map((err, idx) => (
-                <li key={idx}>{err}</li>
+        
+        <div className="flex items-center space-x-3">
+          {savedPlans.length > 0 && (
+            <select
+              value={selectedPlanId}
+              onChange={(e) => handleLoadPlan(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="">Novo plano</option>
+              {savedPlans.map(plan => (
+                <option key={plan.id} value={plan.id}>
+                  {plan.name}
+                </option>
               ))}
-            </ul>
+            </select>
+          )}
+          
+          <button
+            onClick={handleSavePlan}
+            disabled={saving || validationErrors.length > 0}
+            className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            <Save className="w-4 h-4" />
+            <span>{saving ? 'Salvando...' : 'Salvar Plano'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Success Message */}
+      {saveSuccess && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg">
+          Plano de aposentadoria salvo com sucesso!
+        </div>
+      )}
+
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+          Erro: {error}
+        </div>
+      )}
+
+      {/* Validation Errors */}
+      {validationErrors.length > 0 && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+          <div className="flex items-center space-x-2 mb-2">
+            <AlertCircle className="w-5 h-5 text-yellow-600" />
+            <h3 className="font-medium text-yellow-800">Corrija os seguintes erros:</h3>
           </div>
-        )}
+          <ul className="list-disc list-inside text-sm text-yellow-700 space-y-1">
+            {validationErrors.map((error, index) => (
+              <li key={index}>{error}</li>
+            ))}
+          </ul>
+        </div>
+      )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="space-y-8">
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-                <Calendar className="w-7 h-7 text-purple-600" />
-                Parâmetros do Plano
-              </h2>
-
-              <RetirementPlannerForm
-                formData={formData}
-                onChange={handleFormChange}
-                onIncomeChange={handleIncomeChange}
-                onPortfolioChange={handlePortfolioChange}
-                errors={validationErrors}
-              />
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Left Column - Form */}
+        <div className="space-y-6">
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center space-x-2 mb-6">
+              <Plane className="w-5 h-5 text-blue-600" />
+              <h2 className="text-xl font-semibold text-gray-900">Configuração do Plano</h2>
             </div>
-          </div>
-
-          <div className="space-y-8">
-            <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-              <h2 className="text-2xl font-bold text-blue-900 mb-6 flex items-center gap-2">
-                <TrendingUp className="w-7 h-7 text-green-600" />
-                Resultados & Simulação
-              </h2>
-
-              {calculating && <div className="text-blue-700">Calculando...</div>}
-
-              {retirementResult && (
-                <>
-                  <RetirementPlannerResults result={retirementResult} input={formData} />
-                  {/* Se quiser exibir o gráfico, ajuste a prop conforme seu componente */}
-                  <div className="mt-6">
-                    <RetirementPlannerChart data={retirementResult} />
-                  </div>
-                </>
-              )}
-
-              {!retirementResult && !calculating && (
-                <div className="text-gray-500">Preencha os dados para ver a simulação.</div>
-              )}
-            </div>
+            
+            <RetirementPlannerForm
+              formData={formData}
+              onChange={handleFormChange}
+              onIncomeChange={handleIncomeChange}
+              onPortfolioChange={handlePortfolioChange}
+              errors={validationErrors}
+            />
           </div>
         </div>
 
-        <AICopilotWidget
-          page="retirement"
-          contextData={{
-            formData,
-            retirementResult,
-            savedPlans,
-          }}
-        />
+        {/* Right Column - Results */}
+        <div className="space-y-6">
+          {/* Results Summary */}
+          {retirementResult && (
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="flex items-center space-x-2 mb-6">
+                <Globe className="w-5 h-5 text-green-600" />
+                <h2 className="text-xl font-semibold text-gray-900">Resultados</h2>
+              </div>
+              
+              <RetirementPlannerResults result={retirementResult} input={formData} />
+              
+              <div className="mt-6">
+                <AIInsightCard
+                  type="fire"
+                  title="Otimizar Aposentadoria"
+                  description="Estratégias para aposentadoria internacional"
+                  data={{ formData, retirementResult }}
+                  compact
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Chart */}
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <div className="flex items-center space-x-2 mb-6">
+              <TrendingUp className="w-5 h-5 text-purple-600" />
+              <h2 className="text-xl font-semibold text-gray-900">Projeção de Patrimônio</h2>
+            </div>
+            
+            {calculating ? (
+              <div className="flex items-center justify-center h-80">
+                <div className="text-center">
+                  <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                  <p className="text-gray-600">Calculando projeção...</p>
+                </div>
+              </div>
+            ) : retirementResult ? (
+              <RetirementPlannerChart result={retirementResult} input={formData} />
+            ) : (
+              <div className="flex items-center justify-center h-80 text-gray-500">
+                <div className="text-center">
+                  <Calculator className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <p>Preencha os parâmetros para ver a projeção</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
-    </>
+
+      {/* AI Copilot Widget */}
+      <AICopilotWidget 
+        page="retirement" 
+        contextData={{ 
+          formData,
+          retirementResult,
+          savedPlans
+        }} 
+      />
+    </div>
   )
 }

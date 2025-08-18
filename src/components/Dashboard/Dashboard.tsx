@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Plus, X } from 'lucide-react';
+import { TrendingUp, TrendingDown, DollarSign, Target, AlertTriangle, Plus, X, Calculator, Bot, Lightbulb } from 'lucide-react';
 import { MetricsCard } from './MetricsCard';
 import { TransactionForm } from '../Transactions/TransactionForm';
 import { AICopilotWidget } from '../AI/AICopilotWidget';
@@ -20,7 +20,8 @@ const Dashboard: React.FC = () => {
     monthlyExpenses,
     budgetAlerts,
     loading,
-    error
+    error,
+    refreshAll
   } = useDataContext();
   
   const [showTransactionModal, setShowTransactionModal] = useState(false);
@@ -62,41 +63,42 @@ const Dashboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen  text-white flex flex-col py-10 px-2 md:px-8 lg:px-16">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-1">Dashboard</h1>
-          <p className="text-gray-600 text-base">Visão geral das suas finanças</p>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Visão geral das suas finanças</p>
         </div>
-        <button
+        <button 
           onClick={() => setShowTransactionModal(true)}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-lg shadow transition-colors flex items-center gap-2 font-semibold"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
         >
-          <Plus className="w-5 h-5" /> Nova Transação
+          <Plus className="w-4 h-4" />
+          Nova Transação
         </button>
       </div>
 
       {/* Error Display */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-600">Erro ao carregar dados: {error}</p>
         </div>
       )}
 
       {/* Metrics Cards */}
-      <div className="grid text-gray-900 grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricsCard
           title="Saldo Total"
           value={formatCurrency(totalBalance)}
           icon={DollarSign}
-          color="green"
+          color="blue"
         />
         <MetricsCard
           title="Receitas do Mês"
           value={formatCurrency(monthlyIncome)}
           icon={TrendingUp}
-          color="blue"
+          color="green"
         />
         <MetricsCard
           title="Despesas do Mês"
@@ -131,24 +133,37 @@ const Dashboard: React.FC = () => {
           type="spending"
           title="Análise de Gastos"
           description="Identifique padrões e oportunidades de economia"
-          data={{ transactions, monthlyExpenses }}
+          data={{ 
+            transactions: transactions.slice(0, 50), 
+            monthlyExpenses,
+            query: "Analise meus gastos e identifique onde posso economizar"
+          }}
         />
         <AIInsightCard
           type="budget"
           title="Otimização de Orçamentos"
           description="Melhore o controle dos seus gastos"
-          data={{ budgets, budgetAlerts }}
+          data={{ 
+            budgets, 
+            budgetAlerts,
+            query: "Como posso otimizar meus orçamentos atuais?"
+          }}
         />
         <AIInsightCard
           type="fire"
           title="Estratégia FIRE"
           description="Acelere sua independência financeira"
-          data={{ totalBalance, monthlyIncome, monthlyExpenses }}
+          data={{ 
+            totalBalance, 
+            monthlyIncome, 
+            monthlyExpenses,
+            query: "Como acelerar minha independência financeira?"
+          }}
         />
       </div>
 
       {/* Recent Transactions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mt-10">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Transações Recentes</h2>
         </div>

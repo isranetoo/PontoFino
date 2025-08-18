@@ -152,8 +152,8 @@ export function BillingSuccess() {
         <div className="mt-6 text-center text-sm text-gray-500">
           <p>
             Precisa de ajuda? Entre em contato conosco em{' '}
-            <a href="mailto:suporte@PontoFino.com.br" className="text-blue-600 hover:text-blue-700">
-              suporte@PontoFino.com.br
+            <a href="mailto:suporte@financehub.com" className="text-blue-600 hover:text-blue-700">
+              suporte@financehub.com
             </a>
           </p>
         </div>

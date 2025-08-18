@@ -200,91 +200,28 @@ export function BudgetsPage() {
         </div>
       </div>
 
-      {/* Resumo geral */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-50 to-white rounded-2xl shadow p-6 border border-blue-100">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Target className="w-6 h-6 text-blue-600" />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-blue-900">Orçamento Total</h3>
-              <p className="text-3xl font-bold text-blue-900">{formatCurrency(getTotalBudget())}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-gradient-to-br from-red-50 to-white rounded-2xl shadow p-6 border border-red-100">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-red-900">Total Gasto</h3>
-              <p className="text-3xl font-bold text-red-900">{formatCurrency(getTotalSpent())}</p>
-            </div>
-          </div>
-        </div>
-        <div className="bg-gradient-to-br from-green-50 to-white rounded-2xl shadow p-6 border border-green-100">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <Target className="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-green-900">Disponível</h3>
-              <p className="text-3xl font-bold text-green-900">{formatCurrency(Math.max(0, getTotalBudget() - getTotalSpent()))}</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Filtro de período */}
-      <div className="bg-white rounded-2xl shadow p-6 border border-gray-100">
-        <div className="flex flex-col md:flex-row md:items-center md:space-x-4 gap-2">
-          <span className="text-sm font-semibold text-gray-700">Período:</span>
-          <div className="flex space-x-2">
-            {[
-              { value: 'weekly', label: 'Semanal' },
-              { value: 'monthly', label: 'Mensal' },
-              { value: 'yearly', label: 'Anual' }
-            ].map(period => (
-              <button
-                key={period.value}
-                onClick={() => setSelectedPeriod(period.value)}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold shadow-sm border-2 transition-all duration-150
-                  ${selectedPeriod === period.value
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-gray-700 border-gray-200 hover:bg-blue-50 hover:border-blue-400'}
-                `}
-              >
-                {period.label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
       {/* Alertas */}
       {alerts.length > 0 && (
         <div className="space-y-3">
           {alerts.map(alert => (
             <div
               key={alert.id}
-              className={`p-4 rounded-2xl border shadow-sm flex flex-col gap-1 font-semibold text-base
-                ${alert.type === 'exceeded'
+              className={`p-4 rounded-lg border ${
+                alert.type === 'exceeded'
                   ? 'bg-red-50 border-red-200 text-red-800'
-                  : 'bg-yellow-50 border-yellow-200 text-yellow-800'}
-              `}
+                  : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+              }`}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex items-center space-x-2">
                 <AlertTriangle className="w-5 h-5" />
-                <span>
+                <span className="font-medium">
                   {alert.type === 'exceeded' ? 'Orçamento Excedido!' : 'Atenção: Orçamento Quase Esgotado!'}
                 </span>
               </div>
-              <span className="text-sm font-normal">
+              <p className="mt-1 text-sm">
                 <strong>{alert.category}</strong>: {formatCurrency(alert.spent)} de {formatCurrency(alert.amount)} 
                 ({alert.percentage.toFixed(1)}%)
-              </span>
+              </p>
             </div>
           ))}
         </div>
@@ -296,16 +233,90 @@ export function BudgetsPage() {
           type="budget"
           title="Otimizar Orçamentos"
           description="Analise compliance e sugira melhorias"
-          data={{ budgets: budgetsWithSpending, alerts }}
+          data={{ 
+            budgets: budgetsWithSpending, 
+            alerts,
+            query: "Analise meus orçamentos e sugira otimizações específicas"
+          }}
           compact
         />
         <AIInsightCard
           type="spending"
           title="Padrões de Gastos"
           description="Identifique tendências e anomalias"
-          data={{ budgets: budgetsWithSpending }}
+          data={{ 
+            budgets: budgetsWithSpending,
+            query: "Identifique padrões nos meus gastos e oportunidades de economia"
+          }}
           compact
         />
+      </div>
+
+      {/* Resumo geral */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+              <Target className="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600">Orçamento Total</h3>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(getTotalBudget())}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-red-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600">Total Gasto</h3>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(getTotalSpent())}</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
+              <Target className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-medium text-gray-600">Disponível</h3>
+              <p className="text-2xl font-bold text-gray-900">
+                {formatCurrency(Math.max(0, getTotalBudget() - getTotalSpent()))}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Filtro de período */}
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="flex items-center space-x-4">
+          <span className="text-sm font-medium text-gray-700">Período:</span>
+          <div className="flex space-x-2">
+            {[
+              { value: 'weekly', label: 'Semanal' },
+              { value: 'monthly', label: 'Mensal' },
+              { value: 'yearly', label: 'Anual' }
+            ].map(period => (
+              <button
+                key={period.value}
+                onClick={() => setSelectedPeriod(period.value)}
+                className={`px-3 py-1 rounded-lg text-sm transition-colors ${
+                  selectedPeriod === period.value
+                    ? 'bg-blue-100 text-blue-700'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {period.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Lista de orçamentos */}

@@ -107,7 +107,7 @@ export function BillingCancel() {
             Teve algum problema ou precisa de ajuda?
           </p>
           <a
-            href="mailto:suporte@PontoFino.com"
+            href="mailto:suporte@financehub.com"
             className="inline-flex items-center space-x-2 text-blue-600 hover:text-blue-700"
           >
             <MessageCircle className="w-4 h-4" />

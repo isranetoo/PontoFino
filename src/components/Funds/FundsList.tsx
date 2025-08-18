@@ -248,23 +248,23 @@ export function FundsList() {
   }
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-1 tracking-tight">Catálogo de Fundos</h1>
-          <p className="text-lg text-gray-500">Pesquise, compare e acompanhe os melhores fundos do mercado</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Catálogo de Fundos</h1>
+          <p className="text-gray-600">Pesquise, compare e acompanhe os melhores fundos do mercado</p>
         </div>
       </div>
 
       {/* Mostrar erro se houver */}
       {error && (
-        <div className="bg-red-100 border border-red-300 text-red-700 px-6 py-4 rounded-2xl font-semibold shadow-sm">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           Erro ao carregar fundos: {error}
         </div>
       )}
 
       {/* AI Recommendations */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <AIInsightCard
           type="investment"
           title="Análise de Fundos"
@@ -282,25 +282,25 @@ export function FundsList() {
       </div>
 
       {/* Filtros e pesquisa */}
-      <div className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 animate-fade-in">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="bg-white rounded-xl shadow-md p-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="relative">
-            <Search className="w-5 h-5 text-blue-400 absolute left-3 top-3" />
+            <Search className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
             <input
               type="text"
               placeholder="Pesquisar fundo ou ticker..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           <div className="relative">
-            <Filter className="w-5 h-5 text-blue-400 absolute left-3 top-3" />
+            <Filter className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 appearance-none"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
             >
               <option value="">Todas as categorias</option>
               {categories.map(category => (
@@ -310,11 +310,11 @@ export function FundsList() {
           </div>
 
           <div className="relative">
-            <SortAsc className="w-5 h-5 text-blue-400 absolute left-3 top-3" />
+            <SortAsc className="w-5 h-5 text-gray-400 absolute left-3 top-3" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-xl bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 appearance-none"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 appearance-none"
             >
               <option value="name">Nome</option>
               <option value="recent">Rentabilidade Recente</option>
@@ -324,10 +324,10 @@ export function FundsList() {
             </select>
           </div>
 
-          <div className="text-base text-gray-500 flex items-center font-semibold">
+          <div className="text-sm text-gray-600 flex items-center">
             {filteredFunds.length} fundo{filteredFunds.length !== 1 ? 's' : ''} encontrado{filteredFunds.length !== 1 ? 's' : ''}
             {loadingReturns && (
-              <span className="ml-2 text-blue-700 animate-pulse">
+              <span className="ml-2 text-blue-600">
                 (calculando retornos...)
               </span>
             )}
@@ -337,11 +337,11 @@ export function FundsList() {
 
       {/* Lista de fundos */}
       {loadingReturns ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFunds.map(fund => (
-            <div key={fund.id} className="bg-white border border-gray-200 rounded-2xl shadow-lg p-8 animate-pulse">
-              <div className="h-7 bg-gray-200 rounded mb-5"></div>
-              <div className="space-y-3">
+            <div key={fund.id} className="bg-white rounded-xl shadow-md p-6 animate-pulse">
+              <div className="h-6 bg-gray-200 rounded mb-4"></div>
+              <div className="space-y-2">
                 {[...Array(5)].map((_, j) => (
                   <div key={j} className="h-4 bg-gray-200 rounded"></div>
                 ))}
@@ -350,7 +350,7 @@ export function FundsList() {
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredFunds.map(fund => (
             <FundCard
               key={fund.id}
@@ -368,10 +368,10 @@ export function FundsList() {
       )}
 
       {filteredFunds.length === 0 && (
-        <div className="text-center py-16">
-          <Search className="w-20 h-20 text-gray-300 mx-auto mb-6" />
-          <p className="text-2xl text-gray-500 font-bold mb-2">Nenhum fundo encontrado</p>
-          <p className="text-lg text-gray-400">Tente ajustar os filtros de pesquisa</p>
+        <div className="text-center py-12">
+          <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500 text-lg mb-2">Nenhum fundo encontrado</p>
+          <p className="text-gray-400">Tente ajustar os filtros de pesquisa</p>
         </div>
       )}
 
