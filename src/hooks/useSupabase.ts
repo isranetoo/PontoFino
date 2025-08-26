@@ -660,6 +660,37 @@ export function useSupabase() {
 
     return result || []
   }, [executeOperation])
+  
+  // Função especializada para obter preços de múltiplos fundos para comparação
+  const getMultipleFundPrices = useCallback(async (fundIds: string[], days: number = 365): Promise<{[fundId: string]: FundPrice[]}> => {
+    const result = await executeOperation(async () => {
+      // Estabelece a data de início com base nos dias solicitados
+      const startDate = new Date()
+      startDate.setDate(startDate.getDate() - days)
+      const startDateString = startDate.toISOString().split('T')[0]
+      
+      // Busca preços para todos os fundos solicitados
+      const { data, error } = await supabase
+        .from(TABLE_NAMES.FUND_PRICES)
+        .select('*')
+        .in('fund_id', fundIds)
+        .gte('price_date', startDateString)
+        .order('price_date', { ascending: true })
+        
+      if (error) throw error
+      
+      // Organiza os dados por fundId para facilitar o uso
+      const pricesByFund: {[fundId: string]: FundPrice[]} = {}
+      
+      fundIds.forEach(id => {
+        pricesByFund[id] = data?.filter(price => price.fund_id === id) || []
+      })
+      
+      return pricesByFund
+    }, 'buscar preços múltiplos para comparação')
+    
+    return result || {}
+  }, [executeOperation])
 
   // ==================== WATCHLISTS ====================
   const getWatchlist = useCallback(async (): Promise<Watchlist[]> => {
@@ -931,6 +962,7 @@ export function useSupabase() {
     // Funds
     getFunds,
     getFundPrices,
+    getMultipleFundPrices,
     
     // Watchlist
     getWatchlist,
