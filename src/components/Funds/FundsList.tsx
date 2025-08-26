@@ -1,12 +1,11 @@
-import React, { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useEffect } from 'react'
 import { getDayOfYear } from 'date-fns'
 import { useSupabase } from '../../hooks/useSupabase'
-import { usePaywall } from '../../hooks/usePaywall'
 import { FundCard } from './FundCard'
 import { AICopilotWidget } from '../AI/AICopilotWidget'
 import { AIInsightCard } from '../AI/AIInsightCard'
-import { Search, Filter, SortAsc, Bot, TrendingUp, Star } from 'lucide-react'
+import { Search, Filter, SortAsc, Star } from 'lucide-react'
 
 /**
  * Lista de fundos integrada com Supabase
@@ -40,28 +39,61 @@ export function FundsList() {
   const [watchlistedFunds, setWatchlistedFunds] = useState<Set<string>>(new Set())
   const [fundsWithReturns, setFundsWithReturns] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState('')
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
   const [selectedCategory, setSelectedCategory] = useState('')
   const [sortBy, setSortBy] = useState('name')
   const [loadingReturns, setLoadingReturns] = useState(false)
-  const { executeWithPaywall } = usePaywall()
+
+  // Debounce para a pesquisa
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+    }, 500) // Aguarda 500ms após o usuário parar de digitar
+
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  // Fundos sugeridos (destacados) - Uma seleção curada dos mais populares
+  const suggestedFunds = useMemo(() => [
+    // ETFs e Fundos de Índice populares
+    'BOVA11', 'IVVB11', 'SMAL11', 'DIVO11',
+    // FIIs conhecidos e líquidos
+    'XPML11', 'HGLG11', 'VISC11', 'IRDM11', 
+    'KNRI11', 'RBRF11', 'MXRF11', 'BCFF11',
+    // Fundos Multimercado reconhecidos
+    'HASH11', // Se disponível
+    // Outros populares por categoria
+    'ALZR11', 'BTLG11', 'KNCR11', 'RECT11'
+  ], [])
 
   // Carregar dados iniciais
   useEffect(() => {
     const loadInitialData = async () => {
       try {
-        // Carregar fundos
-        const fundsResult = await getFunds({
-          search: searchTerm,
-          category: selectedCategory
-        })
-        if (fundsResult.data) {
-          setFunds(fundsResult.data)
+        // Carregar fundos usando o termo de pesquisa com debounce
+        const fundsResult = await getFunds()
+        if (fundsResult) {
+          // Filtrar fundos baseado no termo de pesquisa e categoria
+          let filteredFunds = fundsResult
+          
+          if (debouncedSearchTerm) {
+            filteredFunds = fundsResult.filter(fund => 
+              fund.name.toLowerCase().includes(debouncedSearchTerm.toLowerCase()) ||
+              fund.ticker.toLowerCase().includes(debouncedSearchTerm.toLowerCase())
+            )
+          }
+          
+          if (selectedCategory) {
+            filteredFunds = filteredFunds.filter(fund => fund.category === selectedCategory)
+          }
+          
+          setFunds(filteredFunds)
         }
 
         // Carregar watchlist
         const watchlistResult = await getWatchlist()
-        if (watchlistResult.data) {
-          const watchlistedIds = new Set(watchlistResult.data.map(item => item.fund_id))
+        if (watchlistResult) {
+          const watchlistedIds = new Set(watchlistResult.map((item: any) => item.fund_id))
           setWatchlistedFunds(watchlistedIds)
         }
       } catch (err) {
@@ -70,7 +102,7 @@ export function FundsList() {
     }
 
     loadInitialData()
-  }, [getFunds, getWatchlist, searchTerm, selectedCategory])
+  }, [getFunds, getWatchlist, debouncedSearchTerm, selectedCategory]) // Usando debouncedSearchTerm em vez de searchTerm
 
   // Calcular retornos dos fundos
   useEffect(() => {
@@ -85,8 +117,8 @@ export function FundsList() {
               // Buscar preços dos últimos 3 anos
               const pricesResult = await getFundPrices(fund.id, 1095) // ~3 anos
               
-              if (pricesResult.data && pricesResult.data.length > 0) {
-                const prices = pricesResult.data.sort((a, b) => 
+              if (pricesResult && pricesResult.length > 0) {
+                const prices = pricesResult.sort((a: any, b: any) => 
                   new Date(a.price_date).getTime() - new Date(b.price_date).getTime()
                 )
                 
@@ -97,7 +129,7 @@ export function FundsList() {
                   const targetDate = new Date()
                   targetDate.setDate(targetDate.getDate() - daysAgo)
                   
-                  const closestPrice = prices.find(p => 
+                  const closestPrice = prices.find((p: any) => 
                     new Date(p.price_date) >= targetDate
                   ) || prices[0]
                   
@@ -178,7 +210,7 @@ export function FundsList() {
       
       if (isWatchlisted) {
         const result = await removeFromWatchlist(fundId)
-        if (!result.error) {
+        if (result) {
           setWatchlistedFunds(prev => {
             const newSet = new Set(prev)
             newSet.delete(fundId)
@@ -193,7 +225,7 @@ export function FundsList() {
         }
       } else {
         const result = await addToWatchlist(fundId)
-        if (!result.error) {
+        if (result) {
           setWatchlistedFunds(prev => new Set([...prev, fundId]))
           // Atualizar o fund específico
           setFundsWithReturns(prev => 
@@ -260,6 +292,110 @@ export function FundsList() {
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
           Erro ao carregar fundos: {error}
+        </div>
+      )}
+
+      {/* Fundos Sugeridos - sempre mostra quando não há pesquisa ativa */}
+      {!debouncedSearchTerm && !selectedCategory && (
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <Star className="w-5 h-5 text-yellow-500" />
+              <h2 className="text-lg font-semibold text-gray-900">Fundos em Destaque</h2>
+            </div>
+            <span className="text-sm text-gray-500">Seleção curada de fundos populares</span>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {(() => {
+              // Primeiro tenta usar os fundos sugeridos
+              const suggestedFundsData = fundsWithReturns.filter(fund => 
+                suggestedFunds.includes(fund.ticker)
+              )
+              
+              // Se não encontrar fundos sugeridos suficientes, pega os melhores por categoria
+              if (suggestedFundsData.length < 4) {
+                const fallbackFunds = [
+                  ...suggestedFundsData,
+                  ...fundsWithReturns
+                    .filter(fund => !suggestedFunds.includes(fund.ticker))
+                    .sort((a, b) => (b.returns?.['12m'] || 0) - (a.returns?.['12m'] || 0))
+                    .slice(0, 8 - suggestedFundsData.length)
+                ]
+                return fallbackFunds.slice(0, 8)
+              }
+              
+              return suggestedFundsData.slice(0, 8)
+            })().map(fund => (
+              <div 
+                key={fund.id} 
+                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => handleViewDetails(fund.id)}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm">{fund.ticker}</h3>
+                    <p className="text-xs text-gray-600 truncate">{fund.name}</p>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleToggleWatchlist(fund.id)
+                    }}
+                    className="p-1 hover:bg-gray-100 rounded"
+                  >
+                    {fund.isWatchlisted ? (
+                      <Star className="w-4 h-4 text-yellow-500 fill-current" />
+                    ) : (
+                      <Star className="w-4 h-4 text-gray-400" />
+                    )}
+                  </button>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">12M</span>
+                    <span className={`font-medium ${
+                      (fund.returns?.['12m'] || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {(fund.returns?.['12m'] || 0) >= 0 ? '+' : ''}{(fund.returns?.['12m'] || 0).toFixed(2)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">Taxa Admin</span>
+                    <span className="text-gray-900">{fund.admin_fee.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {fundsWithReturns.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <p>Carregando fundos em destaque...</p>
+            </div>
+          )}
+          
+          {/* Mostrar categorias dos fundos em destaque */}
+          {fundsWithReturns.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-500 mb-2">Categorias representadas:</p>
+              <div className="flex flex-wrap gap-2">
+                {Array.from(new Set(
+                  fundsWithReturns
+                    .filter(fund => suggestedFunds.includes(fund.ticker))
+                    .map(fund => fund.category)
+                )).map(category => (
+                  <span 
+                    key={category} 
+                    className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
 

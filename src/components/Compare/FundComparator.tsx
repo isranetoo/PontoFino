@@ -5,7 +5,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { ScatterChart, Scatter } from 'recharts'
 import { AICopilotWidget } from '../AI/AICopilotWidget'
 import { AIInsightCard } from '../AI/AIInsightCard'
-import { Search, X, Plus, BarChart3, Bot, Target, TrendingUp, Loader2 } from 'lucide-react'
+import { Search, X, Plus, BarChart3, TrendingUp, Loader2, Star } from 'lucide-react'
 
 interface Fund {
   id: string
@@ -170,6 +170,19 @@ export function FundComparator() {
   const [isLoading, setIsLoading] = useState(true)
   const { executeWithPaywall } = usePaywall()
   const { getFunds, getMultipleFundPrices } = useSupabase()
+
+  // Fundos sugeridos para comparação - Uma seleção curada dos mais populares
+  const suggestedFunds = useMemo(() => [
+    // ETFs e Fundos de Índice populares
+    'BOVA11', 'IVVB11', 'SMAL11', 'DIVO11',
+    // FIIs conhecidos e líquidos
+    'XPML11', 'HGLG11', 'VISC11', 'IRDM11', 
+    'KNRI11', 'RBRF11', 'MXRF11', 'BCFF11',
+    // Fundos Multimercado reconhecidos
+    'HASH11', // Se disponível
+    // Outros populares por categoria
+    'ALZR11', 'BTLG11', 'KNCR11', 'RECT11'
+  ], [])
 
   // Busca todos os fundos e seus preços históricos de forma otimizada
   useEffect(() => {
@@ -406,6 +419,111 @@ export function FundComparator() {
           )}
         </div>
       </div>
+
+      {/* Fundos Sugeridos para Comparação - sempre mostra quando há poucos fundos selecionados */}
+      {selectedFunds.length < 3 && !isLoading && (
+        <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-2">
+              <Star className="w-5 h-5 text-yellow-500" />
+              <h2 className="text-lg font-semibold text-gray-900">Fundos Sugeridos para Comparação</h2>
+            </div>
+            <span className="text-sm text-gray-500">Seleção curada de fundos populares</span>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {(() => {
+              // Primeiro tenta usar os fundos sugeridos que não estão selecionados
+              const suggestedFundsData = allFunds.filter(fund => 
+                suggestedFunds.includes(fund.ticker) && 
+                !selectedFunds.find(selected => selected.id === fund.id)
+              )
+              
+              // Se não encontrar fundos sugeridos suficientes, pega os melhores por performance
+              if (suggestedFundsData.length < 4) {
+                const fallbackFunds = [
+                  ...suggestedFundsData,
+                  ...allFunds
+                    .filter(fund => 
+                      !suggestedFunds.includes(fund.ticker) && 
+                      !selectedFunds.find(selected => selected.id === fund.id)
+                    )
+                    .sort((a, b) => (b.annualizedReturn || 0) - (a.annualizedReturn || 0))
+                    .slice(0, 8 - suggestedFundsData.length)
+                ]
+                return fallbackFunds.slice(0, 8)
+              }
+              
+              return suggestedFundsData.slice(0, 8)
+            })().map(fund => (
+              <div 
+                key={fund.id} 
+                className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                onClick={() => addFund(fund)}
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <div>
+                    <h3 className="font-semibold text-gray-900 text-sm">{fund.ticker}</h3>
+                    <p className="text-xs text-gray-600 truncate">{fund.name}</p>
+                  </div>
+                  <div className="w-4 h-4 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+                    <Plus className="w-3 h-3" />
+                  </div>
+                </div>
+                
+                <div className="space-y-1">
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">Retorno Anual</span>
+                    <span className={`font-medium ${
+                      (fund.annualizedReturn || 0) >= 0 ? 'text-green-600' : 'text-red-600'
+                    }`}>
+                      {(fund.annualizedReturn || 0) >= 0 ? '+' : ''}{(fund.annualizedReturn || 0).toFixed(2)}%
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">Volatilidade</span>
+                    <span className="text-gray-900">{(fund.volatility || 0).toFixed(2)}%</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-gray-600">Taxa Admin</span>
+                    <span className="text-gray-900">{fund.adminFee.toFixed(2)}%</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {allFunds.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <p>Carregando fundos sugeridos...</p>
+            </div>
+          )}
+          
+          {/* Mostrar categorias dos fundos sugeridos */}
+          {allFunds.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-100">
+              <p className="text-xs text-gray-500 mb-2">Categorias representadas:</p>
+              <div className="flex flex-wrap gap-2">
+                {Array.from(new Set(
+                  allFunds
+                    .filter(fund => 
+                      suggestedFunds.includes(fund.ticker) && 
+                      !selectedFunds.find(selected => selected.id === fund.id)
+                    )
+                    .map(fund => fund.category)
+                )).map(category => (
+                  <span 
+                    key={category} 
+                    className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded"
+                  >
+                    {category}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Gráfico de comparação */}
       {selectedFunds.length > 0 && (
