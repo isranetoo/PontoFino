@@ -52,7 +52,14 @@ export function Sidebar({ activeTab, onTabChange }: SidebarProps) {
         fixed inset-y-0 left-0 z-40 w-64 bg-white shadow-lg transform transition-transform duration-200 ease-in-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
       `}>
-        <div className="p-6">
+        <div
+          className="p-6 h-full max-h-screen overflow-y-auto scrollbar-thin scrollbar-thumb-blue-200 scrollbar-track-blue-50"
+          style={{
+            /* fallback for browsers without tailwind-scrollbar plugin */
+            scrollbarWidth: 'thin',
+            scrollbarColor: '#bfdbfe #f0f9ff',
+          }}
+        >
           <div className="flex items-center space-x-3 mb-8">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
               <TrendingUp className="w-6 h-6 text-white" />
