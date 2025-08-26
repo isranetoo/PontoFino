@@ -50,9 +50,12 @@ const Dashboard: React.FC = () => {
   
   // Calculate active goals
   const activeGoals = goals.filter(goal => !goal.is_completed).length;
-  
+
   // Get recent transactions (last 5)
   const recentTransactions = transactions.slice(0, 5);
+
+  // Estado para AI Insights dinâmico
+  const [selectedInsight, setSelectedInsight] = useState<null | 'spending' | 'budget' | 'fire'>(null);
 
   if (!user) {
     return (
@@ -127,39 +130,110 @@ const Dashboard: React.FC = () => {
         </div>
       )}
 
-      {/* AI Insights */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <AIInsightCard
-          type="spending"
-          title="Análise de Gastos"
-          description="Identifique padrões e oportunidades de economia"
-          data={{ 
-            transactions: transactions.slice(0, 50), 
-            monthlyExpenses,
-            query: "Analise meus gastos e identifique onde posso economizar"
-          }}
-        />
-        <AIInsightCard
-          type="budget"
-          title="Otimização de Orçamentos"
-          description="Melhore o controle dos seus gastos"
-          data={{ 
-            budgets, 
-            budgetAlerts,
-            query: "Como posso otimizar meus orçamentos atuais?"
-          }}
-        />
-        <AIInsightCard
-          type="fire"
-          title="Estratégia FIRE"
-          description="Acelere sua independência financeira"
-          data={{ 
-            totalBalance, 
-            monthlyIncome, 
-            monthlyExpenses,
-            query: "Como acelerar minha independência financeira?"
-          }}
-        />
+      {/* AI Insights Dinâmico */}
+      <div className="w-full">
+        {selectedInsight === null ? (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <button
+              className="text-left focus:outline-none"
+              style={{ width: '100%' }}
+              onClick={() => setSelectedInsight('spending')}
+              disabled={selectedInsight !== null}
+            >
+              <AIInsightCard
+                type="spending"
+                title="Análise de Gastos"
+                description="Identifique padrões e oportunidades de economia"
+                data={{ 
+                  transactions: transactions.slice(0, 50), 
+                  monthlyExpenses,
+                  query: "Analise meus gastos e identifique onde posso economizar"
+                }}
+              />
+            </button>
+            <button
+              className="text-left focus:outline-none"
+              style={{ width: '100%' }}
+              onClick={() => setSelectedInsight('budget')}
+              disabled={selectedInsight !== null}
+            >
+              <AIInsightCard
+                type="budget"
+                title="Otimização de Orçamentos"
+                description="Melhore o controle dos seus gastos"
+                data={{ 
+                  budgets, 
+                  budgetAlerts,
+                  query: "Como posso otimizar meus orçamentos atuais?"
+                }}
+              />
+            </button>
+            <button
+              className="text-left focus:outline-none"
+              style={{ width: '100%' }}
+              onClick={() => setSelectedInsight('fire')}
+              disabled={selectedInsight !== null}
+            >
+              <AIInsightCard
+                type="fire"
+                title="Estratégia FIRE"
+                description="Acelere sua independência financeira"
+                data={{ 
+                  totalBalance, 
+                  monthlyIncome, 
+                  monthlyExpenses,
+                  query: "Como acelerar minha independência financeira?"
+                }}
+              />
+            </button>
+          </div>
+        ) : (
+          <div className="relative w-full">
+            <button
+              className="absolute top-0 right-0 mt-2 mr-2 bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-lg text-sm shadow"
+              onClick={() => setSelectedInsight(null)}
+            >
+              Voltar
+            </button>
+            {selectedInsight === 'spending' && (
+              <AIInsightCard
+                type="spending"
+                title="Análise de Gastos"
+                description="Identifique padrões e oportunidades de economia"
+                data={{ 
+                  transactions: transactions.slice(0, 50), 
+                  monthlyExpenses,
+                  query: "Analise meus gastos e identifique onde posso economizar"
+                }}
+              />
+            )}
+            {selectedInsight === 'budget' && (
+              <AIInsightCard
+                type="budget"
+                title="Otimização de Orçamentos"
+                description="Melhore o controle dos seus gastos"
+                data={{ 
+                  budgets, 
+                  budgetAlerts,
+                  query: "Como posso otimizar meus orçamentos atuais?"
+                }}
+              />
+            )}
+            {selectedInsight === 'fire' && (
+              <AIInsightCard
+                type="fire"
+                title="Estratégia FIRE"
+                description="Acelere sua independência financeira"
+                data={{ 
+                  totalBalance, 
+                  monthlyIncome, 
+                  monthlyExpenses,
+                  query: "Como acelerar minha independência financeira?"
+                }}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {/* Recent Transactions */}
