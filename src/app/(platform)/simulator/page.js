@@ -77,6 +77,7 @@ export default function SimulatorPage() {
   const [loadingHistory, setLoadingHistory] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   // Compare mode
   const [compareIds, setCompareIds] = useState([]);
@@ -132,21 +133,43 @@ export default function SimulatorPage() {
     const r = runSimulation({ initialValue, rfAlloc, selic, ibov, ipca, dolar, months });
     setResults(r);
     setSaved(false);
+    setSaveError("");
   }
 
   // ─── Save scenario to Supabase ───
   async function saveScenario() {
-    if (!scenarioName || !results || !selectedPortfolio) return;
+    setSaveError("");
+
+    if (!results) {
+      setSaveError("Rode uma simulação antes de salvar.");
+      return;
+    }
+    if (!selectedPortfolio) {
+      setSaveError("Selecione um cliente e uma carteira para salvar.");
+      return;
+    }
+
     setSaving(true);
 
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !userData?.user) {
+      console.error("[simulator] auth.getUser failed:", userErr);
+      setSaveError("Sessão expirada. Faça login novamente.");
+      setSaving(false);
+      return;
+    }
+    const user = userData.user;
+
+    const finalName =
+      scenarioName.trim() ||
+      `Cenário ${new Date().toLocaleDateString("pt-BR")} ${new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })}`;
 
     const params = { initialValue, rfAlloc, selic, ibov, ipca, dolar, months };
 
     const { error } = await supabase.from("simulations").insert({
       portfolio_id: selectedPortfolio,
       consultant_id: user.id,
-      scenario_name: scenarioName,
+      scenario_name: finalName,
       description: `Selic ${selic}% | IBOV ${ibov}% | RF ${rfAlloc}% | ${months}m`,
       parameters: params,
       results: {
@@ -158,8 +181,16 @@ export default function SimulatorPage() {
       },
     });
 
-    if (!error) setSaved(true);
     setSaving(false);
+
+    if (error) {
+      console.error("[simulator] save failed:", error);
+      setSaveError(error.message || "Erro ao salvar o cenário.");
+      return;
+    }
+
+    if (!scenarioName.trim()) setScenarioName(finalName);
+    setSaved(true);
   }
 
   // ─── Load history ───
@@ -241,8 +272,8 @@ export default function SimulatorPage() {
     { key: "months", l: "Meses", v: months, s: setMonths },
   ];
 
-  // Can save only if portfolio is selected, has name and results
-  const canSave = !!scenarioName && !!results && !!selectedPortfolio;
+  // Can save only if portfolio is selected and we have results (name is auto-generated if missing)
+  const canSave = !!results && !!selectedPortfolio;
 
   if (loadingInit) {
     return (
@@ -423,12 +454,13 @@ export default function SimulatorPage() {
               </div>
             )}
             {!canSave && results && (
-              <p className="w-full text-center text-[10px] text-amber-400/60">
-                {!scenarioName && !selectedPortfolio
-                  ? "Dê um nome ao cenário e selecione uma carteira para salvar"
-                  : !scenarioName
-                  ? "Dê um nome ao cenário para salvar"
-                  : "Selecione um cliente e carteira para salvar"}
+              <p className="w-full text-center text-xs text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-xl px-4 py-2">
+                Selecione um cliente e uma carteira acima para salvar o cenário.
+              </p>
+            )}
+            {saveError && (
+              <p className="w-full text-center text-xs text-red-300 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-2">
+                {saveError}
               </p>
             )}
           </div>
