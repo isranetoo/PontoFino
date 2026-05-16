@@ -323,22 +323,28 @@ export default function SimulatorPage() {
               ))}
             </select>
           </div>
-          {portfolios.length > 0 && (
+          {selectedClient && (
             <div className="space-y-1.5" style={{ animation: "fadeInUp 0.2s ease both" }}>
               <label htmlFor="selected-portfolio" className="text-[10px] uppercase tracking-wider text-white/35">Carteira</label>
-              <select
-                id="selected-portfolio"
-                value={selectedPortfolio}
-                onChange={(e) => setSelectedPortfolio(e.target.value)}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/40"
-              >
-                <option value="" className="bg-slate-900">Selecione</option>
-                {portfolios.map((p) => (
-                  <option key={p.id} value={p.id} className="bg-slate-900">
-                    {p.name} — {formatCurrency(Number(p.total_value))}
-                  </option>
-                ))}
-              </select>
+              {portfolios.length > 0 ? (
+                <select
+                  id="selected-portfolio"
+                  value={selectedPortfolio}
+                  onChange={(e) => setSelectedPortfolio(e.target.value)}
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-indigo-500/40"
+                >
+                  <option value="" className="bg-slate-900">Selecione</option>
+                  {portfolios.map((p) => (
+                    <option key={p.id} value={p.id} className="bg-slate-900">
+                      {p.name} — {formatCurrency(Number(p.total_value))}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="w-full bg-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-2.5 text-xs text-amber-300/80">
+                  Este cliente não tem carteiras ativas. Cadastre uma carteira na página do cliente para poder salvar o cenário.
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -13,6 +13,7 @@ import {
   Users,
   RefreshCw,
   Calculator,
+  Calendar,
   FileText,
   Wallet,
   Shield,
@@ -26,6 +27,7 @@ import {
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
   { href: "/clients", label: "Clientes", icon: Users },
+  { href: "/agenda", label: "Agenda", icon: Calendar },
   { href: "/rebalance", label: "Rebalanceamento", icon: RefreshCw },
   { href: "/simulator", label: "Simulador", icon: Calculator },
   { href: "/reports", label: "Relatórios", icon: FileText },
