@@ -25,6 +25,7 @@ src/
 │       ├── layout.js          # Layout com sidebar
 │       ├── dashboard/page.js
 │       ├── clients/page.js
+│       ├── agenda/page.js
 │       ├── rebalance/page.js
 │       ├── simulator/page.js
 │       ├── reports/page.js
@@ -67,11 +68,13 @@ Edite `.env.local` com suas credenciais:
 - **RESEND_API_KEY** — Chave da API do Resend
 - **RESEND_FROM_EMAIL** — E-mail de envio (precisa de domínio verificado)
 
-### 3. Rodar a migration no Supabase
+### 3. Rodar as migrations no Supabase
 
-No painel do Supabase → SQL Editor, cole e execute o arquivo `001_initial_schema.sql`.
+No painel do Supabase → SQL Editor, cole e execute, em ordem:
 
-Isso cria todas as tabelas, enums, RLS policies, triggers, functions e o bucket de storage.
+1. `src/stores/migrations/001_initial_schema.sql` — tabelas, enums, RLS, triggers e bucket de storage
+2. `src/stores/migrations/002_dashboard_functions.sql` — funções auxiliares do dashboard
+3. `src/stores/migrations/003_events_schema.sql` — agenda (reuniões, follow-ups, revisões)
 
 ### 4. Criar o primeiro usuário admin
 
@@ -112,6 +115,7 @@ Adicione as variáveis de ambiente no painel da Vercel.
 |---|---|
 | **Dashboard** | KPIs (AUM, clientes, receita), gráfico de performance vs CDI/IBOV |
 | **Clientes** | CRUD completo, perfil de risco, busca |
+| **Agenda** | Reuniões, follow-ups e revisões de carteira com calendário mensal |
 | **Rebalanceamento** | Import Excel, cálculo de alocação, export Excel |
 | **Simulador** | Projeções com parâmetros de mercado (Selic, IBOV, etc.) |
 | **Relatórios** | Rentabilidade acumulada, retorno mensal, Sharpe ratio |

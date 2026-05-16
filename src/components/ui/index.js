@@ -203,7 +203,15 @@ export function StatCard({ label, value, icon: Icon, trend, delay = 0 }) {
 }
 
 // ─── Modal ───
-export function Modal({ children, onClose, title, icon: Icon }) {
+const MODAL_SIZES = {
+  sm: "max-w-sm",
+  md: "max-w-md",
+  lg: "max-w-lg",
+  xl: "max-w-xl",
+  "2xl": "max-w-2xl",
+};
+
+export function Modal({ children, onClose, title, icon: Icon, size = "md" }) {
   return (
     <div
       className="fixed inset-0 z-[100] flex items-center justify-center p-4 animate-fade-in"
@@ -213,7 +221,7 @@ export function Modal({ children, onClose, title, icon: Icon }) {
         onClick={onClose}
       />
       <div
-        className="relative w-full max-w-md bg-slate-900/95 border border-white/10 rounded-2xl p-6 shadow-2xl animate-scale-in"
+        className={`relative w-full ${MODAL_SIZES[size] || MODAL_SIZES.md} bg-slate-900/95 border border-white/10 rounded-2xl p-6 shadow-2xl animate-scale-in`}
       >
         {title && (
           <div className="flex items-center justify-between mb-5">
