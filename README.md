@@ -30,6 +30,8 @@ src/
 │       ├── documentos/page.js
 │       ├── suitability/page.js
 │       ├── alertas/page.js
+│       ├── faturamento/page.js
+│       ├── faturamento/print/[id]/page.js
 │       ├── rebalance/page.js
 │       ├── simulator/page.js
 │       ├── reports/page.js
@@ -83,6 +85,7 @@ No painel do Supabase → SQL Editor, cole e execute, em ordem:
 5. `src/stores/migrations/005_documents_schema.sql` — documentos do cliente com versionamento
 6. `src/stores/migrations/006_suitability_schema.sql` — questionário de suitability + validações de compliance
 7. `src/stores/migrations/007_alerts_schema.sql` — alertas/notificações automáticas (carteira, aniversário, suitability, documento, meta)
+8. `src/stores/migrations/008_invoices_schema.sql` — faturas/notas geradas a partir de comissões
 
 ### 4. Criar o primeiro usuário admin
 
@@ -128,6 +131,7 @@ Adicione as variáveis de ambiente no painel da Vercel.
 | **Documentos** | Upload por cliente em categorias fixas (Contratos, KYC, etc.), versionamento automático, download via signed URL |
 | **Suitability** | Questionário CVM/ANBIMA (10 perguntas, validade de 24 meses), comparação ao vivo do perfil declarado vs carteira, snapshots de validação |
 | **Alertas** | Detecção automática de carteira desenquadrada, aniversário, suitability/documento vencendo e meta atingida — com dedupe, filtros, marcar lido/descartar e criação manual |
+| **Faturamento** | Geração de fatura a partir das comissões não-faturadas do cliente + itens avulsos, número sequencial YYYY/NNNN, status pendente/paga/vencida/cancelada, página de impressão A4 (Imprimir / Salvar como PDF) |
 | **Rebalanceamento** | Import Excel, cálculo de alocação, export Excel |
 | **Simulador** | Projeções com parâmetros de mercado (Selic, IBOV, etc.) |
 | **Relatórios** | Rentabilidade acumulada, retorno mensal, Sharpe ratio |

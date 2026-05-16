@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { useAuthStore } from "@/stores/auth-store";
 import { Sidebar } from "@/components/sidebar";
 import { Spinner } from "@/components/ui";
 
 export default function PlatformLayout({ children }) {
   const { loading, initialize } = useAuthStore();
+  const pathname = usePathname();
 
   useEffect(() => {
     initialize();
@@ -18,6 +20,13 @@ export default function PlatformLayout({ children }) {
         <Spinner size={32} />
       </div>
     );
+  }
+
+  // Print routes render without sidebar/chrome so the printable
+  // layout fills the page cleanly.
+  const isChromeless = pathname?.includes("/print/");
+  if (isChromeless) {
+    return <>{children}</>;
   }
 
   return (

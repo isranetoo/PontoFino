@@ -20,6 +20,7 @@ import {
   Bell,
   FileText,
   Wallet,
+  Receipt,
   Shield,
   ChevronLeft,
   ChevronRight,
@@ -40,6 +41,7 @@ const NAV_ITEMS = [
   { href: "/simulator", label: "Simulador", icon: Calculator },
   { href: "/reports", label: "Relatórios", icon: FileText },
   { href: "/commissions", label: "Comissões", icon: Wallet },
+  { href: "/faturamento", label: "Faturamento", icon: Receipt },
 ];
 
 const ADMIN_ITEM = { href: "/admin", label: "Admin", icon: Shield };
