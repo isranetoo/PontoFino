@@ -27,6 +27,7 @@ src/
 │       ├── clients/page.js
 │       ├── agenda/page.js
 │       ├── metas/page.js
+│       ├── documentos/page.js
 │       ├── rebalance/page.js
 │       ├── simulator/page.js
 │       ├── reports/page.js
@@ -77,6 +78,7 @@ No painel do Supabase → SQL Editor, cole e execute, em ordem:
 2. `src/stores/migrations/002_dashboard_functions.sql` — funções auxiliares do dashboard
 3. `src/stores/migrations/003_events_schema.sql` — agenda (reuniões, follow-ups, revisões)
 4. `src/stores/migrations/004_goals_schema.sql` — metas financeiras por cliente e aportes
+5. `src/stores/migrations/005_documents_schema.sql` — documentos do cliente com versionamento
 
 ### 4. Criar o primeiro usuário admin
 
@@ -119,6 +121,7 @@ Adicione as variáveis de ambiente no painel da Vercel.
 | **Clientes** | CRUD completo, perfil de risco, busca |
 | **Agenda** | Reuniões, follow-ups e revisões de carteira com calendário mensal |
 | **Metas** | Planejamento financeiro por cliente, projeção vs realidade, log de aportes |
+| **Documentos** | Upload por cliente em categorias fixas (Contratos, KYC, etc.), versionamento automático, download via signed URL |
 | **Rebalanceamento** | Import Excel, cálculo de alocação, export Excel |
 | **Simulador** | Projeções com parâmetros de mercado (Selic, IBOV, etc.) |
 | **Relatórios** | Rentabilidade acumulada, retorno mensal, Sharpe ratio |
