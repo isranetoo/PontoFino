@@ -17,6 +17,7 @@ import {
   Target,
   FolderOpen,
   ShieldCheck,
+  Bell,
   FileText,
   Wallet,
   Shield,
@@ -29,6 +30,7 @@ import {
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: Home },
+  { href: "/alertas", label: "Alertas", icon: Bell },
   { href: "/clients", label: "Clientes", icon: Users },
   { href: "/agenda", label: "Agenda", icon: Calendar },
   { href: "/metas", label: "Metas", icon: Target },

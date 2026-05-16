@@ -29,6 +29,7 @@ src/
 │       ├── metas/page.js
 │       ├── documentos/page.js
 │       ├── suitability/page.js
+│       ├── alertas/page.js
 │       ├── rebalance/page.js
 │       ├── simulator/page.js
 │       ├── reports/page.js
@@ -81,6 +82,7 @@ No painel do Supabase → SQL Editor, cole e execute, em ordem:
 4. `src/stores/migrations/004_goals_schema.sql` — metas financeiras por cliente e aportes
 5. `src/stores/migrations/005_documents_schema.sql` — documentos do cliente com versionamento
 6. `src/stores/migrations/006_suitability_schema.sql` — questionário de suitability + validações de compliance
+7. `src/stores/migrations/007_alerts_schema.sql` — alertas/notificações automáticas (carteira, aniversário, suitability, documento, meta)
 
 ### 4. Criar o primeiro usuário admin
 
@@ -125,6 +127,7 @@ Adicione as variáveis de ambiente no painel da Vercel.
 | **Metas** | Planejamento financeiro por cliente, projeção vs realidade, log de aportes |
 | **Documentos** | Upload por cliente em categorias fixas (Contratos, KYC, etc.), versionamento automático, download via signed URL |
 | **Suitability** | Questionário CVM/ANBIMA (10 perguntas, validade de 24 meses), comparação ao vivo do perfil declarado vs carteira, snapshots de validação |
+| **Alertas** | Detecção automática de carteira desenquadrada, aniversário, suitability/documento vencendo e meta atingida — com dedupe, filtros, marcar lido/descartar e criação manual |
 | **Rebalanceamento** | Import Excel, cálculo de alocação, export Excel |
 | **Simulador** | Projeções com parâmetros de mercado (Selic, IBOV, etc.) |
 | **Relatórios** | Rentabilidade acumulada, retorno mensal, Sharpe ratio |
