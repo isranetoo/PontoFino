@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatCurrency, formatPct, getInitials } from "@/lib/utils";
-import { RISK_LABELS, ASSET_CLASSES, CLASS_COLORS } from "@/lib/constants";
+import { RISK_LABELS, ASSET_CLASSES, ASSET_CLASS_VALUE_BY_LABEL, CLASS_COLORS } from "@/lib/constants";
 import { GlassCard, GlassInput, Modal, Spinner, StatCard } from "@/components/ui";
 import {
   ChevronLeft, User, Mail, Phone, FileText, Edit3, Save,
@@ -27,6 +27,8 @@ export default function ClientDetailPage() {
   // Portfolio management
   const [showAddPortfolio, setShowAddPortfolio] = useState(false);
   const [portfolioForm, setPortfolioForm] = useState({ name: "", benchmark: "CDI" });
+  const [portfolioError, setPortfolioError] = useState("");
+  const [savingPortfolio, setSavingPortfolio] = useState(false);
   const [expandedPortfolio, setExpandedPortfolio] = useState(null);
 
   // Asset management
@@ -35,6 +37,8 @@ export default function ClientDetailPage() {
     asset_name: "", asset_ticker: "", asset_class: "outros",
     current_value: "", target_pct: "",
   });
+  const [assetError, setAssetError] = useState("");
+  const [savingAsset, setSavingAsset] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -89,27 +93,40 @@ export default function ClientDetailPage() {
   // ─── Portfolio CRUD ───
   async function addPortfolio() {
     if (!portfolioForm.name) return;
+    setPortfolioError("");
+    setSavingPortfolio(true);
     const { data: { user } } = await supabase.auth.getUser();
-    await supabase.from("portfolios").insert({
+    const { error } = await supabase.from("portfolios").insert({
       client_id: id,
       consultant_id: user.id,
       name: portfolioForm.name,
       benchmark: portfolioForm.benchmark,
     });
+    setSavingPortfolio(false);
+    if (error) {
+      setPortfolioError(error.message || "Não foi possível criar a carteira.");
+      return;
+    }
     setPortfolioForm({ name: "", benchmark: "CDI" });
     setShowAddPortfolio(false);
     await load();
   }
 
   async function deletePortfolio(portfolioId) {
-    await supabase.from("portfolios").delete().eq("id", portfolioId);
+    const { error } = await supabase.from("portfolios").delete().eq("id", portfolioId);
+    if (error) {
+      alert(`Não foi possível remover a carteira: ${error.message}`);
+      return;
+    }
     await load();
   }
 
   // ─── Asset CRUD ───
   async function addAsset(portfolioId) {
     if (!assetForm.asset_name || !assetForm.current_value) return;
-    await supabase.from("portfolio_assets").insert({
+    setAssetError("");
+    setSavingAsset(true);
+    const { error } = await supabase.from("portfolio_assets").insert({
       portfolio_id: portfolioId,
       asset_name: assetForm.asset_name,
       asset_ticker: assetForm.asset_ticker,
@@ -117,13 +134,22 @@ export default function ClientDetailPage() {
       current_value: parseFloat(assetForm.current_value) || 0,
       target_pct: (parseFloat(assetForm.target_pct) || 0) / 100,
     });
+    setSavingAsset(false);
+    if (error) {
+      setAssetError(error.message || "Não foi possível adicionar o ativo.");
+      return;
+    }
     setAssetForm({ asset_name: "", asset_ticker: "", asset_class: "outros", current_value: "", target_pct: "" });
     setShowAddAsset(null);
     await load();
   }
 
   async function deleteAsset(assetId) {
-    await supabase.from("portfolio_assets").delete().eq("id", assetId);
+    const { error } = await supabase.from("portfolio_assets").delete().eq("id", assetId);
+    if (error) {
+      alert(`Não foi possível remover o ativo: ${error.message}`);
+      return;
+    }
     await load();
   }
 
@@ -351,7 +377,7 @@ export default function ClientDetailPage() {
 
       {/* Add portfolio modal */}
       {showAddPortfolio && (
-        <Modal title="Nova carteira" icon={Briefcase} onClose={() => setShowAddPortfolio(false)}>
+        <Modal title="Nova carteira" icon={Briefcase} onClose={() => { setShowAddPortfolio(false); setPortfolioError(""); }}>
           <div className="space-y-3">
             <GlassInput label="Nome da carteira" placeholder="Ex: Carteira Principal, Previdência" value={portfolioForm.name} onChange={(e) => setPortfolioForm((p) => ({ ...p, name: e.target.value }))} />
             <div className="space-y-1.5">
@@ -360,8 +386,13 @@ export default function ClientDetailPage() {
                 {["CDI", "IPCA+", "IBOV", "S&P 500", "Dólar"].map((b) => <option key={b} value={b} className="bg-slate-900">{b}</option>)}
               </select>
             </div>
-            <button onClick={addPortfolio} disabled={!portfolioForm.name} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40">
-              <Plus size={15} /> Criar carteira
+            {portfolioError && (
+              <p className="text-[11px] text-red-400 flex items-center gap-1.5 px-1">
+                <AlertTriangle size={11} /> {portfolioError}
+              </p>
+            )}
+            <button onClick={addPortfolio} disabled={!portfolioForm.name || savingPortfolio} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40">
+              {savingPortfolio ? <Spinner size={15} /> : <><Plus size={15} /> Criar carteira</>}
             </button>
           </div>
         </Modal>
@@ -369,7 +400,7 @@ export default function ClientDetailPage() {
 
       {/* Add asset modal */}
       {showAddAsset && (
-        <Modal title="Novo ativo" icon={Plus} onClose={() => setShowAddAsset(null)}>
+        <Modal title="Novo ativo" icon={Plus} onClose={() => { setShowAddAsset(null); setAssetError(""); }}>
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <GlassInput label="Nome do ativo" placeholder="Tesouro Selic 2029" value={assetForm.asset_name} onChange={(e) => setAssetForm((p) => ({ ...p, asset_name: e.target.value }))} />
@@ -378,18 +409,22 @@ export default function ClientDetailPage() {
             <div className="space-y-1.5">
               <label className="text-[10px] uppercase tracking-wider text-white/40 ml-1">Classe de ativo</label>
               <select value={assetForm.asset_class} onChange={(e) => setAssetForm((p) => ({ ...p, asset_class: e.target.value }))} className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none">
-                {ASSET_CLASSES.map((c) => {
-                  const val = c.toLowerCase().replace(/ /g, "_").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace("oes", "acoes");
-                  return <option key={c} value={val} className="bg-slate-900">{c}</option>;
-                })}
+                {ASSET_CLASSES.map((label) => (
+                  <option key={label} value={ASSET_CLASS_VALUE_BY_LABEL[label]} className="bg-slate-900">{label}</option>
+                ))}
               </select>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <GlassInput label="Valor atual (R$)" placeholder="50000" type="number" value={assetForm.current_value} onChange={(e) => setAssetForm((p) => ({ ...p, current_value: e.target.value }))} />
               <GlassInput label="Meta (%)" placeholder="20" type="number" value={assetForm.target_pct} onChange={(e) => setAssetForm((p) => ({ ...p, target_pct: e.target.value }))} />
             </div>
-            <button onClick={() => addAsset(showAddAsset)} disabled={!assetForm.asset_name || !assetForm.current_value} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40">
-              <Plus size={15} /> Adicionar ativo
+            {assetError && (
+              <p className="text-[11px] text-red-400 flex items-center gap-1.5 px-1">
+                <AlertTriangle size={11} /> {assetError}
+              </p>
+            )}
+            <button onClick={() => addAsset(showAddAsset)} disabled={!assetForm.asset_name || !assetForm.current_value || savingAsset} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40">
+              {savingAsset ? <Spinner size={15} /> : <><Plus size={15} /> Adicionar ativo</>}
             </button>
           </div>
         </Modal>

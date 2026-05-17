@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo, useCallback } from "react";
 import * as XLSX from "xlsx";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import { formatCurrency, formatPct } from "@/lib/utils";
-import { ASSET_CLASSES, CLASS_COLORS } from "@/lib/constants";
+import { ASSET_CLASSES, CLASS_COLORS, normalizeAssetClass } from "@/lib/constants";
 import { GlassCard, GlassInput, Modal, Spinner, StatCard } from "@/components/ui";
 import {
   RefreshCw, Target, DollarSign, Upload, Download, Edit3,
@@ -33,7 +33,7 @@ function parseExcel(data) {
     return {
       id: `ex-${i}`,
       ativo,
-      classe: classe.toLowerCase().replace(/ /g, "_").normalize("NFD").replace(/[\u0300-\u036f]/g, ""),
+      classe: normalizeAssetClass(classe),
       valor: isNaN(valor) ? 0 : valor,
       meta: isNaN(meta) ? 0 : meta > 1 ? meta / 100 : meta,
     };

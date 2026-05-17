@@ -1,6 +1,9 @@
 import { Shield, UserCheck, Eye } from "lucide-react";
 
 // ─── Asset Classes ───
+// Mantemos label legível em PT separado do valor do enum no Postgres.
+// Fonte de verdade do enum: src/stores/migrations/001_initial_schema.sql (asset_class).
+// Qualquer mudança aqui precisa ser refletida lá e vice-versa.
 export const ASSET_CLASSES = [
   "Renda Fixa",
   "Ações Brasil",
@@ -13,6 +16,75 @@ export const ASSET_CLASSES = [
   "Caixa",
   "Outros",
 ];
+
+// Mapa label (UI) -> valor do enum asset_class (Postgres).
+// Use sempre este mapa para gravar — derivar o valor por regex/normalize
+// é frágil e já causou bug de "Ações Brasil" virar "acacoes_brasil".
+export const ASSET_CLASS_VALUE_BY_LABEL = {
+  "Renda Fixa": "renda_fixa",
+  "Ações Brasil": "acoes_brasil",
+  "Ações EUA": "acoes_eua",
+  "FIIs": "fiis",
+  "Cripto": "cripto",
+  "Internacional": "internacional",
+  "Multimercado": "multimercado",
+  "Commodities": "commodities",
+  "Caixa": "caixa",
+  "Outros": "outros",
+};
+
+const ASSET_CLASS_VALUES = new Set(Object.values(ASSET_CLASS_VALUE_BY_LABEL));
+
+// Aliases tolerantes a typos / variantes (uso típico: import de Excel).
+// Chave SEMPRE normalizada (lowercase, sem acentos, sem espaços extras).
+const ASSET_CLASS_ALIASES = {
+  "rendafixa": "renda_fixa",
+  "renda fixa": "renda_fixa",
+  "acoes": "acoes_brasil",
+  "acoes brasil": "acoes_brasil",
+  "acoes br": "acoes_brasil",
+  "acoes eua": "acoes_eua",
+  "acoes us": "acoes_eua",
+  "fii": "fiis",
+  "fiis": "fiis",
+  "cripto": "cripto",
+  "cripomoedas": "cripto",
+  "criptomoedas": "cripto",
+  "internacional": "internacional",
+  "multimercado": "multimercado",
+  "commodities": "commodities",
+  "caixa": "caixa",
+  "outros": "outros",
+};
+
+/**
+ * Normaliza uma label (vinda de UI, Excel, etc.) para o valor do enum asset_class.
+ * Retorna 'outros' se não conseguir identificar.
+ *
+ * @param {unknown} input - label ou valor já normalizado
+ * @returns {string} valor válido do enum asset_class
+ */
+export function normalizeAssetClass(input) {
+  if (input == null) return "outros";
+  const str = String(input).trim();
+  if (!str) return "outros";
+
+  // Já é um valor válido do enum?
+  if (ASSET_CLASS_VALUES.has(str)) return str;
+
+  // Match exato com label da UI?
+  if (ASSET_CLASS_VALUE_BY_LABEL[str]) return ASSET_CLASS_VALUE_BY_LABEL[str];
+
+  // Normaliza (lowercase, sem acentos, espaços colapsados) e tenta alias.
+  const normalized = str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  return ASSET_CLASS_ALIASES[normalized] || "outros";
+}
 
 export const CLASS_COLORS = {
   "Renda Fixa": "#34d399",
