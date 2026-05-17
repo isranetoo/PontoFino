@@ -12,6 +12,7 @@ import {
   AlertTriangle, RefreshCw, PieChart, BarChart3,
   Link2, Copy, Mail as MailIcon, ShieldCheck,
 } from "lucide-react";
+import ConnectionsTab from "./connections-tab";
 
 export default function ClientDetailPage() {
   const { id } = useParams();
@@ -40,6 +41,9 @@ export default function ClientDetailPage() {
   });
   const [assetError, setAssetError] = useState("");
   const [savingAsset, setSavingAsset] = useState(false);
+
+  // Tabs (Carteiras | Conexões Pluggy)
+  const [activeTab, setActiveTab] = useState("portfolios");
 
   // Pluggy invite
   const [showInvite, setShowInvite] = useState(false);
@@ -330,17 +334,37 @@ export default function ClientDetailPage() {
         <StatCard label="Perfil" value={RISK_LABELS[client.risk_profile]} icon={Target} delay={0.25} />
       </div>
 
-      {/* Portfolios */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold flex items-center gap-2">
-          <Briefcase size={14} className="text-indigo-400" /> Carteiras
-        </h3>
-        <button onClick={() => setShowAddPortfolio(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 hover:bg-indigo-500/20 transition-all">
-          <Plus size={12} /> Nova carteira
-        </button>
+      {/* Tabs */}
+      <div className="flex items-center gap-1 border-b border-white/[0.06]">
+        <TabButton
+          active={activeTab === "portfolios"}
+          onClick={() => setActiveTab("portfolios")}
+          icon={Briefcase}
+          label="Carteiras"
+          count={portfolios.length}
+        />
+        <TabButton
+          active={activeTab === "connections"}
+          onClick={() => setActiveTab("connections")}
+          icon={Link2}
+          label="Conexões"
+        />
       </div>
 
-      {portfolios.length === 0 ? (
+      {activeTab === "connections" ? (
+        <ConnectionsTab clientId={id} onInviteClick={openInviteModal} />
+      ) : (
+        <div className="space-y-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold flex items-center gap-2">
+              <Briefcase size={14} className="text-indigo-400" /> Carteiras
+            </h3>
+            <button onClick={() => setShowAddPortfolio(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 hover:bg-indigo-500/20 transition-all">
+              <Plus size={12} /> Nova carteira
+            </button>
+          </div>
+
+          {portfolios.length === 0 ? (
         <GlassCard className="p-8 text-center" delay={0.3}>
           <Briefcase size={24} className="text-white/15 mx-auto mb-2" />
           <p className="text-sm text-white/25">Nenhuma carteira cadastrada.</p>
@@ -445,6 +469,8 @@ export default function ClientDetailPage() {
             </GlassCard>
           );
         })
+      )}
+        </div>
       )}
 
       {/* Add portfolio modal */}
@@ -572,5 +598,25 @@ export default function ClientDetailPage() {
         </Modal>
       )}
     </div>
+  );
+}
+
+function TabButton({ active, onClick, icon: Icon, label, count }) {
+  return (
+    <button
+      onClick={onClick}
+      className={`flex items-center gap-1.5 px-3 py-2 -mb-px text-xs font-medium border-b-2 transition-colors ${
+        active
+          ? "text-white border-indigo-400"
+          : "text-white/40 border-transparent hover:text-white/70"
+      }`}
+    >
+      <Icon size={13} /> {label}
+      {typeof count === "number" && (
+        <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${active ? "bg-indigo-500/15 text-indigo-300" : "bg-white/[0.06] text-white/40"}`}>
+          {count}
+        </span>
+      )}
+    </button>
   );
 }
