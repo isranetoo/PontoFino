@@ -73,6 +73,8 @@ Edite `.env.local` com suas credenciais:
 - **SUPABASE_SERVICE_ROLE_KEY** — Chave service role (NUNCA expor no client)
 - **RESEND_API_KEY** — Chave da API do Resend
 - **RESEND_FROM_EMAIL** — E-mail de envio (precisa de domínio verificado)
+- **PLUGGY_CLIENT_ID / PLUGGY_CLIENT_SECRET** — credenciais da Pluggy (apenas server-side; nunca expor no client)
+- **PLUGGY_WEBHOOK_SECRET** — segredo HMAC para validar webhooks da Pluggy (use o mesmo valor configurado em Pluggy → Webhooks → Secret)
 
 ### 3. Rodar as migrations no Supabase
 
@@ -86,6 +88,7 @@ No painel do Supabase → SQL Editor, cole e execute, em ordem:
 6. `src/stores/migrations/006_suitability_schema.sql` — questionário de suitability + validações de compliance
 7. `src/stores/migrations/007_alerts_schema.sql` — alertas/notificações automáticas (carteira, aniversário, suitability, documento, meta)
 8. `src/stores/migrations/008_invoices_schema.sql` — faturas/notas geradas a partir de comissões
+9. `src/stores/migrations/009_pluggy_integration.sql` — integração Pluggy (items, accounts, investments, webhook log + coluna `source` em `portfolio_assets`)
 
 ### 4. Criar o primeiro usuário admin
 
@@ -137,6 +140,7 @@ Adicione as variáveis de ambiente no painel da Vercel.
 | **Relatórios** | Rentabilidade acumulada, retorno mensal, Sharpe ratio |
 | **Comissões** | Receita por cliente e tipo, breakdown visual |
 | **Admin** | Convite de usuários, gestão de roles, senha temporária |
+| **Pluggy (em desenvolvimento)** | Integração de Open Finance: o cliente conecta corretora/banco por um link assinado e as posições de investimento são espelhadas em `portfolios` / `portfolio_assets`. Sync via webhook + botão manual. Fase 1 (schema + wrapper REST) já entregue |
 
 ## Segurança
 
