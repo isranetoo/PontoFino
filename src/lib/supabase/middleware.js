@@ -33,7 +33,10 @@ export async function updateSession(request) {
   const isAuthPage = pathname === "/login";
   const isChangePw = pathname === "/change-password";
   const isApiRoute = pathname.startsWith("/api");
-  const isPublic = isAuthPage || isApiRoute;
+  // /conectar/[token] é o fluxo de Open Finance acessado pelo cliente final,
+  // que não tem session no PontoFino. A página valida o JWT por conta própria.
+  const isConnectFlow = pathname.startsWith("/conectar");
+  const isPublic = isAuthPage || isApiRoute || isConnectFlow;
 
   // Not logged in → redirect to login
   if (!user && !isPublic) {
