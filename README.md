@@ -90,6 +90,7 @@ No painel do Supabase → SQL Editor, cole e execute, em ordem:
 8. `src/stores/migrations/008_invoices_schema.sql` — faturas/notas geradas a partir de comissões
 9. `src/stores/migrations/009_pluggy_integration.sql` — integração Pluggy (items, accounts, investments, webhook log + coluna `source` em `portfolio_assets`)
 10. `src/stores/migrations/010_pluggy_disconnected.sql` — coluna `disconnected_at` em `pluggy_items` (desconectar mantém snapshot histórico)
+11. `src/stores/migrations/011_pluggy_alert_type.sql` — adiciona `pluggy_connection_issue` no enum `alert_type` (detector da Fase 5)
 
 ### 4. Criar o primeiro usuário admin
 
@@ -141,7 +142,7 @@ Adicione as variáveis de ambiente no painel da Vercel.
 | **Relatórios** | Rentabilidade acumulada, retorno mensal, Sharpe ratio |
 | **Comissões** | Receita por cliente e tipo, breakdown visual |
 | **Admin** | Convite de usuários, gestão de roles, senha temporária |
-| **Pluggy** | Integração de Open Finance: cliente conecta corretora/banco por link assinado, posições espelhadas em `portfolios`/`portfolio_assets` automaticamente. Tab "Conexões" em `/clients/[id]` com status, último sync, atualizar agora e desconectar. Webhook recebe atualizações da Pluggy e ressincroniza. Fases 1-3 entregues |
+| **Pluggy** | Integração de Open Finance: cliente conecta corretora/banco por link assinado, posições espelhadas em `portfolios`/`portfolio_assets` automaticamente. Tab "Conexões" em `/clients/[id]` com status, último sync, atualizar agora, desconectar e **drill-down** por conta/posição (qtd, investido, atual, retorno). Webhook recebe atualizações da Pluggy e ressincroniza. **Detector de alertas** sinaliza conexões em `LOGIN_ERROR` / `WAITING_USER_INPUT` > 24h ou `OUTDATED` > 7 dias. Sentry breadcrumbs nas chamadas REST, sync e webhook. Fases 1-5 entregues |
 
 ## Segurança
 

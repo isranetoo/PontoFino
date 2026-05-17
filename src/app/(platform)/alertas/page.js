@@ -12,21 +12,23 @@ import {
 } from "lucide-react";
 
 const TYPE_LABEL = {
-  portfolio_drift:      "Carteira",
-  client_birthday:      "Aniversário",
-  suitability_expiring: "Suitability",
-  document_expiring:    "Documento",
-  goal_reached:         "Meta",
-  manual:               "Manual",
+  portfolio_drift:         "Carteira",
+  client_birthday:         "Aniversário",
+  suitability_expiring:    "Suitability",
+  document_expiring:       "Documento",
+  goal_reached:            "Meta",
+  pluggy_connection_issue: "Conexão Pluggy",
+  manual:                  "Manual",
 };
 
 const TYPE_PILL = {
-  portfolio_drift:      "bg-amber-500/15 text-amber-300 border-amber-500/20",
-  client_birthday:      "bg-pink-500/15 text-pink-300 border-pink-500/20",
-  suitability_expiring: "bg-violet-500/15 text-violet-300 border-violet-500/20",
-  document_expiring:    "bg-cyan-500/15 text-cyan-300 border-cyan-500/20",
-  goal_reached:         "bg-emerald-500/15 text-emerald-300 border-emerald-500/20",
-  manual:               "bg-slate-500/15 text-slate-300 border-slate-500/20",
+  portfolio_drift:         "bg-amber-500/15 text-amber-300 border-amber-500/20",
+  client_birthday:         "bg-pink-500/15 text-pink-300 border-pink-500/20",
+  suitability_expiring:    "bg-violet-500/15 text-violet-300 border-violet-500/20",
+  document_expiring:       "bg-cyan-500/15 text-cyan-300 border-cyan-500/20",
+  goal_reached:            "bg-emerald-500/15 text-emerald-300 border-emerald-500/20",
+  pluggy_connection_issue: "bg-indigo-500/15 text-indigo-300 border-indigo-500/20",
+  manual:                  "bg-slate-500/15 text-slate-300 border-slate-500/20",
 };
 
 const SEVERITY_CONFIG = {
@@ -51,13 +53,14 @@ const STATUS_OPTIONS = [
 ];
 
 const TYPE_FILTER_OPTIONS = [
-  { key: "all",                 label: "Todos os tipos" },
-  { key: "portfolio_drift",     label: "Carteira desenquadrada" },
-  { key: "client_birthday",    label: "Aniversário" },
-  { key: "suitability_expiring", label: "Suitability" },
-  { key: "document_expiring",  label: "Documento" },
-  { key: "goal_reached",       label: "Meta atingida" },
-  { key: "manual",             label: "Manual" },
+  { key: "all",                     label: "Todos os tipos" },
+  { key: "portfolio_drift",         label: "Carteira desenquadrada" },
+  { key: "client_birthday",         label: "Aniversário" },
+  { key: "suitability_expiring",    label: "Suitability" },
+  { key: "document_expiring",       label: "Documento" },
+  { key: "goal_reached",            label: "Meta atingida" },
+  { key: "pluggy_connection_issue", label: "Conexão Pluggy" },
+  { key: "manual",                  label: "Manual" },
 ];
 
 const EMPTY_MANUAL = {

@@ -10,6 +10,7 @@
 // - portfolio_assets com source='manual' nunca são tocados
 // ============================================================
 
+import * as Sentry from "@sentry/nextjs";
 import {
   getItem,
   listAccounts,
@@ -32,69 +33,107 @@ export async function syncItem(supabase, { consultantId, clientId, pluggyItemId 
     throw new Error("syncItem: consultantId, clientId e pluggyItemId são obrigatórios.");
   }
 
-  // 1) Fetch da Pluggy (paralelo)
-  const [item, accounts, investments] = await Promise.all([
-    getItem(pluggyItemId),
-    listAccounts(pluggyItemId, { type: "INVESTMENT" }),
-    listInvestments(pluggyItemId),
-  ]);
-
-  const now = new Date().toISOString();
-
-  // 2) Upsert pluggy_items
-  const itemRow = await upsertItem(supabase, {
-    consultantId,
-    clientId,
-    pluggyItemId,
-    item,
-    now,
+  Sentry.addBreadcrumb({
+    category: "pluggy.sync",
+    message: "syncItem início",
+    level: "info",
+    data: { pluggyItemId, clientId },
   });
 
-  // 3) Garante uma portfolio associada ao item
-  const portfolioId = await ensurePortfolio(supabase, {
-    consultantId,
-    clientId,
-    item,
-    itemRow,
-  });
+  try {
+    // 1) Fetch da Pluggy (paralelo)
+    const [item, accounts, investments] = await Promise.all([
+      getItem(pluggyItemId),
+      listAccounts(pluggyItemId, { type: "INVESTMENT" }),
+      listInvestments(pluggyItemId),
+    ]);
 
-  // 4) Upsert pluggy_accounts
-  await upsertAccounts(supabase, {
-    itemRowId: itemRow.id,
-    accounts,
-    now,
-  });
+    Sentry.addBreadcrumb({
+      category: "pluggy.sync",
+      message: "fetched do Pluggy",
+      level: "info",
+      data: {
+        status: item?.status,
+        accountsCount: accounts.length,
+        investmentsCount: investments.length,
+      },
+    });
 
-  // 5) Map pluggy_account_id -> nossa accounts.id (precisa pro próximo passo)
-  const { data: accountRows, error: accountFetchErr } = await supabase
-    .from("pluggy_accounts")
-    .select("id, pluggy_account_id")
-    .eq("item_id", itemRow.id);
+    const now = new Date().toISOString();
 
-  if (accountFetchErr) {
-    throw new Error(`Pluggy sync: falha ao buscar accounts do item ${itemRow.id}: ${accountFetchErr.message}`);
+    // 2) Upsert pluggy_items
+    const itemRow = await upsertItem(supabase, {
+      consultantId,
+      clientId,
+      pluggyItemId,
+      item,
+      now,
+    });
+
+    // 3) Garante uma portfolio associada ao item
+    const portfolioId = await ensurePortfolio(supabase, {
+      consultantId,
+      clientId,
+      item,
+      itemRow,
+    });
+
+    // 4) Upsert pluggy_accounts
+    await upsertAccounts(supabase, {
+      itemRowId: itemRow.id,
+      accounts,
+      now,
+    });
+
+    // 5) Map pluggy_account_id -> nossa accounts.id (precisa pro próximo passo)
+    const { data: accountRows, error: accountFetchErr } = await supabase
+      .from("pluggy_accounts")
+      .select("id, pluggy_account_id")
+      .eq("item_id", itemRow.id);
+
+    if (accountFetchErr) {
+      throw new Error(`Pluggy sync: falha ao buscar accounts do item ${itemRow.id}: ${accountFetchErr.message}`);
+    }
+    const accountIdMap = new Map((accountRows ?? []).map((r) => [r.pluggy_account_id, r.id]));
+
+    // 6) Upsert pluggy_investments
+    await upsertInvestments(supabase, {
+      investments,
+      accountIdMap,
+      now,
+    });
+
+    // 7) Espelha investments em portfolio_assets (snapshot completo, source='pluggy')
+    await syncPortfolioAssets(supabase, {
+      portfolioId,
+      investments,
+    });
+
+    Sentry.addBreadcrumb({
+      category: "pluggy.sync",
+      message: "syncItem ok",
+      level: "info",
+      data: {
+        itemId: itemRow.id,
+        portfolioId,
+        accountsCount: accounts.length,
+        investmentsCount: investments.length,
+      },
+    });
+
+    return {
+      itemId: itemRow.id,
+      portfolioId,
+      accountsCount: accounts.length,
+      investmentsCount: investments.length,
+    };
+  } catch (err) {
+    Sentry.captureException(err, {
+      tags: { component: "pluggy.sync" },
+      extra: { pluggyItemId, clientId, consultantId },
+    });
+    throw err;
   }
-  const accountIdMap = new Map((accountRows ?? []).map((r) => [r.pluggy_account_id, r.id]));
-
-  // 6) Upsert pluggy_investments
-  await upsertInvestments(supabase, {
-    investments,
-    accountIdMap,
-    now,
-  });
-
-  // 7) Espelha investments em portfolio_assets (snapshot completo, source='pluggy')
-  await syncPortfolioAssets(supabase, {
-    portfolioId,
-    investments,
-  });
-
-  return {
-    itemId: itemRow.id,
-    portfolioId,
-    accountsCount: accounts.length,
-    investmentsCount: investments.length,
-  };
 }
 
 // ─────────────────────────────────────────────────────────────

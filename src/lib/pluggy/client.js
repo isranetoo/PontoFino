@@ -10,6 +10,7 @@
 // ============================================================
 
 import { createHmac, timingSafeEqual } from "crypto";
+import * as Sentry from "@sentry/nextjs";
 
 const PLUGGY_BASE_URL = "https://api.pluggy.ai";
 const API_KEY_TTL_MS = 110 * 60 * 1000; // 110 min (Pluggy emite com 2h)
@@ -71,6 +72,7 @@ async function pluggyFetch(path, { method = "GET", body, query, retryOn403 = tru
     }
   }
 
+  const startedAt = Date.now();
   const apiKey = await getApiKey();
   const res = await fetch(url, {
     method,
@@ -84,18 +86,38 @@ async function pluggyFetch(path, { method = "GET", body, query, retryOn403 = tru
 
   if (res.status === 403 && retryOn403) {
     // apiKey provavelmente expirou — força refresh e tenta de novo (uma vez).
+    Sentry.addBreadcrumb({
+      category: "pluggy",
+      message: `apiKey expirada em ${method} ${path} — refresh + retry`,
+      level: "warning",
+    });
     cachedApiKey = null;
     cachedApiKeyExpiresAt = 0;
     return pluggyFetch(path, { method, body, query, retryOn403: false });
   }
 
+  const durationMs = Date.now() - startedAt;
+
   if (!res.ok) {
     const text = await res.text().catch(() => "");
+    Sentry.addBreadcrumb({
+      category: "pluggy",
+      message: `${method} ${path} → ${res.status}`,
+      level: "error",
+      data: { status: res.status, durationMs, body: text.slice(0, 300) },
+    });
     const err = new Error(`Pluggy ${method} ${path} falhou (${res.status}): ${text}`);
     err.status = res.status;
     err.body = text;
     throw err;
   }
+
+  Sentry.addBreadcrumb({
+    category: "pluggy",
+    message: `${method} ${path} → ${res.status}`,
+    level: "info",
+    data: { status: res.status, durationMs },
+  });
 
   // 204 No Content (ex.: DELETE /items/{id})
   if (res.status === 204) return null;

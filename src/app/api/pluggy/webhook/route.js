@@ -21,6 +21,7 @@
 // ============================================================
 
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { getSupabaseAdminClient } from "@/lib/supabase/server";
 import { verifyWebhookSignature } from "@/lib/pluggy/client";
 import { syncItem } from "@/lib/pluggy/sync";
@@ -54,6 +55,11 @@ export async function POST(request) {
     return NextResponse.json({ error: "Webhook secret não configurado." }, { status: 500 });
   }
   if (!signatureValid) {
+    Sentry.addBreadcrumb({
+      category: "pluggy.webhook",
+      message: "assinatura inválida",
+      level: "warning",
+    });
     return NextResponse.json({ error: "Assinatura inválida." }, { status: 401 });
   }
 
@@ -67,6 +73,13 @@ export async function POST(request) {
 
   const eventType = payload.event ?? "";
   const pluggyItemId = payload.itemId ?? payload.item?.id ?? "";
+
+  Sentry.addBreadcrumb({
+    category: "pluggy.webhook",
+    message: `received ${eventType}`,
+    level: "info",
+    data: { event: eventType, pluggyItemId },
+  });
   // A Pluggy não envia um event_id explícito hoje, então sintetizamos
   // com event+itemId+createdAt — colisões só ocorrem em retries do mesmo
   // payload, que é exatamente o que queremos deduplicar.
@@ -101,6 +114,10 @@ export async function POST(request) {
       await processItemEvent(supabase, { pluggyItemId, eventId });
     } catch (err) {
       console.error("[pluggy/webhook] sync falhou:", err);
+      Sentry.captureException(err, {
+        tags: { component: "pluggy.webhook" },
+        extra: { eventType, pluggyItemId, eventId },
+      });
       await supabase
         .from("pluggy_webhook_events")
         .update({ error: String(err.message || err) })

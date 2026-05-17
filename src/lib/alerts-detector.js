@@ -13,6 +13,11 @@ const SUITABILITY_WARN_DAYS = 60;      // avisa nos últimos 60 dias
 const DOCUMENT_WARN_DAYS = 30;         // avisa nos últimos 30 dias
 const BIRTHDAY_WINDOW_DAYS = 7;        // alerta se aniversário ≤ 7 dias
 
+// Pluggy: tolerância antes de virar alerta. Status efêmeros (UPDATING, p.ex.)
+// não devem disparar alerta — só os persistentes.
+const PLUGGY_BLOCKED_HOURS = 24;       // LOGIN_ERROR / WAITING_USER_INPUT
+const PLUGGY_OUTDATED_DAYS = 7;        // OUTDATED ou sem sync recente
+
 function ymd(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
 }
@@ -198,11 +203,90 @@ function detectGoalsReached(goalsEnriched) {
 }
 
 // ──────────────────────────────────────────────────────────
+// Pluggy — conexão presa em estado problemático
+// LOGIN_ERROR / WAITING_USER_INPUT há > 24h → ação do cliente necessária
+// OUTDATED ou sem sync há > 7 dias → conexão parou de atualizar
+// ──────────────────────────────────────────────────────────
+function detectPluggyIssues(items) {
+  const out = [];
+  const now = new Date();
+
+  for (const item of items) {
+    // Items desconectados são read-only por design — não geram alerta.
+    if (item.disconnected_at) continue;
+
+    const clientName = item.clients?.full_name || "Cliente";
+    const connector = item.connector_name || "Conexão";
+    const refTime = item.pluggy_updated_at || item.last_synced_at || item.created_at;
+    if (!refTime) continue;
+
+    const hoursSince = (now - new Date(refTime)) / (1000 * 60 * 60);
+    const daysSince = hoursSince / 24;
+
+    // Estados que dependem do cliente para destravar (auth, MFA, senha).
+    if (item.status === "LOGIN_ERROR" && hoursSince >= PLUGGY_BLOCKED_HOURS) {
+      out.push({
+        type: "pluggy_connection_issue",
+        severity: "critical",
+        title: `Falha de login na conexão — ${clientName}`,
+        message: `${connector} está em LOGIN_ERROR há ${Math.round(hoursSince)}h. A senha do banco/corretora pode ter sido alterada — envie um novo convite para o cliente reconectar.`,
+        link: `/clients/${item.client_id}`,
+        client_id: item.client_id,
+        // Dedupe por status: se a conexão sair do erro e voltar, gera novo alerta.
+        dedupe_key: `pluggy-${item.id}-LOGIN_ERROR`,
+        payload: { pluggy_item_id: item.id, status: item.status, hours_since: Math.round(hoursSince) },
+      });
+      continue;
+    }
+
+    if (item.status === "WAITING_USER_INPUT" && hoursSince >= PLUGGY_BLOCKED_HOURS) {
+      out.push({
+        type: "pluggy_connection_issue",
+        severity: "warning",
+        title: `Conexão aguarda ação do cliente — ${clientName}`,
+        message: `${connector} aguarda autenticação adicional (MFA/token) há ${Math.round(hoursSince)}h. Envie um novo convite para o cliente concluir.`,
+        link: `/clients/${item.client_id}`,
+        client_id: item.client_id,
+        dedupe_key: `pluggy-${item.id}-WAITING_USER_INPUT`,
+        payload: { pluggy_item_id: item.id, status: item.status, hours_since: Math.round(hoursSince) },
+      });
+      continue;
+    }
+
+    // Conexão estagnada — Pluggy não conseguiu atualizar a tempo OU
+    // está em qualquer outro estado de erro persistente.
+    const isStale = daysSince >= PLUGGY_OUTDATED_DAYS;
+    if (item.status === "OUTDATED" || (isStale && item.status !== "UPDATED" && item.status !== "UPDATING")) {
+      out.push({
+        type: "pluggy_connection_issue",
+        severity: "warning",
+        title: `Conexão desatualizada — ${clientName}`,
+        message: `${connector} não atualiza há ${Math.round(daysSince)} dias (status: ${item.status || "desconhecido"}). Use "Atualizar agora" no painel ou reconecte.`,
+        link: `/clients/${item.client_id}`,
+        client_id: item.client_id,
+        dedupe_key: `pluggy-${item.id}-OUTDATED`,
+        payload: { pluggy_item_id: item.id, status: item.status, days_since: Math.round(daysSince) },
+      });
+    }
+  }
+
+  return out;
+}
+
+// ──────────────────────────────────────────────────────────
 // Detector principal — orquestra tudo
 // ──────────────────────────────────────────────────────────
 export async function detectAlerts(supabase, consultantId) {
   // Carregamento paralelo
-  const [portfoliosRes, clientsRes, questionnairesRes, documentsRes, goalsRes, contributionsRes] = await Promise.all([
+  const [
+    portfoliosRes,
+    clientsRes,
+    questionnairesRes,
+    documentsRes,
+    goalsRes,
+    contributionsRes,
+    pluggyItemsRes,
+  ] = await Promise.all([
     supabase
       .from("portfolios")
       .select("id, name, client_id, clients(full_name), portfolio_assets(asset_name, asset_class, current_value, target_pct)")
@@ -229,6 +313,10 @@ export async function detectAlerts(supabase, consultantId) {
     supabase
       .from("goal_contributions")
       .select("goal_id, amount"),
+    supabase
+      .from("pluggy_items")
+      .select("id, client_id, connector_name, status, last_synced_at, pluggy_updated_at, created_at, disconnected_at, clients(full_name)")
+      .is("disconnected_at", null),
   ]);
 
   const contributionsByGoal = {};
@@ -246,6 +334,7 @@ export async function detectAlerts(supabase, consultantId) {
     ...detectSuitabilityExpiring(questionnairesRes.data || []),
     ...detectDocumentExpiring(documentsRes.data || []),
     ...detectGoalsReached(goalsEnriched),
+    ...detectPluggyIssues(pluggyItemsRes.data || []),
   ];
 
   if (candidates.length === 0) return { inserted: 0, candidates: 0 };
