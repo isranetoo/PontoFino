@@ -10,6 +10,7 @@ import {
   ChevronLeft, User, Mail, Phone, FileText, Edit3, Save,
   Briefcase, Plus, Trash2, Check, X, TrendingUp, Target,
   AlertTriangle, RefreshCw, PieChart, BarChart3,
+  Link2, Copy, Mail as MailIcon, ShieldCheck,
 } from "lucide-react";
 
 export default function ClientDetailPage() {
@@ -39,6 +40,15 @@ export default function ClientDetailPage() {
   });
   const [assetError, setAssetError] = useState("");
   const [savingAsset, setSavingAsset] = useState(false);
+
+  // Pluggy invite
+  const [showInvite, setShowInvite] = useState(false);
+  const [inviteUrl, setInviteUrl] = useState("");
+  const [inviteError, setInviteError] = useState("");
+  const [generatingInvite, setGeneratingInvite] = useState(false);
+  const [sendingInviteEmail, setSendingInviteEmail] = useState(false);
+  const [emailSentStatus, setEmailSentStatus] = useState(""); // "" | "sent" | "skipped"
+  const [linkCopied, setLinkCopied] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -153,6 +163,65 @@ export default function ClientDetailPage() {
     await load();
   }
 
+  // ─── Pluggy invite ───
+  async function openInviteModal() {
+    setShowInvite(true);
+    setInviteUrl("");
+    setInviteError("");
+    setEmailSentStatus("");
+    setLinkCopied(false);
+    setGeneratingInvite(true);
+    try {
+      const res = await fetch("/api/pluggy/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId: id }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Falha ao gerar convite.");
+      setInviteUrl(json.url);
+    } catch (err) {
+      setInviteError(err.message);
+    } finally {
+      setGeneratingInvite(false);
+    }
+  }
+
+  async function copyInviteLink() {
+    if (!inviteUrl) return;
+    try {
+      await navigator.clipboard.writeText(inviteUrl);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+    } catch {
+      setInviteError("Não foi possível copiar — copie manualmente o link abaixo.");
+    }
+  }
+
+  async function sendInviteEmail() {
+    if (!client?.email) {
+      setEmailSentStatus("skipped");
+      return;
+    }
+    setSendingInviteEmail(true);
+    setInviteError("");
+    try {
+      const res = await fetch("/api/pluggy/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ clientId: id, sendEmail: true }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Falha ao enviar e-mail.");
+      setInviteUrl(json.url);
+      setEmailSentStatus(json.emailed ? "sent" : "skipped");
+    } catch (err) {
+      setInviteError(err.message);
+    } finally {
+      setSendingInviteEmail(false);
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
@@ -214,6 +283,9 @@ export default function ClientDetailPage() {
               </>
             ) : (
               <>
+                <button onClick={openInviteModal} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-300 hover:bg-indigo-500/20 transition-all">
+                  <Link2 size={12} /> Convidar para conectar
+                </button>
                 <button onClick={() => setEditing(true)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/[0.05] border border-white/10 text-xs text-white/40 hover:text-white/70 transition-all">
                   <Edit3 size={12} /> Editar
                 </button>
@@ -426,6 +498,76 @@ export default function ClientDetailPage() {
             <button onClick={() => addAsset(showAddAsset)} disabled={!assetForm.asset_name || !assetForm.current_value || savingAsset} className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-500 text-sm font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-40">
               {savingAsset ? <Spinner size={15} /> : <><Plus size={15} /> Adicionar ativo</>}
             </button>
+          </div>
+        </Modal>
+      )}
+
+      {/* Pluggy invite modal */}
+      {showInvite && (
+        <Modal
+          title="Convidar para conectar"
+          icon={ShieldCheck}
+          onClose={() => setShowInvite(false)}
+          size="lg"
+        >
+          <div className="space-y-4">
+            <p className="text-xs text-white/55 leading-relaxed">
+              Gere um link seguro para <strong className="text-white">{client.full_name}</strong> autorizar
+              a leitura das posições de investimento (corretora ou banco) via Open Finance. O link expira em 7 dias.
+            </p>
+
+            {generatingInvite ? (
+              <div className="flex items-center justify-center py-6">
+                <Spinner size={20} />
+              </div>
+            ) : inviteUrl ? (
+              <>
+                <div className="space-y-1.5">
+                  <label className="text-[10px] uppercase tracking-wider text-white/40 ml-1">Link do convite</label>
+                  <div className="flex gap-2">
+                    <input
+                      readOnly
+                      value={inviteUrl}
+                      className="flex-1 bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white/70 font-mono focus:outline-none"
+                    />
+                    <button
+                      onClick={copyInviteLink}
+                      className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-white/[0.06] border border-white/10 text-xs text-white/70 hover:bg-white/[0.1] transition-all whitespace-nowrap"
+                    >
+                      {linkCopied ? <><Check size={13} className="text-emerald-400" /> Copiado</> : <><Copy size={13} /> Copiar</>}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 pt-2 border-t border-white/[0.06]">
+                  <button
+                    onClick={sendInviteEmail}
+                    disabled={sendingInviteEmail || !client.email}
+                    title={!client.email ? "Cliente sem e-mail cadastrado." : ""}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-violet-500/10 border border-violet-500/20 text-sm text-violet-300 hover:bg-violet-500/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    {sendingInviteEmail ? <Spinner size={14} /> : <><MailIcon size={14} /> Enviar por e-mail</>}
+                  </button>
+                </div>
+
+                {emailSentStatus === "sent" && (
+                  <p className="text-[11px] text-emerald-400 flex items-center gap-1.5">
+                    <Check size={11} /> E-mail enviado para {client.email}.
+                  </p>
+                )}
+                {emailSentStatus === "skipped" && !client.email && (
+                  <p className="text-[11px] text-amber-400 flex items-center gap-1.5">
+                    <AlertTriangle size={11} /> Cliente sem e-mail cadastrado. Use o botão "Copiar" para compartilhar manualmente.
+                  </p>
+                )}
+              </>
+            ) : null}
+
+            {inviteError && (
+              <p className="text-[11px] text-red-400 flex items-center gap-1.5">
+                <AlertTriangle size={11} /> {inviteError}
+              </p>
+            )}
           </div>
         </Modal>
       )}
