@@ -89,6 +89,7 @@ No painel do Supabase → SQL Editor, cole e execute, em ordem:
 7. `src/stores/migrations/007_alerts_schema.sql` — alertas/notificações automáticas (carteira, aniversário, suitability, documento, meta)
 8. `src/stores/migrations/008_invoices_schema.sql` — faturas/notas geradas a partir de comissões
 9. `src/stores/migrations/009_pluggy_integration.sql` — integração Pluggy (items, accounts, investments, webhook log + coluna `source` em `portfolio_assets`)
+10. `src/stores/migrations/010_pluggy_disconnected.sql` — coluna `disconnected_at` em `pluggy_items` (desconectar mantém snapshot histórico)
 
 ### 4. Criar o primeiro usuário admin
 
@@ -140,7 +141,7 @@ Adicione as variáveis de ambiente no painel da Vercel.
 | **Relatórios** | Rentabilidade acumulada, retorno mensal, Sharpe ratio |
 | **Comissões** | Receita por cliente e tipo, breakdown visual |
 | **Admin** | Convite de usuários, gestão de roles, senha temporária |
-| **Pluggy (em desenvolvimento)** | Integração de Open Finance: o cliente conecta corretora/banco por um link assinado e as posições de investimento são espelhadas em `portfolios` / `portfolio_assets`. Sync via webhook + botão manual. Fase 1 (schema + wrapper REST) já entregue |
+| **Pluggy** | Integração de Open Finance: cliente conecta corretora/banco por link assinado, posições espelhadas em `portfolios`/`portfolio_assets` automaticamente. Tab "Conexões" em `/clients/[id]` com status, último sync, atualizar agora e desconectar. Webhook recebe atualizações da Pluggy e ressincroniza. Fases 1-3 entregues |
 
 ## Segurança
 
